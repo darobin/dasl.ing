@@ -1,0 +1,118 @@
+
+@font-face {
+  font-family: "Barlow";
+  src: url("fonts/Barlow-Regular.ttf");
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Barlow";
+  src: url("fonts/Barlow-Regular.ttf");
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Barlow";
+  src: url("fonts/Barlow-Italic.ttf");
+  font-weight: 400;
+  font-style: italic;
+}
+@font-face {
+  font-family: "Barlow";
+  src: url("fonts/Barlow-Bold.ttf");
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Barlow";
+  src: url("fonts/Barlow-BoldItalic.ttf");
+  font-weight: 700;
+  font-style: italic;
+}
+@font-face {
+  font-family: "Barlow";
+  src: url("fonts/Barlow-Thin.ttf");
+  font-weight: 100;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Barlow";
+  src: url("fonts/Barlow-ThinItalic.ttf");
+  font-weight: 100;
+  font-style: italic;
+}
+
+/* https://colorkit.co/palette/fff500-00ff75-cd76ea-ffb443-ff5e5e-39dbff/ */
+:root {
+  --yellow: #fff500;
+  --green: #00ff75;
+  --purple: #cd76ea;
+  --orange: #ffb443;
+  --red: #ff5e5e;
+  --blue: #39dbff;
+  --content-width: 80rem;
+  --header-font-size: 1.6rem;
+}
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: Barlow;
+}
+main {
+  max-width: var(--content-width);
+  margin: auto;
+  min-height: 100vh;
+  padding: 1rem;
+}
+header {
+  display: flex;
+  border: 5px solid #000;
+}
+h1 {
+  font-weight: 400;
+  font-size: var(--header-font-size);
+  margin: 0.5rem;
+  text-decoration: underline;
+  text-decoration-color: var(--green);
+  text-decoration-thickness: 5px;
+}
+nav {
+  text-align: right;
+  flex-grow: 1;
+}
+nav > ul {
+  list-style-type: none;
+  margin: 0.5rem;
+  padding: 0;
+}
+nav > ul > li {
+  font-size: var(--header-font-size);
+  display: inline-block;
+  margin-left: 1rem;
+}
+nav > ul > li > a {
+  color: #000;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-decoration-thickness: 5px;
+}
+nav > ul > li > a[href="#what"] { text-decoration-color: var(--orange); }
+nav > ul > li > a[href="#what"]:hover { color: var(--orange); }
+nav > ul > li > a[href="#code"] { text-decoration-color: var(--blue); }
+nav > ul > li > a[href="#code"]:hover { color: var(--blue); }
+nav > ul > li > a[href="#spec"] { text-decoration-color: var(--red); }
+nav > ul > li > a[href="#spec"]:hover { color: var(--red); }
+section {
+}
+section > h2 {
+  border: 5px solid #000;
+  font-weight: 400;
+  font-size: var(--header-font-size);
+  padding: 0.5rem;
+  text-decoration: underline;
+  text-decoration-thickness: 5px;
+  text-transform: uppercase;
+}
+#what > h2 { text-decoration-color: var(--orange); }
+#code > h2 { text-decoration-color: var(--blue); }
+#spec > h2 { text-decoration-color: var(--red); }

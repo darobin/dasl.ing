@@ -1,0 +1,32 @@
+name: "Deploy to polity (static)"
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  scp:
+    runs-on: ubuntu-latest
+    name: scp
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: copy file via ssh password
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: "174.138.76.168"
+          username: root
+          passphrase: ${{ secrets.PASSWORD }}
+          key: ${{ secrets.KEY }}
+          source: "*,!README.md,!LICENSE,!optimise-pdf.sh,!.git,!.github,!.gitignore,polity.json"
+          target: "/var/www/dasl.ing/"
+          rm: true
+      - name: chown to robin
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: "174.138.76.168"
+          username: root
+          key: ${{ secrets.KEY }}
+          passphrase: ${{ secrets.PASSWORD }}
+          script: "chown -R robin /var/www/dasl.ing/"
