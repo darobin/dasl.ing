@@ -123,6 +123,10 @@ p, section > ul {
   line-height: 1.4;
   font-size: 1.2rem;
 }
+section > ul {
+  padding-left: 1rem;
+  max-width: calc(70ch - 1rem);
+}
 section li {
   list-style-type: square;
 }
