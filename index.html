@@ -20,7 +20,40 @@
       </header>
       <section id="what">
         <h2>What is this?</h2>
-        <p></p>
+        <p>
+          DASL ("dazzle") is a small set of simple, standard primitives to work on content-addressed data.
+          We call it "data-addressed" because it supports a data serialization component that makes
+          content-addressing sweet and easy when working with data. The design is taken from the
+          <a href="https://ipfs.tech/">IPFS</a> universe, but simplified so as to improve interoperability,
+          decrease costs, and work well with the web. More specifically, our priorities are:
+        </p>
+        <ul>
+          <li>
+            <strong>pave the cowpaths</strong>: we focus on supporting what people trying to solve real-world
+            problems actually use. This takes over any consideration of engineering ideals or theoretical purity.
+          </li>
+          <li>
+            <strong>extensibility vs optionality</strong>: extensibility is important for long-lived distributed
+            systems, because the world will happen and you will need to change. But introducing optionality
+            reduces interoperability and increases cost of both implementation and adoption. So rather than
+            require support for many options now, we have extension points now but deliberately don't use their
+            full range.
+          </li>
+          <li>
+            <strong>don't make me think</strong>: you don't want to be thinking about content addressing. You
+            want to grab this off the shelf and have something that works out of the box. Nothing weird, no
+            impedance mismatch with the systems you know and love (or maybe know and hate, but whatever, it
+            just works).
+          </li>
+          <li>
+            <strong>lightweight loading</strong>: some people like JavaScript, others don't. We don't care, we
+            just want things that work. What's certain is that you can't ignore it and be relevant. The ability
+            to ship small code to the browser is critical.
+          </li>
+        </ul>
+        <p>
+
+        </p>
       </section>
       <section id="code">
         <h2>Implementations</h2>

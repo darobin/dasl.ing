@@ -50,6 +50,7 @@
   --orange: #ffb443;
   --red: #ff5e5e;
   --blue: #39dbff;
+  --contrasted: #00819e;
   --content-width: 80rem;
   --header-font-size: 1.6rem;
   --brutal-border: 5px solid #000;
@@ -107,7 +108,7 @@ nav > ul > li > a[href="https://github.com/darobin/dasl.ing"] { text-decoration-
 nav > ul > li > a[href="https://github.com/darobin/dasl.ing"]:hover { color: var(--yellow); }
 nav > ul > li > a[href="https://github.com/darobin/dasl.ing/issues"] { text-decoration-color: var(--purple); }
 nav > ul > li > a[href="https://github.com/darobin/dasl.ing/issues"]:hover { color: var(--purple); }
-section > h2 {
+h2 {
   border: var(--brutal-border);
   font-weight: 400;
   font-size: var(--header-font-size);
@@ -115,6 +116,26 @@ section > h2 {
   text-decoration: underline;
   text-decoration-thickness: 5px;
   text-transform: uppercase;
+}
+p, section > ul {
+  margin: 0 1rem;
+  max-width: 70ch;
+  line-height: 1.4;
+  font-size: 1.2rem;
+}
+section li {
+  list-style-type: square;
+}
+p:not(:last-child) {
+  margin-bottom: 1rem;
+}
+a {
+  color: var(--contrasted);
+  text-decoration-thickness: 3px;
+  text-decoration-color: var(--blue);
+}
+a:hover {
+  text-decoration-color: var(--red);
 }
 #what > h2 { text-decoration-color: var(--orange); }
 #code > h2 { text-decoration-color: var(--blue); }
