@@ -52,6 +52,7 @@
   --blue: #39dbff;
   --content-width: 80rem;
   --header-font-size: 1.6rem;
+  --brutal-border: 5px solid #000;
 }
 html, body {
   margin: 0;
@@ -66,7 +67,7 @@ main {
 }
 header {
   display: flex;
-  border: 5px solid #000;
+  border: var(--brutal-border);
 }
 h1 {
   font-weight: 400;
@@ -102,10 +103,12 @@ nav > ul > li > a[href="#code"] { text-decoration-color: var(--blue); }
 nav > ul > li > a[href="#code"]:hover { color: var(--blue); }
 nav > ul > li > a[href="#spec"] { text-decoration-color: var(--red); }
 nav > ul > li > a[href="#spec"]:hover { color: var(--red); }
-section {
-}
+nav > ul > li > a[href="https://github.com/darobin/dasl.ing"] { text-decoration-color: var(--yellow); }
+nav > ul > li > a[href="https://github.com/darobin/dasl.ing"]:hover { color: var(--yellow); }
+nav > ul > li > a[href="https://github.com/darobin/dasl.ing/issues"] { text-decoration-color: var(--purple); }
+nav > ul > li > a[href="https://github.com/darobin/dasl.ing/issues"]:hover { color: var(--purple); }
 section > h2 {
-  border: 5px solid #000;
+  border: var(--brutal-border);
   font-weight: 400;
   font-size: var(--header-font-size);
   padding: 0.5rem;
@@ -116,3 +119,6 @@ section > h2 {
 #what > h2 { text-decoration-color: var(--orange); }
 #code > h2 { text-decoration-color: var(--blue); }
 #spec > h2 { text-decoration-color: var(--red); }
+footer {
+  border: var(--brutal-border);
+}
