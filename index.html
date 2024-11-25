@@ -32,6 +32,7 @@
           <li>
             <strong>pave the cowpaths</strong>: we focus on supporting what people trying to solve real-world
             problems actually use. This takes over any consideration of engineering ideals or theoretical purity.
+            We're retconning the spec to what people actually use implement — as it should be.
           </li>
           <li>
             <strong>extensibility vs optionality</strong>: extensibility is important for long-lived distributed
@@ -52,17 +53,121 @@
             to ship small code to the browser is critical.
           </li>
         </ul>
-        <p>
-
-        </p>
       </section>
       <section id="code">
         <h2>Implementations</h2>
-        <p></p>
+        <p>
+          DASL is a strict subset of IPFS CIDs and IPLD, so existing IPFS and IPLD implementations will just
+          read DASL without so much as a hiccup. Some implementations also specifically target a DASL subset.
+        </p>
+        <ul>
+          <li>
+            <a href="https://github.com/mary-ext/atcute/">atcute</a> (JS/TS): a collection of lightweight
+            packages to make working with Bluesky and the ATmosphere easy.
+          </li>
+          <li>
+            <a href="https://github.com/MarshalX/python-libipld">python-libipld</a> (Python): a Python
+            wrapper around Rust, focused on the ATmosphere.
+          </li>
+          <li>
+            <a href="https://github.com/ipld/libipld">libipld</a> (Rust): fast Rust implementation, extracted
+            from the original <code>ipfs-rust</code> project.
+          </li>
+          <li>
+            <a href="https://github.com/ipfs/kubo/">Kubo</a>/<a href="https://github.com/ipfs/boxo/">Boxo</a> (Go):
+            the Swiss-Army chainsaw of all things IPFS.
+          </li>
+          <li>
+            <a href="https://helia.io/">Helia</a> (JS/TS): general-purpose JS implementation of IPFS.
+          </li>
+        </ul>
       </section>
       <section id="spec">
         <h2>Specification</h2>
-        <p></p>
+        <p>
+          There are two specifications in DASL: <a href="#cid">CIDs</a> and <a href="#dcbor42">dCBOR42</a>. CIDs
+          (Content IDs) are identifiers used for content addressing and dCBOR42 (deterministic CBOR with tag 42)
+          is a serialization format that is deterministic and supports CID links.
+        </p>
+        <section id="cid">
+          <h3>Content IDs (CIDs)</h3>
+          <p>
+            DASL CIDs are a strict subset of IPFS CIDs (but you don't need to understanding anything about IPFS to
+            either use or implement them) with the following properties:
+          </p>
+          <ul>
+            <li>Only v1, no v0.</li>
+            <li>Only lowercase base32 multibase encoding (the <code>b</code> prefix) for the string, human-readable encoding.</li>
+            <li>Only the raw-binary codec (0x55) and dag-cbor (0x71), with the latter used for dCBOR42.</li>
+            <li>Only SHA-256 (0x12) and Blake3 hashes (0x1e).</li>
+            <li>No blocks.</li>
+            <li>This set of options has the added advantage that no varint processing is required.</li>
+          </ul>
+          <p>
+            Supporting two hashes isn't ideal, but having one hash type that can stream the verification of large
+            resources is a plus. Because Blake-3 isn't supported by web browsers, it is strongly recommended that
+            CID producers limit themselves to SHA-256 unless the alternative isn't possible. Implementations intended
+            to run in web contexts are likely to either not verify Blake-3 hashes or to have to dynamically load
+            a Blake-3 library, which may cause latency.
+          </p>
+          <p>
+            Use the following steps to <dfn id="parse-cid-string">parse a CID string</dfn>:
+          </p>
+          <ol>
+            <li>Accept a string <var>CID</var>.</li>
+            <li>Remove the first character from <var>CID</var> and store it in <var>prefix</var>.</li>
+            <li>If <var>prefix</var> is not equal to <code>b</code>, throw an error.</li>
+            <li>
+              Decode the rest of <var>CID</var> using <a href="https://datatracker.ietf.org/doc/html/rfc4648#section-6">the
+              base32 algorithm from RFC4648</a> with a lowercase alphabet and store the result in <var>CID bytes</var>.
+            </li>
+            <li>Return the result of applying the steps to <a href="#decode-cid">decode a CID</a> to <var>CID bytes</var>.</li>
+          </ol>
+          <p>
+            Use the following steps to <dfn id="parse-cid-binary">parse a binary CID</dfn>:
+          </p>
+          <ol>
+            <li>Accept an array of bytes <var>binary CID</var>.</li>
+            <li>
+              Remove the first byte in <var>binary CID</var> and store it in <var>prefix</var>.
+            </li>
+            <li>If <var>prefix</var> is not equal to <code>0</code> (a null byte, the binary base256 prefix), throw an error.</li>
+            <li>Store the rest of <var>binary CID</var> in <var>CID bytes</var>.</li>
+            <li>Return the result of applying the steps to <a href="#decode-cid">decode a CID</a> to <var>CID bytes</var>.</li>
+          </ol>
+          <p>
+            Use the following steps to <dfn id="decode-cid">decode a CID</dfn>:
+          </p>
+          <ol>
+            <li>Accept an array of bytes <var>CID bytes</var>.</li>
+            <li>
+              Remove the first byte in <var>CID bytes</var> and store it in <var>version</var>.
+            </li>
+            <li>If <var>version</var> is not equal to <code>1</code>, throw an error.</li>
+            <li>
+              Remove the next byte in <var>CID bytes</var> and store it in <var>codec</var>.
+            </li>
+            <li>If <var>codec</var> is not equal to <code>0x55</code> (raw) or <code>0x71</code> (dCBOR42), throw an error.</li>
+            <li>
+              Remove the next two bytes in <var>CID bytes</var> and store them in <var>hash type</var> and <var>hash size</var>,
+              respectively.
+            </li>
+            <li>If <var>hash type</var> is not equal to <code>0x12</code> (SJA-256) or <code>0x1e</code> (Blake-3), throw an error.</li>
+            <li>Store the rest of <var>CID bytes</var> in <code>digest</code>.</li>
+            <li>Return <var>version</var>, <var>codec</var>, <var>hash type</var>, <var>hash size</var>, and <var>digest</var></li>
+          </ol>
+        </section>
+        <section id="dcbor42">
+          <h3>Deterministic CBOR with tag 42 (dCBOR42)</h3>
+          <p>
+            dCBOR42 is a subset of IPLD that only supports DAG-CBOR serialization (DAG-JSON can be used for debugging
+            purposes, but the CIDs embedded in it should be the CIDs that correspond to the CBOR serialization) and
+            that uses the IETF's deterministic CBOR encoding rules to guarantee a deterministic output.
+          </p>
+          <p>
+            Further details TBD.
+          </p>
+        </section>
       </section>
       <footer>
         <nav>

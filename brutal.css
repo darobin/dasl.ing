@@ -117,21 +117,24 @@ h2 {
   text-decoration-thickness: 5px;
   text-transform: uppercase;
 }
-p, section > ul {
-  margin: 0 1rem;
+h3 {
+  margin: 1rem;
+  font-weight: 400;
+  font-size: var(--header-font-size);
+
+}
+p, section > ul, section > ol {
+  margin: 0 1rem 1rem 1rem;
   max-width: 70ch;
   line-height: 1.4;
   font-size: 1.2rem;
 }
-section > ul {
+section > ul, section > ol {
   padding-left: 1rem;
   max-width: calc(70ch - 1rem);
 }
-section li {
+section ul > li {
   list-style-type: square;
-}
-p:not(:last-child) {
-  margin-bottom: 1rem;
 }
 a {
   color: var(--contrasted);
@@ -140,6 +143,10 @@ a {
 }
 a:hover {
   text-decoration-color: var(--red);
+}
+dfn {
+  font-style: normal;
+  font-weight: 700;
 }
 #what > h2 { text-decoration-color: var(--orange); }
 #code > h2 { text-decoration-color: var(--blue); }
