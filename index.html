@@ -153,7 +153,7 @@
             <li>
               Remove the first byte in <var>binary CID</var> and store it in <var>prefix</var>.
             </li>
-            <li>If <var>prefix</var> is not equal to <code>0</code> (a null byte, the binary base256 prefix), you are dealing with a non-DASLing CID; you may need to throw an error, warn the user, and/or log the exception.</li>
+            <li>If <var>prefix</var> is not equal to <code>0</code> (a null byte, the binary base256 prefix), throw an error.</li>
             <li>Store the rest of <var>binary CID</var> in <var>CID bytes</var>.</li>
             <li>Return the result of applying the steps to <a href="#decode-cid">decode a CID</a> to <var>CID bytes</var>.</li>
           </ol>
