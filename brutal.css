@@ -148,6 +148,13 @@ dfn {
   font-style: normal;
   font-weight: 700;
 }
+var {
+  text-decoration: underline;
+  text-decoration-color: #ccc;
+}
+code {
+  font-size: 1rem;
+}
 #what > h2 { text-decoration-color: var(--orange); }
 #code > h2 { text-decoration-color: var(--blue); }
 #spec > h2 { text-decoration-color: var(--red); }
