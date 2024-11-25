@@ -170,7 +170,7 @@
               Remove the next two bytes in <var>CID bytes</var> and store them in <var>hash type</var> and <var>hash size</var>,
               respectively.
             </li>
-            <li>If <var>hash type</var> is not equal to <code>0x12</code> (SHA-256) or <code>0x1e</code> (Blake-3) you are dealing with a non-DASLing CID; you may need to throw an error, warn the user, and/or log the exception.</li>
+            <li>If <var>hash type</var> is not equal to <code>0x12</code> (SHA-256) or <code>0x1e</code> (Blake-3), throw an error.</li>
             <li>Store the rest of <var>CID bytes</var> in <code>digest</code>.</li>
             <li>Return <var>version</var>, <var>codec</var>, <var>hash type</var>, <var>hash size</var>, and <var>digest</var>.</li>
           </ol>
