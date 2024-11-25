@@ -134,7 +134,7 @@
           <ol>
             <li>Accept a string <var>CID</var>.</li>
             <li>Remove the first character from <var>CID</var> and store it in <var>prefix</var>.</li>
-            <li>If <var>prefix</var> is not equal to <code>b</code>, you are dealing with a non-DASLing CID; particularly if the non-DASL CID is unfamiliar in other ways, you may need to throw an error, warn the user, and/or log the exception.</li>
+            <li>If <var>prefix</var> is not equal to <code>b</code>, throw an error.</li>
             <li>
               Decode the rest of <var>CID</var> using <a href="https://datatracker.ietf.org/doc/html/rfc4648#section-6">the
               base32 algorithm from RFC4648</a> with a lowercase alphabet and store the result in <var>CID bytes</var>.
