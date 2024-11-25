@@ -36,7 +36,7 @@
       <section id="what">
         <h2>What is this?</h2>
         <p>
-          DASL ("dazzle") is a small set of simple, standard primitives for working with data. It builds on content addressing, a proven approach used in Git and <a href="https://docs.ipfs.tech/concepts/what-is-ipfs/">IPFS</a> to create reliable content identifiers (known as CIDs) through cryptographic hashing. Content addressing enables robust data integrity checks and efficient networking: systems can verify they received exactly what they asked for and avoid downloading the same content twice.
+          DASL ("dazzle") is a small set of simple, standard primitives for working with content-addressed, linked data. It builds on content addressing, a proven approach used in Git and <a href="https://docs.ipfs.tech/concepts/what-is-ipfs/">IPFS</a> to create reliable content identifiers (known as CIDs) through cryptographic hashing. Content addressing enables robust data integrity checks and efficient networking: systems can verify they received exactly what they asked for and avoid downloading the same content twice. The linked data part lets you link to stuff by its hash. You can build very big graphs with these primitives, such as the graph behind Bluesky. 
         </p>
         <p>
           We call DASL "data-addressed" because it supports a data serialization component that makes content-addressing sweet and easy when working with data. The design is taken from the <a href="https://ipfs.tech/">IPFS</a> universe, but simplified to improve interoperability, decrease costs, and work well with the web. 
