@@ -165,7 +165,7 @@
             <li>
               Remove the first byte in <var>CID bytes</var> and store it in <var>version</var>.
             </li>
-            <li>If <var>version</var> is not equal to <code>1</code>, you are dealing with a non-DASLing CID; you may need to throw an error, warn the user, and/or log the exception.throw an error.</li>
+            <li>If <var>version</var> is not equal to <code>1</code>, throw an error.</li>
             <li>
               Remove the next byte in <var>CID bytes</var> and store it in <var>codec</var>.
             </li>
