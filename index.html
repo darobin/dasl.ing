@@ -38,7 +38,7 @@
         <p>
           DASL ("dazzle") is a small set of simple, standard primitives to work on content-addressed data.
           We call it "data-addressed" because it supports a data serialization component that makes
-          <a href="https://proto.school/content-addressing">content-addressing</a> sweet and easy when working with data. The design is taken from subcomponents of the 
+          <a href="https://proto.school/content-addressing">content-addressing</a> sweet and easy when working with data. The design is taken from subcomponents of the
           <a href="https://docs.ipfs.tech/concepts/content-addressing/">IPFS</a> universe, but simplified to improve interoperability,
           decrease costs, and work well with the web. More specifically, our priorities are:
         </p>
@@ -78,7 +78,7 @@
         <h2>Implementations</h2>
         <p>
           DASL is a strict subset of IPFS CIDs and IPLD, so existing IPFS and IPLD implementations will just
-          read DASL without so much as a hiccup. Some implementations also specifically target a DASL subset.
+          read DASL CIDs and IPLD without so much as a hiccup. Some implementations also specifically target a DASL subset.
         </p>
         <ul>
           <li>
@@ -102,7 +102,7 @@
             the Swiss-Army chainsaw of all things IPFS.
           </li>
           <li>
-            <a href="https://helia.io/">Helia</a> (JS/TS): general-purpose JS implementation of IPFS.
+            <a href="https://helia.io/">Helia</a> (JS/TS): a browser- and CDN-friendly, modular, "import only what you need" JS implementation of IPFS.
           </li>
         </ul>
       </section>
@@ -110,8 +110,8 @@
         <h2>Specification</h2>
         <p>
           There are two specifications in DASL: <a href="#cid">CIDs</a> and <a href="#dcbor42">dCBOR42</a>. CIDs
-          (Content IDs) are identifiers used for content addressing and dCBOR42 (deterministic CBOR with tag 42)
-          is a serialization format that is deterministic and supports CID links.
+          (Content IDs) are opaque identifiers used for addressing resources by their contents, as in IPFS; dCBOR42 (deterministically-serialized CBOR with optional CBOR tag <code>42</code> supported)
+          is a serialization format that is deterministic and aware of CID-linked graphs, i.e. "IPLD".
         </p>
         <section id="cid">
           <h3>Content IDs (CIDs)</h3>
@@ -120,19 +120,17 @@
             either use or implement them) with the following properties:
           </p>
           <ul>
-            <li>Only v1, no v0.</li>
-            <li>Only lowercase base32 multibase encoding (the <code>b</code> prefix) for the string, human-readable encoding.</li>
-            <li>Only the raw-binary codec (0x55) and dag-cbor (0x71), with the latter used for dCBOR42.</li>
-            <li>Only SHA-256 (0x12) and Blake3 hashes (0x1e).</li>
-            <li>No blocks.</li>
-            <li>This set of options has the added advantage that no varint processing is required.</li>
+            <li>Only modern CIDv1 CIDs are used, not legacy CIDv0.</li>
+            <li>Only the lowercase base32 multibase encoding (the <code>b</code> prefix) is used for human-readable (and subdomain-usable) string encoding.</li>
+            <li>Only the <code>raw</code> binary multicodec (0x55) and <code>dag-cbor</code> multicodec (0x71), with the latter used only for dCBOR42-conformant DAGs.</li>
+            <li>Only SHA-256 (0x12) and Blake3 hash functions (0x1e), and the latter only in certain circumstances.</li>
+            <li>Regardless of size, resources SHOULD NOT be "chunked" into a DAG or merkle tree (as historically done with UnixFS canonicalization in IPFS systems) but rather hashed in their entirety and content-addressed directly.</li>
+            <li>This set of options has the added advantage that all the aforementioned single-byte prefixes require no additional varint processing or byte-fiddling.</li>
           </ul>
           <p>
-            Supporting two hashes isn't ideal, but having one hash type that can stream the verification of large
-            resources is a plus. Because Blake-3 isn't supported by web browsers, it is strongly recommended that
-            CID producers limit themselves to SHA-256 unless the alternative isn't possible. Implementations intended
-            to run in web contexts are likely to either not verify Blake-3 hashes or to have to dynamically load
-            a Blake-3 library, which may cause latency.
+            Supporting two hashes isn't ideal, but having one hash type that can stream large resources (and do incremental verification mid-stream) is a plus.
+            Because Blake-3 is still far from being supported by web browsers, it is strongly recommended that CID producers limit themselves to SHA-256 if possible.
+            Implementations intending to run in web contexts are likely to either forego Blake-3 verification in-browser, outsource verification to a trusted component, or to have to dynamically load a Blake-3 library in the browser, which may cause latency.
           </p>
           <p>
             Use the following steps to <dfn id="parse-cid-string">parse a CID string</dfn>:
@@ -140,7 +138,7 @@
           <ol>
             <li>Accept a string <var>CID</var>.</li>
             <li>Remove the first character from <var>CID</var> and store it in <var>prefix</var>.</li>
-            <li>If <var>prefix</var> is not equal to <code>b</code>, throw an error.</li>
+            <li>If <var>prefix</var> is not equal to <code>b</code>, you are dealing with a non-DASLing CID; particularly if the non-DASL CID is unfamiliar in other ways, you may need to throw an error, warn the user, and/or log the exception.</li>
             <li>
               Decode the rest of <var>CID</var> using <a href="https://datatracker.ietf.org/doc/html/rfc4648#section-6">the
               base32 algorithm from RFC4648</a> with a lowercase alphabet and store the result in <var>CID bytes</var>.
@@ -155,7 +153,7 @@
             <li>
               Remove the first byte in <var>binary CID</var> and store it in <var>prefix</var>.
             </li>
-            <li>If <var>prefix</var> is not equal to <code>0</code> (a null byte, the binary base256 prefix), throw an error.</li>
+            <li>If <var>prefix</var> is not equal to <code>0</code> (a null byte, the binary base256 prefix), you are dealing with a non-DASLing CID; you may need to throw an error, warn the user, and/or log the exception.</li>
             <li>Store the rest of <var>binary CID</var> in <var>CID bytes</var>.</li>
             <li>Return the result of applying the steps to <a href="#decode-cid">decode a CID</a> to <var>CID bytes</var>.</li>
           </ol>
@@ -167,7 +165,7 @@
             <li>
               Remove the first byte in <var>CID bytes</var> and store it in <var>version</var>.
             </li>
-            <li>If <var>version</var> is not equal to <code>1</code>, throw an error.</li>
+            <li>If <var>version</var> is not equal to <code>1</code>, you are dealing with a non-DASLing CID; you may need to throw an error, warn the user, and/or log the exception.throw an error.</li>
             <li>
               Remove the next byte in <var>CID bytes</var> and store it in <var>codec</var>.
             </li>
@@ -176,21 +174,20 @@
               Remove the next two bytes in <var>CID bytes</var> and store them in <var>hash type</var> and <var>hash size</var>,
               respectively.
             </li>
-            <li>If <var>hash type</var> is not equal to <code>0x12</code> (SJA-256) or <code>0x1e</code> (Blake-3), throw an error.</li>
+            <li>If <var>hash type</var> is not equal to <code>0x12</code> (SHA-256) or <code>0x1e</code> (Blake-3) you are dealing with a non-DASLing CID; you may need to throw an error, warn the user, and/or log the exception.</li>
             <li>Store the rest of <var>CID bytes</var> in <code>digest</code>.</li>
-            <li>Return <var>version</var>, <var>codec</var>, <var>hash type</var>, <var>hash size</var>, and <var>digest</var></li>
+            <li>Return <var>version</var>, <var>codec</var>, <var>hash type</var>, <var>hash size</var>, and <var>digest</var>.</li>
           </ol>
         </section>
         <section id="dcbor42">
           <h3>Deterministic CBOR with tag 42 (dCBOR42)</h3>
           <p>
-            dCBOR42 is a subset of IPLD that only supports DAG-CBOR serialization (DAG-JSON can be used for debugging
-            purposes, but the CIDs embedded in it should be the CIDs that correspond to the CBOR serialization) and
-            that uses the IETF's deterministic CBOR encoding rules to guarantee a deterministic output. We support no
-            ADLs.
+            dCBOR42 is an IPLD scheme that serializes not just as conformant CBOR, but specifically as deterministic CBOR by normalizing and reducing some type flexibility.
+            (See the <a href="https://datatracker.ietf.org/doc/draft-mcnally-deterministic-cbor/">current draft specification for dCBOR</a>, and <a href=https://ftp.linux.cz/pub/internet-drafts/draft-bormann-cbor-det-01.html>Carsten Bormann's BCP document on the underspecified determinism of Section 4.2 of the CBOR specification</a>).
+            For debugging purposes, either one-way conversion to DAG-JSON or <a href="https://datatracker.ietf.org/doc/draft-ietf-cbor-edn-literals/">CBOR Extended Diagnostic Notation</a> can be used, but either way, note that the CIDs embedded in it should be serialized as valid CBOR using tag 42.
           </p>
           <p>
-            Further details TBD.
+            Further details forthcoming.
           </p>
         </section>
       </section>
