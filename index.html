@@ -36,11 +36,17 @@
       <section id="what">
         <h2>What is this?</h2>
         <p>
-          DASL ("dazzle") is a small set of simple, standard primitives to work on content-addressed data.
-          We call it "data-addressed" because it supports a data serialization component that makes
-          <a href="https://proto.school/content-addressing">content-addressing</a> sweet and easy when working with data. The design is taken from subcomponents of the
-          <a href="https://docs.ipfs.tech/concepts/content-addressing/">IPFS</a> universe, but simplified to improve interoperability,
-          decrease costs, and work well with the web. More specifically, our priorities are:
+          DASL ("dazzle") is a small set of simple, standard primitives for working with content-addressed, linked data. 
+          It builds on content addressing, a proven approach used in Git and <a href="https://docs.ipfs.tech/concepts/what-is-ipfs/">IPFS</a> to 
+          create reliable content identifiers (known as CIDs) through cryptographic hashing. Content addressing enables robust data integrity 
+          checks and efficient networking: systems can verify they received exactly what they asked for and avoid downloading the same content 
+          twice. The linked data part lets you link to stuff by its hash. You can build very big graphs with these primitives, such as the graph 
+          behind Bluesky. 
+        </p>
+        <p>
+          We call DASL "data-addressed" because it supports a data serialization component that makes <a href="https://proto.school/content-addressing">content-addressing</a> sweet and easy when 
+          working with data. The design is taken from subcomponents of the <a href="https://docs.ipfs.tech/concepts/content-addressing/">IPFS</a> universe, but simplified to improve 
+          interoperability, decrease costs, and work well with the web. More specifically, our priorities are:
         </p>
         <ul>
           <li>
@@ -80,6 +86,7 @@
           DASL is a strict subset of IPFS CIDs and IPLD, so existing IPFS and IPLD implementations will just
           read DASL CIDs and dCBOR42 without so much as a hiccup. Some implementations also specifically target a DASL subset.
         </p>
+        <p>Here are some implementations that partially or fully support DASL:</p>
         <ul>
           <li>
             <a href="https://github.com/mary-ext/atcute/">atcute</a> (JS/TS): a collection of lightweight
@@ -120,7 +127,7 @@
         <section id="cid">
           <h3>Content IDs (CIDs)</h3>
           <p>
-            DASL CIDs are a strict subset of IPFS CIDs (but you don't need to understanding anything about IPFS to
+            DASL CIDs are a strict subset of <a href="https://docs.ipfs.tech/concepts/content-addressing/">IPFS CIDs</a>a> (but you don't need to understanding anything about IPFS to
             either use or implement them) with the following properties:
           </p>
           <ul>
