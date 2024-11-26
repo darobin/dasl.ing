@@ -36,16 +36,19 @@
       <section id="what">
         <h2>What is this?</h2>
         <p>
-          DASL ("dazzle") is a small set of simple, standard primitives for working with content-addressed, linked data.
-          It builds on content addressing, a proven approach used in Git and <a href="https://docs.ipfs.tech/concepts/what-is-ipfs/">IPFS</a> to
-          create reliable content identifiers (known as CIDs) through cryptographic hashing. Content addressing enables robust data integrity
-          checks and efficient networking: systems can verify they received exactly what they asked for and avoid downloading the same content
-          twice. The linked data part lets you link to stuff by its hash. You can build very big graphs with these primitives, such as the graph
-          behind Bluesky.
+          DASL ("dazzle") is a small set of simple, standard primitives for working with content-addressed,
+          linked data. It builds on content addressing, a proven approach used in Git and
+          <a href="https://docs.ipfs.tech/concepts/what-is-ipfs/">IPFS</a> to
+          create reliable content identifiers (known as CIDs) through cryptographic hashing. Content addressing
+          enables robust data integrity checks and efficient networking: systems can verify they received exactly
+          what they asked for and avoid downloading the same content twice. The linked data part lets you link to
+          stuff by its hash. You can build very big graphs with these primitives, such as the graph behind Bluesky.
         </p>
         <p>
-          We call DASL "data-addressed" because it supports a data serialization component that makes <a href="https://proto.school/content-addressing">content-addressing</a> sweet and easy when
-          working with data. The design is taken from subcomponents of the <a href="https://docs.ipfs.tech/concepts/content-addressing/">IPFS</a> universe, but simplified to improve
+          We call DASL "data-addressed" because it supports a data serialization component that makes
+          <a href="https://proto.school/content-addressing">content-addressing</a> sweet and easy when
+          working with data. The design is taken from subcomponents of the
+          <a href="https://docs.ipfs.tech/concepts/content-addressing/">IPFS</a> universe, but simplified to improve
           interoperability, decrease costs, and work well with the web. More specifically, our priorities are:
         </p>
         <ul>
@@ -121,27 +124,42 @@
         <h2>Specification</h2>
         <p>
           There are two specifications in DASL: <a href="#cid">CIDs</a> and <a href="#dcbor42">dCBOR42</a>. CIDs
-          (Content IDs) are identifiers used for addressing resources by their contents, as in IPFS; dCBOR42 (deterministically-serialized CBOR with optional CBOR tag <code>42</code> supported)
+          (Content IDs) are identifiers used for addressing resources by their contents, as in IPFS; dCBOR42
+          (deterministically-serialized CBOR with optional CBOR tag <code>42</code> supported)
           is a serialization format that is deterministic and aware of CID-linked graphs, i.e. "IPLD".
         </p>
         <section id="cid">
           <h3>Content IDs (CIDs)</h3>
           <p>
-            DASL CIDs are a strict subset of <a href="https://docs.ipfs.tech/concepts/content-addressing/">IPFS CIDs</a>a> (but you don't need to understanding anything about IPFS to
-            either use or implement them) with the following properties:
+            DASL CIDs are a strict subset of <a href="https://docs.ipfs.tech/concepts/content-addressing/">IPFS CIDs</a>a>
+            (but you don't need to understanding anything about IPFS to either use or implement them) with the following properties:
           </p>
           <ul>
             <li>Only modern CIDv1 CIDs are used, not legacy CIDv0.</li>
-            <li>Only the lowercase base32 multibase encoding (the <code>b</code> prefix) is used for human-readable (and subdomain-usable) string encoding.</li>
-            <li>Only the <code>raw</code> binary multicodec (0x55) and <code>dag-cbor</code> multicodec (0x71), with the latter used only for dCBOR42-conformant DAGs.</li>
+            <li>
+              Only the lowercase base32 multibase encoding (the <code>b</code> prefix) is used for human-readable
+              (and subdomain-usable) string encoding.
+            </li>
+            <li>
+              Only the <code>raw</code> binary multicodec (0x55) and <code>dag-cbor</code> multicodec (0x71), with the
+              latter used only for dCBOR42-conformant DAGs.
+            </li>
             <li>Only SHA-256 (0x12) and BLAKE3 hash functions (0x1e), and the latter only in certain circumstances.</li>
-            <li>Regardless of size, resources SHOULD NOT be "chunked" into a DAG or merkle tree (as historically done with UnixFS canonicalization in IPFS systems) but rather hashed in their entirety and content-addressed directly.</li>
-            <li>This set of options has the added advantage that all the aforementioned single-byte prefixes require no additional varint processing or byte-fiddling.</li>
+            <li>
+              Regardless of size, resources <em>should not</em> be "chunked" into a DAG or Merkle tree (as historically done with
+              UnixFS canonicalization in IPFS systems) but rather hashed in their entirety and content-addressed directly.
+            </li>
+            <li>
+              This set of options has the added advantage that all the aforementioned single-byte prefixes require no
+              additional varint processing or byte-fiddling.
+            </li>
           </ul>
           <p>
-            Supporting two hashes isn't ideal, but having one hash type that can stream large resources (and do incremental verification mid-stream) is a plus.
-            Because BLAKE3 is still far from being supported by web browsers, it is strongly recommended that CID producers limit themselves to SHA-256 if possible.
-            Implementations intending to run in web contexts are likely to either forego BLAKE3 verification in-browser, outsource verification to a trusted component, or to have to dynamically load a BLAKE3 library in the browser, which may cause latency.
+            Supporting two hashes isn't ideal, but having one hash type that can stream large resources (and do incremental
+            verification mid-stream) is a plus. Because BLAKE3 is still far from being supported by web browsers, it is
+            strongly recommended that CID producers limit themselves to SHA-256 if possible. Implementations intending to
+            run in web contexts are likely to either forego BLAKE3 verification in-browser, outsource verification to a
+            trusted component, or to have to dynamically load a BLAKE3 library in the browser, which may cause latency.
           </p>
           <p>
             Use the following steps to <dfn id="parse-cid-string">parse a CID string</dfn>:
@@ -193,10 +211,14 @@
         <section id="dcbor42">
           <h3>Deterministic CBOR with tag 42 (dCBOR42)</h3>
           <p>
-            dCBOR42 is a form of IPLD that serializes only to deterministic CBOR, by normalizing and reducing some type flexibility.
-            Notably, we support no ADLs.
-            (See the <a href="https://datatracker.ietf.org/doc/draft-mcnally-deterministic-cbor/">current draft specification for dCBOR</a>, and <a href="https://ftp.linux.cz/pub/internet-drafts/draft-bormann-cbor-det-01.html">Carsten Bormann's BCP document on the underspecified determinism of Section 4.2 of the CBOR specification</a>).
-            For debugging purposes, either one-way conversion to DAG-JSON or <a href="https://datatracker.ietf.org/doc/draft-ietf-cbor-edn-literals/">CBOR Extended Diagnostic Notation</a> can be used, but either way, note that the CIDs in such debugging outputs should be the CIDs of the dCBOR42 content, not of other debugging resources.
+            dCBOR42 is a form of IPLD that serializes only to deterministic CBOR, by normalizing and reducing some type
+            flexibility. Notably, we support no ADLs.
+            (See the <a href="https://datatracker.ietf.org/doc/draft-mcnally-deterministic-cbor/">current draft specification for dCBOR</a>,
+            and <a href="https://ftp.linux.cz/pub/internet-drafts/draft-bormann-cbor-det-01.html">Carsten Bormann's BCP document
+            on the underspecified determinism of Section 4.2 of the CBOR specification</a>). For debugging purposes, either
+            one-way conversion to DAG-JSON or <a href="https://datatracker.ietf.org/doc/draft-ietf-cbor-edn-literals/">CBOR
+            Extended Diagnostic Notation</a> can be used, but either way, note that the CIDs in such debugging outputs
+            should be the CIDs of the dCBOR42 content, not of other debugging resources.
           </p>
           <p>
             Further details forthcoming.
