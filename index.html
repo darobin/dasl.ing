@@ -38,8 +38,8 @@
         <p>
           DASL ("dazzle") is a small set of simple, standard primitives to work on content-addressed data.
           We call it "data-addressed" because it supports a data serialization component that makes
-          content-addressing sweet and easy when working with data. The design is taken from the
-          <a href="https://ipfs.tech/">IPFS</a> universe, but simplified so as to improve interoperability,
+          <a href="https://proto.school/content-addressing">content-addressing</a> sweet and easy when working with data. The design is taken from subcomponents of the
+          <a href="https://docs.ipfs.tech/concepts/content-addressing/">IPFS</a> universe, but simplified to improve interoperability,
           decrease costs, and work well with the web. More specifically, our priorities are:
         </p>
         <ul>
@@ -128,7 +128,7 @@
             <li>This set of options has the added advantage that all the aforementioned single-byte prefixes require no additional varint processing or byte-fiddling.</li>
           </ul>
           <p>
-            Supporting two hashes isn't ideal, but having one hash type that can stream large resources (and do incremental verification mid-stream) is a plus. 
+            Supporting two hashes isn't ideal, but having one hash type that can stream large resources (and do incremental verification mid-stream) is a plus.
             Because Blake-3 is still far from being supported by web browsers, it is strongly recommended that CID producers limit themselves to SHA-256 if possible.
             Implementations intending to run in web contexts are likely to either forego Blake-3 verification in-browser, outsource verification to a trusted component, or to have to dynamically load a Blake-3 library in the browser, which may cause latency.
           </p>
@@ -184,7 +184,7 @@
           <p>
             dCBOR42 is a form of IPLD that serializes only to deterministic CBOR, by normalizing and reducing some type flexibility.
             Notably, we support no ADLs.
-            (See the <a href="https://datatracker.ietf.org/doc/draft-mcnally-deterministic-cbor/">current draft specification for dCBOR</a>, and <a href=https://ftp.linux.cz/pub/internet-drafts/draft-bormann-cbor-det-01.html>Carsten Bormann's BCP document on the underspecified determinism of Section 4.2 of the CBOR specification</a>). 
+            (See the <a href="https://datatracker.ietf.org/doc/draft-mcnally-deterministic-cbor/">current draft specification for dCBOR</a>, and <a href="https://ftp.linux.cz/pub/internet-drafts/draft-bormann-cbor-det-01.html">Carsten Bormann's BCP document on the underspecified determinism of Section 4.2 of the CBOR specification</a>).
             For debugging purposes, either one-way conversion to DAG-JSON or <a href="https://datatracker.ietf.org/doc/draft-ietf-cbor-edn-literals/">CBOR Extended Diagnostic Notation</a> can be used, but either way, note that the CIDs in such debugging outputs should be the CIDs of the dCBOR42 content, not of other debugging resources.
           </p>
           <p>
