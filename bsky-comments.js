@@ -152,9 +152,6 @@ class BskyPost extends LitElement {
           </div>
           <div class="rich-text">${textContent}</div>
           ${ embeds || nothing }
-          <div class="actions">
-            <a href=${link}>
-          </div>
         </div>
       </div>
       <div class="replies">
