@@ -51,21 +51,28 @@ customElements.define("bsky-comments", BskyComments);
 //    ~~handle
 //    ~~displayName
 //    ~~avatar: url
-//  record
+//  ~~record
 //    ~~createdAt
-//    facets (use lib for this)
-//    text
+//    ~~facets (use lib for this)
+//    ~~text
 //  embed
-//    external
+//    external []
 //      uri
 //      title
 //      description
 //      thumb: url
+//    images []
+//      thumb uri
+//      fullsize url
+//      alt
+//      aspectRatio
+//        height
+//        width
 //  replyCount
 //  repostCount
 //  likeCount
 //  quoteCount
-// replies: [posts]
+// ~replies: [posts]
 class BskyPost extends LitElement {
   static properties = {
     post: { attribute: false },
@@ -87,6 +94,21 @@ class BskyPost extends LitElement {
     .rich-text {
       white-space: pre-wrap;
       overflow-wrap: break-word;
+    }
+    .replies {
+      margin-top: 1rem;
+      padding-left: 0.5rem;
+      border-left: 1px solid #ccc;
+    }
+    .meta {
+      color: rgb(66, 87, 108);
+    }
+    .meta strong {
+      color: #000;
+    }
+    .meta a {
+      color: inherit;
+      text-decoration: none;
     }
   `;
   render () {
