@@ -1,0 +1,36 @@
+{
+  "name": "dasl.ing",
+  "type": "module",
+  "private": true,
+  "version": "0.0.1",
+  "author": "Robin Berjon <robin@berjon.com>",
+  "license": "Apache-2.0",
+  "scripts": {
+    "watch": "./build.js --watch",
+    "build": "./build.js"
+  },
+  "bin": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/darobin/dasl.ing.git"
+  },
+  "eslintConfig": {
+    "env": {
+      "browser": true,
+      "mocha": true,
+      "es2021": true
+    },
+    "extends": "eslint:recommended",
+    "overrides": [],
+    "parserOptions": {
+      "ecmaVersion": "latest",
+      "sourceType": "module"
+    },
+    "rules": {}
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0",
+    "eslint": "^8.26.0",
+    "lit": "^3.2.1"
+  }
+}
