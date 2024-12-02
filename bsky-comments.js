@@ -1,5 +1,6 @@
 
 import { LitElement, html, css, nothing } from "lit";
+import { RichText } from '@atproto/api';
 
 class BskyComments extends LitElement {
   static properties = {
@@ -83,11 +84,23 @@ class BskyPost extends LitElement {
     .avatar img {
       border-radius: 21px;
     }
+    .rich-text {
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+    }
   `;
   render () {
     if (!this.post) return html`<div>loading post…</div>`;
     const { post: { uri, author, record, embed, replyCount, repostCount, likeCount, quoteCount }, replies = [] } = this.post;
     const rid = uri.replace(/.+\//, '');
+    const rt = new RichText(record);
+    const textContent = [];
+    for (const seg of rt.segments()) {
+      if (seg.isLink()) textContent.push(html`<a href=${seg.link?.uri}>${sane(seg.text)}</a>`);
+      else if (seg.isMention()) textContent.push(html`<a href=${`https://bsky.app/profile/${seg.mention?.did}`}>${sane(seg.text)}</a>`);
+      else if (seg.isTag()) textContent.push(html`<a href=${`https://bsky.app/hashtag/${seg.tag?.tag}`}>${sane(seg.text)}</a>`);
+      else textContent.push(sane(seg.text));
+    }
     return html`<div class="post">
       <div class="content">
         <div class="avatar"><img alt=${author.displayName || author.handle} src=${author.avatar} width="42" height="42"></div>
@@ -98,6 +111,7 @@ class BskyPost extends LitElement {
             •
             <a href=${`https://bsky.app/profile/${author.handle}/post/${rid}`}><time datetime=${record.createdAt}>${formatDate(record.createdAt)}</time></a>
           </div>
+          <div class="rich-text">${textContent}</div>
         </div>
       </div>
       <div class="replies">
@@ -125,4 +139,8 @@ function formatDate (str) {
   let [day, time] = str.split('T');
   time = time.replace(/\:\d\d\..+/, '');
   return `${day} ${time}`;
+}
+
+function sane (str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 }

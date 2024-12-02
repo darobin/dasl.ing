@@ -29,6 +29,7 @@
     "rules": {}
   },
   "devDependencies": {
+    "@atproto/api": "^0.13.18",
     "esbuild": "^0.24.0",
     "eslint": "^8.26.0",
     "lit": "^3.2.1"
