@@ -44,35 +44,9 @@ class BskyComments extends LitElement {
 }
 customElements.define("bsky-comments", BskyComments);
 
-// post
-//  ~~uri: at-uri
-//  ~~author
-//    did
-//    ~~handle
-//    ~~displayName
-//    ~~avatar: url
-//  ~~record
-//    ~~createdAt
-//    ~~facets (use lib for this)
-//    ~~text
-//  embed
-//    external []
-//      uri
-//      title
-//      description
-//      thumb: url
-//    images []
-//      thumb uri
-//      fullsize url
-//      alt
-//      aspectRatio
-//        height
-//        width
-//  replyCount
-//  repostCount
-//  likeCount
-//  quoteCount
-// ~replies: [posts]
+// XXX
+//  - reply link
+//  - counts
 class BskyPost extends LitElement {
   static properties = {
     post: { attribute: false },
@@ -110,6 +84,30 @@ class BskyPost extends LitElement {
       color: inherit;
       text-decoration: none;
     }
+    .images, .external {
+      max-width: 500px;
+      border-radius: 10px;
+      margin: 1rem;
+      border: 1px solid #ccc;
+      overflow: hidden;
+    }
+    .images img, .external img {
+      max-width: 100%;
+    }
+    .images a, .external a {
+      text-decoration: none;
+      color: inherit;
+    }
+    .title {
+      font-weight: bold;
+      margin: 0 1rem;
+    }
+    .description {
+      margin: 0 1rem 1rem 1rem;
+    }
+    a {
+      text-decoration: none;
+    }
   `;
   render () {
     if (!this.post) return html`<div>loading post…</div>`;
@@ -117,23 +115,46 @@ class BskyPost extends LitElement {
     const rid = uri.replace(/.+\//, '');
     const rt = new RichText(record);
     const textContent = [];
+    let embeds = nothing;
+    if (embed) {
+      if (embed.images) {
+        embeds = html`<div class="images">${embed.images.map(({ thumb, alt, fullsize }) => html`<a href=${fullsize}><img src=${thumb} alt=${alt || ''}></a>`)}</div>`;
+      }
+      else if (embed.external) {
+        const { title, description, thumb, uri } = embed.external;
+        embeds = html`<div class="external">
+          <a href=${uri}>
+            ${thumb ? html`<img src=${embed.external.thumb}>` : nothing}
+            <div class="title">${title}</div>
+            <div class="description">${description}</div>
+          </a>
+        </div>`;
+      }
+    }
     for (const seg of rt.segments()) {
       if (seg.isLink()) textContent.push(html`<a href=${seg.link?.uri}>${sane(seg.text)}</a>`);
       else if (seg.isMention()) textContent.push(html`<a href=${`https://bsky.app/profile/${seg.mention?.did}`}>${sane(seg.text)}</a>`);
       else if (seg.isTag()) textContent.push(html`<a href=${`https://bsky.app/hashtag/${seg.tag?.tag}`}>${sane(seg.text)}</a>`);
       else textContent.push(sane(seg.text));
     }
+    const link = `https://bsky.app/profile/${author.handle}/post/${rid}`;
     return html`<div class="post">
       <div class="content">
-        <div class="avatar"><img alt=${author.displayName || author.handle} src=${author.avatar} width="42" height="42"></div>
+        <div class="avatar"><a href=${`https://bsky.app/profile/${author.handle}`}><img alt=${author.displayName || author.handle} src=${author.avatar} width="42" height="42"></a></div>
         <div class="body">
           <div class="meta">
-            ${ author.displayName ? html`<strong>${author.displayName}</strong>` : nothing }
-            ${ author.handle }
+            <a href=${`https://bsky.app/profile/${author.handle}`}>
+              ${ author.displayName ? html`<strong>${author.displayName}</strong>` : nothing }
+              ${ author.handle }
+            </a>
             •
-            <a href=${`https://bsky.app/profile/${author.handle}/post/${rid}`}><time datetime=${record.createdAt}>${formatDate(record.createdAt)}</time></a>
+            <a href=${link}><time datetime=${record.createdAt}>${formatDate(record.createdAt)}</time></a>
           </div>
           <div class="rich-text">${textContent}</div>
+          ${ embeds || nothing }
+          <div class="actions">
+            <a href=${link}>
+          </div>
         </div>
       </div>
       <div class="replies">
