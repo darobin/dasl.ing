@@ -1,5 +1,5 @@
 
-import { LitElement, html, css } from "lit";
+import { LitElement, html, css, nothing } from "lit";
 
 class BskyComments extends LitElement {
   static properties = {
@@ -44,14 +44,14 @@ class BskyComments extends LitElement {
 customElements.define("bsky-comments", BskyComments);
 
 // post
-//  uri: at-uri
-//  author
+//  ~~uri: at-uri
+//  ~~author
 //    did
-//    handle
-//    displayName
-//    avatar: url
+//    ~~handle
+//    ~~displayName
+//    ~~avatar: url
 //  record
-//    createdAt
+//    ~~createdAt
 //    facets (use lib for this)
 //    text
 //  embed
@@ -86,10 +86,19 @@ class BskyPost extends LitElement {
   `;
   render () {
     if (!this.post) return html`<div>loading post…</div>`;
-    const { post: { author, record, embed, replyCount, repostCount, likeCount, quoteCount }, replies = [] } = this.post;
+    const { post: { uri, author, record, embed, replyCount, repostCount, likeCount, quoteCount }, replies = [] } = this.post;
+    const rid = uri.replace(/.+\//, '');
     return html`<div class="post">
       <div class="content">
         <div class="avatar"><img alt=${author.displayName || author.handle} src=${author.avatar} width="42" height="42"></div>
+        <div class="body">
+          <div class="meta">
+            ${ author.displayName ? html`<strong>${author.displayName}</strong>` : nothing }
+            ${ author.handle }
+            •
+            <a href=${`https://bsky.app/profile/${author.handle}/post/${rid}`}><time datetime=${record.createdAt}>${formatDate(record.createdAt)}</time></a>
+          </div>
+        </div>
       </div>
       <div class="replies">
         ${replies.map(r => html`<bsky-post .post=${r}></bsky-post>`)}
@@ -110,4 +119,10 @@ function atURL (url) {
     }
   }
   return url;
+}
+
+function formatDate (str) {
+  let [day, time] = str.split('T');
+  time = time.replace(/\:\d\d\..+/, '');
+  return `${day} ${time}`;
 }
