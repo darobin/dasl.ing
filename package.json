@@ -5,10 +5,7 @@
   "version": "0.0.1",
   "author": "Robin Berjon <robin@berjon.com>",
   "license": "Apache-2.0",
-  "scripts": {
-    "watch": "./build.js --watch",
-    "build": "./build.js"
-  },
+  "scripts": {},
   "bin": {},
   "repository": {
     "type": "git",
@@ -29,9 +26,6 @@
     "rules": {}
   },
   "devDependencies": {
-    "@atproto/api": "^0.13.18",
-    "esbuild": "^0.24.0",
-    "eslint": "^8.26.0",
-    "lit": "^3.2.1"
+    "eslint": "^8.26.0"
   }
 }
