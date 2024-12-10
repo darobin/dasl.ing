@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Big DASL (BDASL)</title>
+  </head>
+  <body>
+    <div id="abstract">
+      <p>
+        BDASL extends DASL CIDs with a new hash type that works better for large files but isn't
+        available by default in browsers, and therefore not an appropriate option in most
+        situations.
+      </p>
+    </div>
+    <section>
+      <h2>Introduction</h2>
+      <p>
+        BDASL extends DASL CIDs by adding BLAKE3 support ([[blake3]). BLAKE3 is a powerful hashing
+        framework that works well for progressive verification of large streams. Unfortunately,
+        it isn't available in browser (and neither is streaming hashing in general) which makes it
+        inappriopriate for inclusion as the primary hash function in DASL CIDs.
+      </p>
+      <p>
+        It is recommended to avoid using BDASL CIDs in arbitrary open environments, and rather to
+        focus on using such CIDs in specific cases in which participants are likely to know how
+        to handle them.
+      </p>
+    </section>
+    <section>
+      <h2>Parsing BDASL CIDs</h2>
+      <p>
+        All the parsing works the same as for DASL CIDs ([[cid]]) with one modification.
+      </p>
+      <p>
+        In the steps to <a href="cid.html#decode-a-cid">decode a CID</a>, the <var>hash type</var>
+        may also be equal to <code>0x1e</code> (BLAKE3) ([[blake3]]).
+      </p>
+    </section>
+  </body>
+</html>

@@ -18,3 +18,4 @@
   - [ ] CAR
   - [ ] MASL (Metadata for Arbitrary Structures and Links)
   - [ ] RASL
+- [ ] Test Suite

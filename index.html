@@ -17,11 +17,6 @@
     <meta name="theme-color" content="#00ff75">
   </head>
   <body>
-    <!--
-      - [ ] the dCBOR42 spec (indicate as future work)
-      - [ ] code examples
-      - [ ] test suite
-    -->
     <main>
       <header>
         <h1>DASL — Data-Addressed Structures &amp; Links</h1>
@@ -138,6 +133,14 @@
           <dd>
             dCBOR42 is a serialization format that is deterministic (so that the same data will have the same CID)
             and that features native support for using CIDs as links.
+          </dd>
+          <dt>
+            <a href="bdasl.html">Big DASL (BDASL)</a>
+          </dt>
+          <dd>
+            This extends DASL CIDs with a new hash type that works better for large files but isn't
+            available by default in browsers, and therefore not an appropriate option in most
+            situations.
           </dd>
         </dl>
       </section>
