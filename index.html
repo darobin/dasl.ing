@@ -42,7 +42,7 @@
         <p>
           We call DASL "data-addressed" because it supports a data serialization component that makes
           <a href="https://proto.school/content-addressing">content-addressing</a> sweet and easy when
-          working with data. The design is taken from subcomponents of the
+          working with data. The design is inspired by subcomponents of the
           <a href="https://docs.ipfs.tech/concepts/content-addressing/">IPFS</a> universe, but simplified to improve
           interoperability, decrease costs, and work well with the web. More specifically, our priorities are:
         </p>
@@ -69,6 +69,10 @@
             <strong>lightweight loading</strong>: some people like JavaScript, others don't. We don't care, we
             just want things that work. What's certain is that you can't ignore it and be relevant. The ability
             to ship small code to the browser is critical.
+          </li>
+          <li>
+            <strong>Unix philosophy</strong>: all of our specs are tiny and meant to compose together in simple
+            ways that can be implemented independently from one another.
           </li>
         </ul>
         <p>

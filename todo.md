@@ -7,12 +7,7 @@
 - [ ] intro clarity
 - [ ] Unix philosophy
 - [ ] Specs
-  - [ ] CIDs
-    - [ ] remove B3
-    - [ ] size issue
-    - [x] rel to IPFS
-    - [x] use proper refs
-    - [x] sections
+  - [x] CIDs
   - [ ] dCBOR42
   - [x] BDASL
   - [ ] CAR
