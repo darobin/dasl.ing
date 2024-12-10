@@ -37,7 +37,7 @@ header td {
 header table p {
   margin: 0;
 }
-p, ul, ol, dl {
+section, ul, ol {
   margin: 0 1rem 1rem 1rem;
   max-width: 70ch;
 }
@@ -47,4 +47,26 @@ ul, ol {
 }
 ul > li {
   list-style-type: square;
+}
+dt {
+  font-weight: bold;
+}
+h2 {
+  font-weight: 400;
+  font-size: var(--header-font-size);
+  text-decoration: underline;
+  text-decoration-thickness: 5px;
+  text-transform: uppercase;
+}
+a.ref {
+  text-decoration: none;
+}
+
+@media only screen and (max-width:800px) {
+  header table, header tr, header th, header td {
+    display: block;
+  }
+  .nav-back {
+    font-size: 1rem;
+  }
 }

@@ -12,79 +12,82 @@
         (but you don't need to understanding anything about IPFS to either use or implement them) with the following properties:
       </p>
     </div>
-    <ul>
-      <li>Only modern CIDv1 CIDs are used, not legacy CIDv0.</li>
-      <li>
-        Only the lowercase base32 multibase encoding (the <code>b</code> prefix) is used for human-readable
-        (and subdomain-usable) string encoding.
-      </li>
-      <li>
-        Only the <code>raw</code> binary multicodec (0x55) and <code>dag-cbor</code> multicodec (0x71), with the
-        latter used only for dCBOR42-conformant DAGs.
-      </li>
-      <li>Only SHA-256 (0x12) and BLAKE3 hash functions (0x1e), and the latter only in certain circumstances.</li>
-      <li>
-        Regardless of size, resources <em>should not</em> be "chunked" into a DAG or Merkle tree (as historically done with
-        UnixFS canonicalization in IPFS systems) but rather hashed in their entirety and content-addressed directly.
-      </li>
-      <li>
-        This set of options has the added advantage that all the aforementioned single-byte prefixes require no
-        additional varint processing or byte-fiddling.
-      </li>
-    </ul>
-    <p>
-      Supporting two hashes isn't ideal, but having one hash type that can stream large resources (and do incremental
-      verification mid-stream) is a plus. Because BLAKE3 is still far from being supported by web browsers, it is
-      strongly recommended that CID producers limit themselves to SHA-256 if possible. Implementations intending to
-      run in web contexts are likely to either forego BLAKE3 verification in-browser, outsource verification to a
-      trusted component, or to have to dynamically load a BLAKE3 library in the browser, which may cause latency.
-    </p>
-    <p>
-      Use the following steps to <dfn id="parse-cid-string">parse a CID string</dfn>:
-    </p>
-    <ol>
-      <li>Accept a string <var>CID</var>.</li>
-      <li>Remove the first character from <var>CID</var> and store it in <var>prefix</var>.</li>
-      <li>If <var>prefix</var> is not equal to <code>b</code>, throw an error.</li>
-      <li>
-        Decode the rest of <var>CID</var> using <a href="https://datatracker.ietf.org/doc/html/rfc4648#section-6">the
-        base32 algorithm from RFC4648</a> with a lowercase alphabet and store the result in <var>CID bytes</var>.
-      </li>
-      <li>Return the result of applying the steps to <a href="#decode-cid">decode a CID</a> to <var>CID bytes</var>.</li>
-    </ol>
-    <p>
-      Use the following steps to <dfn id="parse-cid-binary">parse a binary CID</dfn>:
-    </p>
-    <ol>
-      <li>Accept an array of bytes <var>binary CID</var>.</li>
-      <li>
-        Remove the first byte in <var>binary CID</var> and store it in <var>prefix</var>.
-      </li>
-      <li>If <var>prefix</var> is not equal to <code>0</code> (a null byte, the binary base256 prefix), throw an error.</li>
-      <li>Store the rest of <var>binary CID</var> in <var>CID bytes</var>.</li>
-      <li>Return the result of applying the steps to <a href="#decode-cid">decode a CID</a> to <var>CID bytes</var>.</li>
-    </ol>
-    <p>
-      Use the following steps to <dfn id="decode-cid">decode a CID</dfn>:
-    </p>
-    <ol>
-      <li>Accept an array of bytes <var>CID bytes</var>.</li>
-      <li>
-        Remove the first byte in <var>CID bytes</var> and store it in <var>version</var>.
-      </li>
-      <li>If <var>version</var> is not equal to <code>1</code>, throw an error.</li>
-      <li>
-        Remove the next byte in <var>CID bytes</var> and store it in <var>codec</var>.
-      </li>
-      <li>If <var>codec</var> is not equal to <code>0x55</code> (raw) or <code>0x71</code> (dCBOR42), throw an error.</li>
-      <li>
-        Remove the next two bytes in <var>CID bytes</var> and store them in <var>hash type</var> and <var>hash size</var>,
-        respectively.
-      </li>
-      <li>If <var>hash type</var> is not equal to <code>0x12</code> (SHA-256) or <code>0x1e</code> (BLAKE3), throw an error.</li>
-      <li>If there are fewer than <var>hash size</var> bytes left in <var>CID bytes</var>, throw an error.</li>
-      <li>Remove the first <var>hash size</var> bytes from <var>CID bytes</var> and store them in <code>digest</code>. Store the rest in <var>remaining bytes</var>.</li>
-      <li>Return <var>version</var>, <var>codec</var>, <var>hash type</var>, <var>hash size</var>, <var>digest</var>, and <var>remaining bytes</var>.</li>
-    </ol>
+    <section>
+      <h2>Parsing CIDs</h2>
+      <ul>
+        <li>Only modern CIDv1 CIDs are used, not legacy CIDv0.</li>
+        <li>
+          Only the lowercase base32 multibase encoding (the <code>b</code> prefix) is used for human-readable
+          (and subdomain-usable) string encoding.
+        </li>
+        <li>
+          Only the <code>raw</code> binary multicodec (0x55) and <code>dag-cbor</code> multicodec (0x71), with the
+          latter used only for dCBOR42-conformant DAGs.
+        </li>
+        <li>Only SHA-256 (0x12) and BLAKE3 hash functions (0x1e), and the latter only in certain circumstances.</li>
+        <li>
+          Regardless of size, resources <em>should not</em> be "chunked" into a DAG or Merkle tree (as historically done with
+          UnixFS canonicalization in IPFS systems) but rather hashed in their entirety and content-addressed directly.
+        </li>
+        <li>
+          This set of options has the added advantage that all the aforementioned single-byte prefixes require no
+          additional varint processing or byte-fiddling.
+        </li>
+      </ul>
+      <p>
+        Supporting two hashes isn't ideal, but having one hash type that can stream large resources (and do incremental
+        verification mid-stream) is a plus. Because BLAKE3 is still far from being supported by web browsers, it is
+        strongly recommended that CID producers limit themselves to SHA-256 if possible. Implementations intending to
+        run in web contexts are likely to either forego BLAKE3 verification in-browser, outsource verification to a
+        trusted component, or to have to dynamically load a BLAKE3 library in the browser, which may cause latency.
+      </p>
+      <p>
+        Use the following steps to <dfn id="parse-cid-string">parse a CID string</dfn>:
+      </p>
+      <ol>
+        <li>Accept a string <var>CID</var>.</li>
+        <li>Remove the first character from <var>CID</var> and store it in <var>prefix</var>.</li>
+        <li>If <var>prefix</var> is not equal to <code>b</code>, throw an error.</li>
+        <li>
+          Decode the rest of <var>CID</var> using <a href="https://datatracker.ietf.org/doc/html/rfc4648#section-6">the
+          base32 algorithm from RFC4648</a> with a lowercase alphabet and store the result in <var>CID bytes</var> ([[rfc4648]]).
+        </li>
+        <li>Return the result of applying the steps to <a href="#decode-cid">decode a CID</a> to <var>CID bytes</var>.</li>
+      </ol>
+      <p>
+        Use the following steps to <dfn id="parse-cid-binary">parse a binary CID</dfn>:
+      </p>
+      <ol>
+        <li>Accept an array of bytes <var>binary CID</var>.</li>
+        <li>
+          Remove the first byte in <var>binary CID</var> and store it in <var>prefix</var>.
+        </li>
+        <li>If <var>prefix</var> is not equal to <code>0</code> (a null byte, the binary base256 prefix), throw an error.</li>
+        <li>Store the rest of <var>binary CID</var> in <var>CID bytes</var>.</li>
+        <li>Return the result of applying the steps to <a href="#decode-cid">decode a CID</a> to <var>CID bytes</var>.</li>
+      </ol>
+      <p>
+        Use the following steps to <dfn id="decode-cid">decode a CID</dfn>:
+      </p>
+      <ol>
+        <li>Accept an array of bytes <var>CID bytes</var>.</li>
+        <li>
+          Remove the first byte in <var>CID bytes</var> and store it in <var>version</var>.
+        </li>
+        <li>If <var>version</var> is not equal to <code>1</code>, throw an error.</li>
+        <li>
+          Remove the next byte in <var>CID bytes</var> and store it in <var>codec</var>.
+        </li>
+        <li>If <var>codec</var> is not equal to <code>0x55</code> (raw) or <code>0x71</code> (dCBOR42), throw an error ([[dcbor42]]).</li>
+        <li>
+          Remove the next two bytes in <var>CID bytes</var> and store them in <var>hash type</var> and <var>hash size</var>,
+          respectively.
+        </li>
+        <li>If <var>hash type</var> is not equal to <code>0x12</code> (SHA-256) or <code>0x1e</code> (BLAKE3), throw an error. ([[sha256]], [[blake3]])</li>
+        <li>If there are fewer than <var>hash size</var> bytes left in <var>CID bytes</var>, throw an error.</li>
+        <li>Remove the first <var>hash size</var> bytes from <var>CID bytes</var> and store them in <code>digest</code>. Store the rest in <var>remaining bytes</var>.</li>
+        <li>Return <var>version</var>, <var>codec</var>, <var>hash type</var>, <var>hash size</var>, <var>digest</var>, and <var>remaining bytes</var>.</li>
+      </ol>
+    </section>
   </body>
 </html>

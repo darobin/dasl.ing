@@ -43,8 +43,9 @@ class SISL {
   }
   async build () {
     // load the bibliography
+    let bibliography;
     try {
-      this.bibliography = JSON.parse(await readFile(join(this.baseDir, 'bibliography.json')));
+      bibliography = JSON.parse(await readFile(join(this.baseDir, 'bibliography.json')));
     }
     catch (err) {
       this.die(err.message);
@@ -59,7 +60,7 @@ class SISL {
     }
     // extract metadata from all src and add to biblio
     Object.keys(specs).forEach(shortname => {
-      this.bibliography[shortname] = this.htmlifyReference({
+      bibliography[shortname] = this.htmlifyReference({
         author: 'Robin Berjon & Juan Caballero',
         title: specs[shortname].doc.title,
         date: today(),
@@ -123,6 +124,28 @@ class SISL {
         '.'
       ]);
       doc.body.prepend(bk);
+      // references
+      const refs = {};
+      main.innerHTML = main.innerHTML.replace(
+        /\[\[([\w-]+)\]\]/g,
+        (_, ref) => {
+          if (!bibliography[ref]) {
+            this.err(`No "${ref}" entry in the bibliography.`);
+            return `[[${ref}]]`;
+          }
+          refs[ref] = bibliography[ref];
+          return `[[<a href="#ref-${ref}" class="ref">${ref}</a>]]`;
+        }
+      );
+      if (Object.keys(refs).length) {
+        const refSec = el('section', {}, [el('h2', {}, ['References'])], main);
+        const dl = el('dl', {}, [], refSec);
+        Object.keys(refs).sort().forEach(r => {
+          el('dt', { id: `ref-${r}` }, [`[${r}]`], dl);
+          const dd = el('dd', {}, [], dl);
+          dd.innerHTML = refs[r];
+        });
+      }
       // save
       await writeFile(join(this.baseDir, `${shortname}.html`), dom.serialize());
     }
