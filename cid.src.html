@@ -8,39 +8,48 @@
   <body>
     <div id="abstract">
       <p>
-        DASL CIDs are a strict subset of <a href="https://docs.ipfs.tech/concepts/content-addressing/">IPFS CIDs</a>
-        (but you don't need to understanding anything about IPFS to either use or implement them) with the following properties:
+        DASL CIDs are a simple structured identifier format for content addressing. They encapsulate a hash
+        with enough metadata to be extensible (to add new hash types in the future) and to indicate whether
+        they are pointing to raw bytes or to structured data.
       </p>
     </div>
     <section>
-      <h2>Parsing CIDs</h2>
-      <ul>
-        <li>Only modern CIDv1 CIDs are used, not legacy CIDv0.</li>
-        <li>
-          Only the lowercase base32 multibase encoding (the <code>b</code> prefix) is used for human-readable
-          (and subdomain-usable) string encoding.
-        </li>
-        <li>
-          Only the <code>raw</code> binary multicodec (0x55) and <code>dag-cbor</code> multicodec (0x71), with the
-          latter used only for dCBOR42-conformant DAGs.
-        </li>
-        <li>Only SHA-256 (0x12) and BLAKE3 hash functions (0x1e), and the latter only in certain circumstances.</li>
-        <li>
-          Regardless of size, resources <em>should not</em> be "chunked" into a DAG or Merkle tree (as historically done with
-          UnixFS canonicalization in IPFS systems) but rather hashed in their entirety and content-addressed directly.
-        </li>
-        <li>
-          This set of options has the added advantage that all the aforementioned single-byte prefixes require no
-          additional varint processing or byte-fiddling.
-        </li>
-      </ul>
+      <h2>Introduction</h2>
       <p>
-        Supporting two hashes isn't ideal, but having one hash type that can stream large resources (and do incremental
-        verification mid-stream) is a plus. Because BLAKE3 is still far from being supported by web browsers, it is
-        strongly recommended that CID producers limit themselves to SHA-256 if possible. Implementations intending to
-        run in web contexts are likely to either forego BLAKE3 verification in-browser, outsource verification to a
-        trusted component, or to have to dynamically load a BLAKE3 library in the browser, which may cause latency.
+        DASL CIDs are a simple structured identifier format for content addressing. They encapsulate a hash
+        with enough metadata to be extensible (to add new hash types in the future) and to indicate whether
+        they are pointing to raw bytes or to structured data. If you're simply DASL CIDs as identifiers, you
+        can almost certainly just use the string as an opaque ID and worry no further.
       </p>
+      <p>
+        A DASL CID can be represented as a string or as an array of bytes. If you wish to understand the
+        internals of a CID, it has the following structure:
+      </p>
+      <ol>
+        <li>
+          A <code>b</code> prefix (only in string form). This is an extensibility point for future
+          CID encodings other than the current base32 to be supported. (Currently this is the only one.)
+        </li>
+        <li>
+          A version number, which is currently always 1.
+        </li>
+        <li>
+          A content codec, which is a flag indicating whether it is pointing to structured or raw
+          data.
+        </li>
+        <li>
+          A hash type, that is always SHA-256 ([[sha256]]).
+        </li>
+        <li>
+          A hash size, indicating how many bytes long the digest is.
+        </li>
+        <li>
+          A digest, which is the hash of the content being identified.
+        </li>
+      </ol>
+    </section>
+    <section>
+      <h2>Parsing CIDs</h2>
       <p>
         Use the following steps to <dfn>parse a CID string</dfn>:
       </p>
@@ -49,8 +58,9 @@
         <li>Remove the first character from <var>CID</var> and store it in <var>prefix</var>.</li>
         <li>If <var>prefix</var> is not equal to <code>b</code>, throw an error.</li>
         <li>
-          Decode the rest of <var>CID</var> using <a href="https://datatracker.ietf.org/doc/html/rfc4648#section-6">the
-          base32 algorithm from RFC4648</a> with a lowercase alphabet and store the result in <var>CID bytes</var> ([[rfc4648]]).
+          Decode the rest of <var>CID</var> using
+          <a href="https://datatracker.ietf.org/doc/html/rfc4648#section-6">the base32 algorithm from
+          RFC4648</a> with a lowercase alphabet and store the result in <var>CID bytes</var> ([[rfc4648]]).
         </li>
         <li>Return the result of applying the steps to <a>decode a CID</a> to <var>CID bytes</var>.</li>
       </ol>
@@ -62,7 +72,10 @@
         <li>
           Remove the first byte in <var>binary CID</var> and store it in <var>prefix</var>.
         </li>
-        <li>If <var>prefix</var> is not equal to <code>0</code> (a null byte, the binary base256 prefix), throw an error.</li>
+        <li>
+          If <var>prefix</var> is not equal to <code>0</code> (a null byte, the binary base256
+          prefix), throw an error.
+        </li>
         <li>Store the rest of <var>binary CID</var> in <var>CID bytes</var>.</li>
         <li>Return the result of applying the steps to <a>decode a CID</a> to <var>CID bytes</var>.</li>
       </ol>
@@ -78,16 +91,64 @@
         <li>
           Remove the next byte in <var>CID bytes</var> and store it in <var>codec</var>.
         </li>
-        <li>If <var>codec</var> is not equal to <code>0x55</code> (raw) or <code>0x71</code> (dCBOR42), throw an error ([[dcbor42]]).</li>
         <li>
-          Remove the next two bytes in <var>CID bytes</var> and store them in <var>hash type</var> and <var>hash size</var>,
-          respectively.
+          If <var>codec</var> is not equal to <code>0x55</code> (raw) or <code>0x71</code> (dCBOR42),
+          throw an error ([[dcbor42]]).
         </li>
-        <li>If <var>hash type</var> is not equal to <code>0x12</code> (SHA-256) or <code>0x1e</code> (BLAKE3), throw an error. ([[sha256]], [[blake3]])</li>
-        <li>If there are fewer than <var>hash size</var> bytes left in <var>CID bytes</var>, throw an error.</li>
-        <li>Remove the first <var>hash size</var> bytes from <var>CID bytes</var> and store them in <code>digest</code>. Store the rest in <var>remaining bytes</var>.</li>
-        <li>Return <var>version</var>, <var>codec</var>, <var>hash type</var>, <var>hash size</var>, <var>digest</var>, and <var>remaining bytes</var>.</li>
+        <li>
+          Remove the next two bytes in <var>CID bytes</var> and store them in <var>hash type</var> and
+          <var>hash size</var>, respectively.
+        </li>
+        <li>
+          If <var>hash type</var> is not equal to <code>0x12</code> (SHA-256) or <code>0x1e</code> (BLAKE3),
+          throw an error ([[sha256]], [[blake3]]).
+        </li>
+        <li>
+          If there are fewer than <var>hash size</var> bytes left in <var>CID bytes</var>, throw an error.
+        </li>
+        <li>
+          Remove the first <var>hash size</var> bytes from <var>CID bytes</var> and store them in
+          <code>digest</code>. Store the rest in <var>remaining bytes</var>.
+        </li>
+        <li>
+          Return <var>version</var>, <var>codec</var>, <var>hash type</var>, <var>hash size</var>,
+          <var>digest</var>, and <var>remaining bytes</var>.
+        </li>
       </ol>
+    </section>
+    <section>
+      <h2>Relationship to IPFS</h2>
+      <p>
+        You don't need to understand IPFS in order to use DASL. This section is for informational
+        purposes only.
+      </p>
+      <p>
+        DASL CIDs are a strict subset of <a href="https://docs.ipfs.tech/concepts/content-addressing/">IPFS CIDs</a>
+        with the following properties:
+      </p>
+      <ul>
+        <li>Only modern CIDv1 CIDs are used, not legacy CIDv0.</li>
+        <li>
+          Only the lowercase base32 multibase encoding (the <code>b</code> prefix) is used for human-readable
+          (and subdomain-usable) string encoding.
+        </li>
+        <li>
+          Only the <code>raw</code> binary multicodec (0x55) and <code>dag-cbor</code> multicodec (0x71), with the
+          latter used only for dCBOR42-conformant DAGs.
+        </li>
+        <li>Only SHA-256 (0x12) for the hash function .</li>
+        <li>
+          The CID isn't the boss of anyone, but the expectation is that, regardless of size, resources
+          <em>should not</em> be "chunked" into a DAG or Merkle tree (as historically done with UnixFS canonicalization
+          in IPFS systems) but rather hashed in their entirety and content-addressed directly. That being
+          said, a DASL CID can point to a piece of dCBOR42 metadata that describes this kind of
+          chunking, if needed. (A separate specification may be added for that.)
+        </li>
+        <li>
+          This set of options has the added advantage that all the aforementioned single-byte prefixes require no
+          additional varint processing or byte-fiddling.
+        </li>
+      </ul>
     </section>
   </body>
 </html>

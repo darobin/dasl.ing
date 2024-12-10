@@ -2,18 +2,16 @@
 # TODO
 
 - [x] spec gen script
-  - [x] refs watch (from specs and JSON)
-  - [x] specs watch (all .src.html)
-  - [x] references
-  - [x] dfn & xref
-  - [x] spec style & top metadata
-  - [x] mobile
+  - [ ] anchors to section headings
+  - [ ] make it easy to link to dfns
 - [ ] intro clarity
 - [ ] Unix philosophy
 - [ ] Specs
   - [ ] CIDs
     - [ ] remove B3
-    - [ ] use proper refs
+    - [ ] size issue
+    - [x] rel to IPFS
+    - [x] use proper refs
     - [x] sections
   - [ ] dCBOR42
   - [ ] BDASL

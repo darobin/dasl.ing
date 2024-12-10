@@ -103,9 +103,17 @@ class SISL {
             el('td', {}, [
               el('a', { href: 'https://berjon.com/' }, ['Robin Berjon']),
               ' <', el('a', { href: 'mailto:robin@berjon.com' }, ['robin@berjon.com']), '>',
-              ' & ',
+              el('br'),
               el('a', { href: 'https://bumblefudge.com/' }, ['Juan Caballero']),
               ' <', el('a', { href: 'mailto:bumblefudge@learningproof.xyz' }, ['bumblefudge@learningproof.xyz']), '>',
+            ]),
+          ]),
+          el('tr', {}, [
+            el('th', {}, ['issues']),
+            el('td', {}, [
+              el('a', { href: 'https://github.com/darobin/dasl.ing/issues' }, ['list']),
+              ', ',
+              el('a', { href: 'https://github.com/darobin/dasl.ing/issues/new' }, ['new']),
             ]),
           ]),
           el('tr', {}, [
@@ -149,7 +157,7 @@ class SISL {
             return `[[${ref}]]`;
           }
           refs[ref] = bibliography[ref];
-          return `[[<a href="#ref-${ref}" class="ref">${ref}</a>]]`;
+          return `[<a href="#ref-${ref}" class="ref">${ref}</a>]`;
         }
       );
       if (Object.keys(refs).length) {

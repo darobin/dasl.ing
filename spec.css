@@ -58,7 +58,7 @@ h2 {
   text-decoration-thickness: 5px;
   text-transform: uppercase;
 }
-a.ref {
+header table a, a.ref {
   text-decoration: none;
 }
 a.dfn-ref {
