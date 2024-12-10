@@ -1,11 +1,11 @@
 
 # TODO
 
-- [ ] spec gen script
+- [x] spec gen script
   - [x] refs watch (from specs and JSON)
   - [x] specs watch (all .src.html)
   - [x] references
-  - [ ] dfn & xref
+  - [x] dfn & xref
   - [x] spec style & top metadata
   - [x] mobile
 - [ ] intro clarity

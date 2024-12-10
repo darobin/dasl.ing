@@ -124,6 +124,21 @@ class SISL {
         '.'
       ]);
       doc.body.prepend(bk);
+      // definitions & xrefs
+      [...doc.querySelectorAll('dfn')].forEach(dfn => {
+        const id = slugify(doc, dfn, 'dfn', true);
+        dfn.setAttribute('id', id);
+      });
+      [...doc.querySelectorAll('a:not([href])')].forEach(a => {
+        const id = slugify(doc, a, 'dfn');
+        if (doc.getElementById(id)) {
+          a.setAttribute('href', `#${id}`);
+          a.className = 'dfn-ref';
+        }
+        else {
+          this.err(`Empty link "${a.textContent}" (#${id}) has no matching dfn.`);
+        }
+      });
       // references
       const refs = {};
       main.innerHTML = main.innerHTML.replace(
@@ -181,6 +196,22 @@ function makeEl (doc) {
     if (parent) parent.append(el);
     return el;
   };
+}
+
+function slugify (doc, el, pfx, unique) {
+  if (el.hasAttribute('id')) return el.getAttribute('id');
+  let suf;
+  const txt = (norm(el.textContent) || 'empty').toLowerCase().replace(/\W/g, '-').replace(/-{2,}/g, '-').replace(/^-|-$/g, '');
+  const idify = () => [pfx, txt, suf].filter(Boolean).join('-');
+  let id = idify();
+  if (unique) {
+    while (doc.getElementById(id)) {
+      if (!suf) suf = 0;
+      suf++;
+      id = idify();
+    }
+  }
+  return id;
 }
 
 function today () {

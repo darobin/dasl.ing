@@ -84,6 +84,7 @@ dfn {
 }
 var {
   text-decoration: underline;
+  text-decoration-thickness: 3px;
   text-decoration-color: #ccc;
 }
 code {

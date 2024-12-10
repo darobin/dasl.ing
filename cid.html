@@ -40,7 +40,7 @@
         trusted component, or to have to dynamically load a BLAKE3 library in the browser, which may cause latency.
       </p>
       <p>
-        Use the following steps to <dfn id="parse-cid-string">parse a CID string</dfn>:
+        Use the following steps to <dfn id="dfn-parse-a-cid-string">parse a CID string</dfn>:
       </p>
       <ol>
         <li>Accept a string <var>CID</var>.</li>
@@ -50,10 +50,10 @@
           Decode the rest of <var>CID</var> using <a href="https://datatracker.ietf.org/doc/html/rfc4648#section-6">the
           base32 algorithm from RFC4648</a> with a lowercase alphabet and store the result in <var>CID bytes</var> ([[<a href="#ref-rfc4648" class="ref">rfc4648</a>]]).
         </li>
-        <li>Return the result of applying the steps to <a href="#decode-cid">decode a CID</a> to <var>CID bytes</var>.</li>
+        <li>Return the result of applying the steps to <a href="#dfn-decode-a-cid" class="dfn-ref">decode a CID</a> to <var>CID bytes</var>.</li>
       </ol>
       <p>
-        Use the following steps to <dfn id="parse-cid-binary">parse a binary CID</dfn>:
+        Use the following steps to <dfn id="dfn-parse-a-binary-cid">parse a binary CID</dfn>:
       </p>
       <ol>
         <li>Accept an array of bytes <var>binary CID</var>.</li>
@@ -62,10 +62,10 @@
         </li>
         <li>If <var>prefix</var> is not equal to <code>0</code> (a null byte, the binary base256 prefix), throw an error.</li>
         <li>Store the rest of <var>binary CID</var> in <var>CID bytes</var>.</li>
-        <li>Return the result of applying the steps to <a href="#decode-cid">decode a CID</a> to <var>CID bytes</var>.</li>
+        <li>Return the result of applying the steps to <a href="#dfn-decode-a-cid" class="dfn-ref">decode a CID</a> to <var>CID bytes</var>.</li>
       </ol>
       <p>
-        Use the following steps to <dfn id="decode-cid">decode a CID</dfn>:
+        Use the following steps to <dfn id="dfn-decode-a-cid">decode a CID</dfn>:
       </p>
       <ol>
         <li>Accept an array of bytes <var>CID bytes</var>.</li>
