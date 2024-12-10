@@ -2,11 +2,15 @@
 # TODO
 
 - [ ] spec gen script
-  - [ ] refs watch (from specs and JSON)
-  - [ ] specs watch (all .src.html)
-  - [ ] spec style
+  - [x] refs watch (from specs and JSON)
+  - [x] specs watch (all .src.html)
+  - [ ] references
+  - [ ] spec style & top metadata
 - [ ] intro clarity
 - [ ] Specs
+  - [ ] CIDs
+    - [ ] remove B3
+    - [ ] use proper refs
   - [ ] dCBOR42
   - [ ] BDASL
   - [ ] CAR

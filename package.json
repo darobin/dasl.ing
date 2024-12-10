@@ -5,7 +5,10 @@
   "version": "0.0.1",
   "author": "Robin Berjon <robin@berjon.com>",
   "license": "Apache-2.0",
-  "scripts": {},
+  "scripts": {
+    "watch": "node --watch ./sisl.js --watch",
+    "build": "./sisl.js"
+  },
   "bin": {},
   "repository": {
     "type": "git",

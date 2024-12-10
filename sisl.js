@@ -33,10 +33,12 @@ class SISL {
     chokidar
       .watch(this.baseDir, {
         depth: 0,
+        ignoreInitial: true,
       })
       .on('add', (path) => buildIfMatch(path))
       .on('change', (path) => buildIfMatch(path))
       .on('unlink', (path) => removeIfMatch(path))
+      .on('ready', () => this.build())
     ;
   }
   async build () {
@@ -53,19 +55,75 @@ class SISL {
     for (const s of specList) {
       const dom = new JSDOM(await readFile(s, 'utf8'));
       const { window: { document: doc } } = dom;
-      specs[basename(s).replace(/\.src\.html$/, '')] = { dom, doc};
+      specs[basename(s).replace(/\.src\.html$/, '')] = { dom, doc };
     }
     // extract metadata from all src and add to biblio
     Object.keys(specs).forEach(shortname => {
       this.bibliography[shortname] = this.htmlifyReference({
         author: 'Robin Berjon & Juan Caballero',
         title: specs[shortname].doc.title,
-        date: new Date().toISOString().replace(/T.+/, ''),
+        date: today(),
         url: `https://dasl.ing/${shortname}.html`,
       });
     });
     for (const shortname of Object.keys(specs)) {
-      const { dom } = specs[shortname];
+      const { dom, doc } = specs[shortname];
+      const el = makeEl(doc);
+      console.warn(`--- Processing ${shortname} "${doc.title}" (${doc.body.innerHTML.length}) ---`);
+      // css
+      const abstract = doc.querySelector('#abstract');
+      if (!abstract) this.err(`Missing abstract in ${doc.title}`);
+      const head = doc.querySelector('head');
+      el('link', { rel: 'stylesheet', href: 'spec.css' }, [], head);
+      el('link', { rel: 'icon', href: 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%220%22 y=%220%22 width=%22100%22 height=%22100%22 fill=%22%2300ff75%22></rect></svg>' }, [], head);
+      el('meta', { name: 'twitter:card', content: 'summary_large_image' }, [], head);
+      el('meta', { name: 'twitter:title', property: 'og:title', content: `DASL: ${doc.title}` }, [], head);
+      if (abstract) el('meta', { name: 'twitter:description', property: 'og:description', content: norm(abstract.textContent) }, [], head);
+      el('meta', { name: 'twitter:image', property: 'og:image', content: 'https://dasl.ing/banner.png' }, [], head);
+      el('meta', { name: 'twitter:image:alt', content: 'Very colourful stripes, so colourful it hurts' }, [], head);
+      el('meta', { name: 'twitter:url', property: 'og:url', content: 'https://dasl.ing/' }, [], head);
+      el('meta', { property: 'og:site_name', content: 'DASL' }, [], head);
+      el('meta', { property: 'og:locale', content: 'en' }, [], head);
+      el('meta', { name: 'theme-color', content: '#00ff75' }, [], head);
+
+      // main & header
+      const main = doc.createElement('main');
+      const header = el('header', {}, [el('h1', {}, [doc.title])], main);
+      el(
+        'table',
+        {},
+        [
+          el('tr', {}, [
+            el('th', {}, ['date']),
+            el('td', {}, [today()]),
+          ]),
+          el('tr', {}, [
+            el('th', {}, ['editors']),
+            el('td', {}, [
+              el('a', { href: 'https://berjon.com/' }, ['Robin Berjon']),
+              ' <', el('a', { href: 'mailto:robin@berjon.com' }, ['robin@berjon.com']), '>',
+              ' & ',
+              el('a', { href: 'https://bumblefudge.com/' }, ['Juan Caballero']),
+              ' <', el('a', { href: 'mailto:bumblefudge@learningproof.xyz' }, ['bumblefudge@learningproof.xyz']), '>',
+            ]),
+          ]),
+          el('tr', {}, [
+            el('th', {}, ['abstract']),
+            el('td', {}, [abstract]),
+          ]),
+        ],
+        header
+      );
+      main.append(...doc.body.childNodes);
+      doc.body.append(main);
+      // nav back
+      const bk = el('div', { class: 'nav-back' }, [
+        'A specification of the ',
+        el('a', { href: '/' }, ['DASL Project']),
+        '.'
+      ]);
+      doc.body.prepend(bk);
+      // save
       await writeFile(join(this.baseDir, `${shortname}.html`), dom.serialize());
     }
   }
@@ -87,8 +145,31 @@ class SISL {
   }
 }
 
+function makeEl (doc) {
+  return (n, attr, kids, parent) => {
+    const el = doc.createElement(n);
+    if (attr) Object.keys(attr).forEach((k) => el.setAttribute(k, attr[k]));
+    if (kids) {
+      kids.forEach(k => {
+        if (typeof k === 'string') k = doc.createTextNode(k);
+        el.append(k);
+      });
+    }
+    if (parent) parent.append(el);
+    return el;
+  };
+}
+
+function today () {
+  return new Date().toISOString().replace(/T.+/, '');
+}
+
 function esc (str) {
   return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+}
+
+function norm (str) {
+  return (str || '').replace(/\s/g, ' ').replace(/^\s+|\s+$/g, '');
 }
 
 const isWatch = argv[2] === '--watch';

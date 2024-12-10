@@ -1,0 +1,91 @@
+
+@font-face {
+  font-family: "Barlow";
+  src: url("fonts/Barlow-Regular.ttf");
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Barlow";
+  src: url("fonts/Barlow-Regular.ttf");
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Barlow";
+  src: url("fonts/Barlow-Italic.ttf");
+  font-weight: 400;
+  font-style: italic;
+}
+@font-face {
+  font-family: "Barlow";
+  src: url("fonts/Barlow-Bold.ttf");
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Barlow";
+  src: url("fonts/Barlow-BoldItalic.ttf");
+  font-weight: 700;
+  font-style: italic;
+}
+@font-face {
+  font-family: "Barlow";
+  src: url("fonts/Barlow-Thin.ttf");
+  font-weight: 100;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Barlow";
+  src: url("fonts/Barlow-ThinItalic.ttf");
+  font-weight: 100;
+  font-style: italic;
+}
+
+/* https://colorkit.co/palette/fff500-00ff75-cd76ea-ffb443-ff5e5e-39dbff/ */
+:root {
+  --yellow: #fff500;
+  --green: #00ff75;
+  --purple: #cd76ea;
+  --orange: #ffb443;
+  --red: #ff5e5e;
+  --blue: #39dbff;
+  --contrasted: #00819e;
+  --content-width: 80rem;
+  --spec-width: 800px;
+  --header-font-size: 1.6rem;
+  --brutal-border: 5px solid #000;
+}
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: Barlow;
+}
+main {
+  max-width: var(--content-width);
+  margin: auto;
+  min-height: 100vh;
+  padding: 1rem;
+}
+dd {
+  margin-bottom: 1rem;
+}
+a {
+  color: var(--contrasted);
+  text-decoration-thickness: 3px;
+  text-decoration-color: var(--blue);
+}
+a:hover {
+  text-decoration-color: var(--red);
+}
+dfn {
+  font-style: normal;
+  font-weight: 700;
+}
+var {
+  text-decoration: underline;
+  text-decoration-color: #ccc;
+}
+code {
+  font-size: 1rem;
+}

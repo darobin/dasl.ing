@@ -1,0 +1,50 @@
+
+@import "shared.css";
+
+body {
+  line-height: 1.4;
+  font-size: 1.2rem;
+}
+.nav-back {
+  max-width: var(--spec-width);
+  margin: auto;
+  text-transform: uppercase;
+  text-align: right;
+}
+main {
+  max-width: var(--spec-width);
+}
+header {
+  padding: 4rem 0 1rem 0.5rem;
+}
+h1 {
+  font-weight: 400;
+  font-size: 2rem;
+  margin: 0.5rem 0;
+  text-decoration: underline;
+  text-decoration-color: var(--green);
+  text-decoration-thickness: 5px;
+}
+header th {
+  font-weight: normal;
+  text-transform: uppercase;
+  text-align: left;
+  vertical-align: top;
+}
+header td {
+  padding-left: 1rem;
+}
+header table p {
+  margin: 0;
+}
+p, ul, ol, dl {
+  margin: 0 1rem 1rem 1rem;
+  max-width: 70ch;
+}
+ul, ol {
+  padding-left: 1rem;
+  max-width: calc(70ch - 1rem);
+}
+ul > li {
+  list-style-type: square;
+}
