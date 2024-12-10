@@ -14,7 +14,7 @@
     - [x] use proper refs
     - [x] sections
   - [ ] dCBOR42
-  - [ ] BDASL
+  - [x] BDASL
   - [ ] CAR
   - [ ] MASL (Metadata for Arbitrary Structures and Links)
   - [ ] RASL
