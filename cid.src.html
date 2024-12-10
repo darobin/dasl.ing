@@ -104,15 +104,12 @@
           throw an error ([[sha256]], [[blake3]]).
         </li>
         <li>
-          If there are fewer than <var>hash size</var> bytes left in <var>CID bytes</var>, throw an error.
-        </li>
-        <li>
-          Remove the first <var>hash size</var> bytes from <var>CID bytes</var> and store them in
-          <code>digest</code>. Store the rest in <var>remaining bytes</var>.
+          If the number of bytes left in <var>CID bytes</var> differs from <var>hash size</var>,
+          throw an error. Store the remaining <var>CID bytes</var> in <code>digest</code>.
         </li>
         <li>
           Return <var>version</var>, <var>codec</var>, <var>hash type</var>, <var>hash size</var>,
-          <var>digest</var>, and <var>remaining bytes</var>.
+          and <var>digest</var>.
         </li>
       </ol>
     </section>
