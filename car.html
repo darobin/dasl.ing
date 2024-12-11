@@ -1,0 +1,252 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content-Addressable aRchives (CAR)</title>
+  <link rel="stylesheet" href="spec.css"><link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%220%22 y=%220%22 width=%22100%22 height=%22100%22 fill=%22%2300ff75%22></rect></svg>"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" property="og:title" content="DASL: Content-Addressable aRchives (CAR)"><meta name="twitter:description" property="og:description" content="The CAR format offers a serialized representation of graph or list of content-addressed         resources in one single concatenated stream, alongside a header and random-access index         that describe that content."><meta name="twitter:image" property="og:image" content="https://dasl.ing/banner.png"><meta name="twitter:image:alt" content="Very colourful stripes, so colourful it hurts"><meta name="twitter:url" property="og:url" content="https://dasl.ing/"><meta property="og:site_name" content="DASL"><meta property="og:locale" content="en"><meta name="theme-color" content="#00ff75"></head>
+  <body><div class="nav-back">A specification of the <a href="/">DASL Project</a>.</div><main><header><h1>Content-Addressable aRchives (CAR)</h1><table><tbody><tr><th>date</th><td>2024-12-11</td></tr><tr><th>editors</th><td><a href="https://berjon.com/">Robin Berjon</a> &lt;<a href="mailto:robin@berjon.com">robin@berjon.com</a>&gt;<br><a href="https://bumblefudge.com/">Juan Caballero</a> &lt;<a href="mailto:bumblefudge@learningproof.xyz">bumblefudge@learningproof.xyz</a>&gt;</td></tr><tr><th>issues</th><td><a href="https://github.com/darobin/dasl.ing/issues">list</a>, <a href="https://github.com/darobin/dasl.ing/issues/new">new</a></td></tr><tr><th>abstract</th><td><div id="abstract">
+      <p>
+        The CAR format offers a serialized representation of graph or list of content-addressed
+        resources in one single concatenated stream, alongside a header and random-access index
+        that describe that content.
+      </p>
+    </div></td></tr></tbody></table></header>
+    
+    <section>
+      <h2>Introduction</h2>
+      <p>
+        The CAR format (Content Addressable aRchives) is used to store series of
+        content-addressable objects as a sequence of bytes. It packages that stream of
+        objects with a header and an optional random-access index.
+      </p>
+      <p>
+        In addition to the binary block data, storage overhead for the CAR format consists of:
+      </p>
+      <ul>
+        <li>An 11-byte pragma that identifies the data as CAR.</li>
+        <li>
+          A header describing some characteristics of the CAR as well as the locations of
+          the data payload and index payload.
+        </li>
+        <li>
+          A header block encoded as dCBOR42 containing the format version and an array of
+          root CIDs ([<a href="#ref-dcbor42" class="ref">dcbor42</a>], [<a href="#ref-cid" class="ref">cid</a>]),
+        </li>
+        <li>A CID for each block preceding its binary data.</li>
+        <li>
+          A compressed integer prefixing each block (including the header block) indicating
+          the total length of that block, including the length of the encoded CID.
+        </li>
+        <li>
+          <!-- XXX how about we have only one index format -->
+          An optional index, which may be one of a number of supported index formats,
+          allowing for fast lookups of blocks within the data payload.
+        </li>
+      </ul>
+      <p>
+        The CARv2 format can be illustrated as follows:
+      </p>
+      <figure>
+        <img src="./carv2-sections.png" alt="Content Addressable aRchive v2 Sections">
+        <figcaption>
+          <pre><code>| 11-byte fixed pragma | 40-byte header | optional padding | CARv1 data payload | optional padding | optional index payload |</code></pre>
+        </figcaption>
+      </figure>
+      <p>
+        Note that this structure is slightly inefficient for historical reasons:
+        we have already seen two versions of the CAR format, and the result
+        reflects organic growth over time. Maintaining compatibility with existing
+        implementations makes the small overhead worth accepting.
+      </p>
+      <p>
+        Much of the content of this specification was initially developed as part
+        of the <a href="https://github.com/ipld/ipld">IPLD</a> project. This document
+        merges together CARv1 and CARv2 based on demand from the community to have
+        just the one spec.
+      </p>
+    </section>
+
+
+
+<!-- XXX material below -->
+
+ <h3 id="pragma" tabindex="-1"><a class="header-anchor" href="#pragma">Pragma</a></h3>
+ <p>The CARv2 version pragma (or <a href="https://en.wikipedia.org/wiki/List_of_file_signatures">"magic bytes"</a>) was chosen for compatibility with existing CARv1 parsers. CARv1 leads with a <a href="../../../codecs/dag-cbor/">DAG-CBOR</a> block, prefixed with a varint where the block contains the version and roots array:</p>
+ <pre class="language-ipldsch"><code class="language-ipldsch"><span class="token typedef"><span class="token keyword">type</span> <span class="token class-name">CarV1Header</span></span> <span class="token builtin">struct</span> <span class="token punctuation">{</span>
+   version Int <span class="token comment"># 1</span>
+   roots <span class="token punctuation">[</span><span class="token punctuation">&amp;</span>Any<span class="token punctuation">]</span>
+ <span class="token punctuation">}</span></code></pre>
+ <p>To introduce a new version that existing parsers can safely reject as an <em>"unsupported version"</em> we must copy the minimal form of this header with a new version.</p>
+ <p>Therefore, the CARv2 pragma is a fixed sequence of 11 bytes: <strong><code>0x0aa16776657273696f6e02</code></strong>.</p>
+ <p>These bytes decode as follows: A leading <code>0x0a</code> which translates as a <code>uint(10)</code> (or <code>varint(10)</code>) indicating the length of the DAG-CBOR header block to follow. The remaining 10 bytes are a standard CBOR encoding of a map containing a <code>"version"</code> field with a value <code>2</code>. i.e.</p>
+ <pre class="language-ipldsch"><code class="language-ipldsch"><span class="token typedef"><span class="token keyword">type</span> <span class="token class-name">CarV2Pragma</span></span> <span class="token builtin">struct</span> <span class="token punctuation">{</span>
+   version Int <span class="token comment"># 2</span>
+ <span class="token punctuation">}</span></code></pre>
+ <p>The 10 bytes are parsed in CBOR as follows:</p>
+ <pre><code>a1                                                # map(1)
+   67                                              #   string(7)
+     76657273696f6e                                #     "version"
+   02                                              #   uint(2)
+ </code></pre>
+ <p>Existing CARv1 parsers should safely read this pragma and reject the byte stream as an unsupported version of the CAR format.</p>
+ <p>This 11 byte string remains fixed and may be matched using a simple byte comparison and does not require a varint or CBOR decode since it does not vary for the CARv2 format.</p>
+ <h3 id="header" tabindex="-1"><a class="header-anchor" href="#header">Header</a></h3>
+ <p>Following the 11 byte pragma, the CARv2 header is a fixed-length sequence of 40 bytes, broken into the following sections:</p>
+ <ol>
+ <li><strong>Characteristics</strong>: A 128-bit (16-byte) bitfield used to describe certain features of the enclosed data.</li>
+ <li><strong>Data offset</strong>: A 64-bit (8-byte) unsigned little-endian integer indicating the byte-offset from the beginning of the CARv2 pragma to the first byte of the CARv1 data payload.</li>
+ <li><strong>Data size</strong>: A 64-bit (8-byte) unsigned little-endian integer indicating the byte-length of the CARv1 data payload.</li>
+ <li><strong>Index offset</strong>: A 64-bit (8-byte) unsigned little-endian integer indicating the byte-offset from the beginning of the CARv2 pragma to the first byte of the index payload. This value may be <code>0</code> to indicate the absence of index data.</li>
+ </ol>
+ <h3 id="characteristics" tabindex="-1"><a class="header-anchor" href="#characteristics">Characteristics</a></h3>
+ <p>The characteristics bitfield contained within the CARv2 header may be used to indicate certain features of the specific CARv2. All bits in the bitfield will be unset (<code>0</code>) by default and only set (<code>1</code>) where they are being used to signal a characteristic other than the default.</p>
+ <p>The first (i.e. left-most bit) value in characteristics bitfield specifies whether the index represents a full catalog of sections that appear in data payload, referred to as <code>fully-indexed</code> characteristic. When this characteristic is set (<code>1</code>), the index must include a complete catalog of the section CIDs regardless of whether they are identity CIDs or not.</p>
+ <p>The reminder of characteristics bitfield is not used and should have all bits unset (<code>0</code>). Future iterations of this specification may introduce characteristic indicators for features such as:</p>
+ <ul>
+ <li>DAG walk ordering—none, depth-first, breadth-first, or via <a href="../../../selectors/">IPLD Selector</a>.</li>
+ <li>De-duplication status</li>
+ </ul>
+ <h3 id="carv1-data-payload" tabindex="-1"><a class="header-anchor" href="#carv1-data-payload">CARv1 data payload</a></h3>
+ <p>The CARv1 data payload starts at the "Data offset" indicated by the CARv2 header. It is important that a decoder adhere to this offset rather than assuming the data payload begins immediately after the header in order to make allowance for additional data following the header as indicated by the characteristics field in future amendments to this specification.</p>
+ <p>The CARv1 data payload ends after the number of bytes indicated by the "Data size" field in the header. This is important as the CARv1 parser has no means to determine extent other than encountering the end of a byte stream. Therefore, a CARv2 decoder may defer to a CARv1 decoder to load the <code>CID:Bytes</code> sequence payload and "roots" array, but must be able to deliver it a byte stream that strictly begins at "Data offset" and ends after "Data size" bytes from that offset.</p>
+ <p>The data payload is a complete, self-contained CARv1. As such, it must include a valid CARv1 header, including a roots array and a <code>version</code> field with a value strictly of <code>1</code>, followed by a series of data blocks. As such, conversion from a CARv2 to CARv1 simply requires extraction of the data payload without further modification.</p>
+ <p>Refer to the <a href="../carv1/">CARv1 Specification</a> for details on the CARv1 format.</p>
+ <h3 id="index-payload" tabindex="-1"><a class="header-anchor" href="#index-payload">Index payload</a></h3>
+ <p>The CARv2 index payload follows the CARv1 data payload, but may be offset by padding or additional data as dictated by the characteristics field. If an index is present, the index payload begins at "Index offset", which <em>must</em> be after the end of the CARv2 data payload, and continues until the end of the CARv2 byte stream (its length is not encoded in the header).</p>
+ <p>An "Index offset" value of <code>0</code> in the CARv2 header indicates that there is no index in this CARv2 and no attempt should be made to read it.</p>
+ <h3 id="index-format" tabindex="-1"><a class="header-anchor" href="#index-format">Index format</a></h3>
+ <p>The CARv2 index is a flexible format itself, allowing for different index layouts depending on suitability for a particular application or set of data - generation speed, usage performance, size, etc. Supported index formats will be detailed in this specification, below.</p>
+ <p>At present, once read from a CARv2, the index data provides a mapping of hash digest bytes to block location in byte offset from the beginning of the CARv1 data payload (<em>not</em> the begining of the CARv2). The index only uses the hash digest—it does not use the full bytes of a CID, nor does it use any of the multihash prefix bytes. Future index formats may introduce alternative mapping schemes or additional data within the index.</p>
+ <p>The first byte(s) of a CARv2 index (at the "Index offset" position) contain an unsigned <a href="https://en.wikipedia.org/wiki/LEB128">LEB128</a> integer ("varint") that indicates the index format type as a <a href="https://github.com/multiformats/multicodec">Multicodec</a> code. The remaining bytes follow the encoding rules of that index format type.</p>
+ <p>As the index only contains the hash digest bytes, other details contained within the block's CID and the length of the block's bytes must be derived by inspecting the initial bytes of the block entry within the data payload.</p>
+ <p>Indexes <strong>should not include identity hash CIDs unless the <code>fully-indexed</code> characteristic is set</strong>. It is assumed that any use of a CARv2 as a blockstore will return identity CID data immediately by extracting it from the CID, therefore there should be no need to provide indexing for such entries. However, when <code>fully-indexed</code> characteristic is set, the blockstore should persist blocks with identity CID into the CARv2 data payload and index them.</p>
+ <h4 id="format-0x0400-indexsorted" tabindex="-1"><a class="header-anchor" href="#format-0x0400-indexsorted">Format <code>0x0400</code>: IndexSorted</a></h4>
+ <p>An unsigned varint of <code>0x0400</code> at the "Index offset" byte position indicates the remaining bytes of the CAR should be interpreted as the "IndexSorted" format.</p>
+ <p>IndexSorted sorts hash digests by two dimensions: first into buckets of <em>digest length</em>, smallest to largest, and then within those buckets ordered by a simple byte-wise sorting. In this way, locating a hash digest within the CAR requires first finding the bucket matching the length of the requested hash digest, then searching the ordered list of digests within that bucket to find the matching entry.</p>
+ <ul>
+ <li>IndexSorted may contain one or more length-grouped buckets of digests.</li>
+ <li>Buckets are ordered by digest length and concatenated together to form the index.</li>
+ <li>Each bucket is prefixed with:
+ <ul>
+ <li>a "width" encoded as a 32-bit unsigned little-endian integer indicating the common byte length of the combination of hash digests and their offsets in this bucket; followed by</li>
+ <li>a "count" encoded as a 64-bit unsigned little-endian integer which determines the total number of hash digests (and their offsets) bucket.</li>
+ </ul>
+ </li>
+ </ul>
+ <p>A common case of a single bucket of 32-byte hash digests is expected due to the commonality of this digest length for CIDs.</p>
+ <p>Individual index entries are the concatenation of the hash digest an an additional 64-bit unsigned little-endian integer indicating the offset of the block from the begining of the CARv1 data payload. Offsets locate the first byte of the varint that prefix the <code>CID:Bytes</code> pair within the CARv1 payload. See the <a href="../carv1/#data">data section in the CARv1 Specification</a> for details on block encoding.</p>
+ <p>For example, a bucket containing 32-byte hash digests will have a "width" of <code>40</code> as each entry in the bucket is a concatenation of the 32-byte digest and an 8-byte offset value. Hash digest length within a bucket is derived by subtracting <code>8</code> from the "width" of the bucket.</p>
+ <p>Each bucket, therefore, takes the following form:</p>
+ <pre><code>| width (uint32) | count (uint64) | digest1 | digest1 offset (uint64) | digest2 | digest2 offset (uint64) ...
+ </code></pre>
+ <h4 id="format-0x0401-multihashindexsorted" tabindex="-1"><a class="header-anchor" href="#format-0x0401-multihashindexsorted">Format <code>0x0401</code>: MultihashIndexSorted</a></h4>
+ <p>An unsigned varint of <code>0x0401</code> at the "Index offset" byte position indicates the remaining bytes of the CAR should be interpreted as the "MultihashIndexSorted" format.</p>
+ <p>MultihashIndexSorted builds on top of the <code>IndexSorted</code> by storing an additional dimension: the hash function by which digests are calculated, a.k.a. <em>multihash code</em>. More precisely, MultihashIndexSorted sorts hash digests by three dimensions: first into buckets of multihash code, smallest to largest, then into buckets of <em>digest length</em>, smallest to largest, and finally within those buckets ordered by a simple byte-wise sorting. In this way, locating a multihash within the CAR requires first finding the bucket matching the code of the requested multihash, then the length of the requested multihash digest, and finally searching the ordered list of digests within that bucket to find the matching entry.</p>
+ <ul>
+ <li>MultihashIndexSorted may contain one or more multihash code-grouped buckets of digests.</li>
+ <li>Multihash code-grouped buckets may further contain one or more length-grouped buckets.</li>
+ <li>Buckets are ordered by multihash code then digest length, and concatenated together to form the index.</li>
+ <li>Each bucket is prefixed with:
+ <ul>
+ <li>a "multihash code" encoded as a 64-bit unsigned little-endian integer indicating the common multihash code for the digests in this bucket; followed by</li>
+ <li>length-grouped bucket structure identical to IndexSorted.</li>
+ </ul>
+ </li>
+ </ul>
+ <p>Individual index entries are also identical to the IndexSorted entries. Each bucket, therefore, takes the following form:</p>
+ <pre><code>| multihash-code (uint64) | width (uint32) | count (uint64) | digest1 | digest1 offset (uint64) | digest2 | digest2 offset (uint64) ...
+ </code></pre>
+
+		<!-- CAR v1 -->
+
+
+<h2 id="format-description" tabindex="-1"><a class="header-anchor" href="#format-description">Format Description</a></h2>
+<p>The CAR format comprises a sequence of length-prefixed IPLD block data, where the first block in the CAR is the Header encoded as CBOR, and the remaining blocks form the Data component of the CAR and are each additionally prefixed with their CIDs. The length prefix of each block in a CAR is encoded as a "varint"—an unsigned <a href="https://en.wikipedia.org/wiki/LEB128">LEB128</a> integer. This integer specifies the number of remaining bytes for that block entry—excluding the bytes used to encode the integer, but including the CID for non-header blocks.</p>
+<pre><code>|--------- Header --------| |---------------------------------- Data -----------------------------------|
+
+[ varint | DAG-CBOR block ] [ varint | CID | block ] [ varint | CID | block ] [ varint | CID | block ] …
+</code></pre>
+<h3 id="header" tabindex="-1"><a class="header-anchor" href="#header">Header</a></h3>
+<p>The first bytes of the CAR format hold a varint, this unsigned integer specifies the number of bytes beyond the varint itself that contain the <em>Header</em> block. This Header block is a byte array DAG-CBOR (CBOR with tag 42 for CIDs) encoded object holding the version number and array of roots. As an <a href="../../../../docs/schemas/">IPLD Schema</a>:</p>
+<pre class="language-ipldsch"><code class="language-ipldsch"><span class="token typedef"><span class="token keyword">type</span> <span class="token class-name">CarHeader</span></span> <span class="token builtin">struct</span> <span class="token punctuation">{</span>
+  version Int
+  roots <span class="token punctuation">[</span><span class="token punctuation">&amp;</span>Any<span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+<h4 id="constraints" tabindex="-1"><a class="header-anchor" href="#constraints">Constraints</a></h4>
+<ul>
+<li>The <code>version</code> is always a value of <code>1</code>. Future iterations of this specification may make use of <code>version</code> to introduce variations of the format.</li>
+<li>The <code>roots</code> array must contain <strong>one or more</strong> CIDs, each of which should be present somewhere in the remainder of the CAR.</li>
+</ul>
+<p><em>(Caveats: see <a href="#number-of-roots">Number of roots</a> and <a href="#root-cid-block-existence">Root CID block existence</a> under Unresolved Issues.)</em></p>
+<h3 id="data" tabindex="-1"><a class="header-anchor" href="#data">Data</a></h3>
+<p>Immediately following the Header block, <strong>one or more</strong> IPLD blocks are concatenated to form the <em>Data</em> section of the CAR format. <em>(Caveat: see <a href="#zero-blocks">Zero blocks</a> under Unresolved Issues.)</em> Each block is encoded into a <em>Section</em> by the concatenation of the following values:</p>
+<ol>
+<li>Length in bytes of the combined CID and data in this Section, encoded as a varint</li>
+<li>CID of the block in this Section, encoded in the raw byte form of the CID</li>
+<li>Binary data of the block</li>
+</ol>
+<h4 id="length" tabindex="-1"><a class="header-anchor" href="#length">Length</a></h4>
+<p>Each Section begins with a varint representation of an unsigned integer indicating the number of bytes containing the remainder of the section.</p>
+<h4 id="cid" tabindex="-1"><a class="header-anchor" href="#cid">CID</a></h4>
+<p>Following the Length, the CID of the block is included in raw byte form. A decoder reading a Section must decode the CID according to CID byte encoding rules, which don't provide a stable length. See <a href="https://github.com/multiformats/cid">https://github.com/multiformats/cid</a> for details on the encoding of a CID. CIDv0 and CIDv1 are currently supported. <em>(Caveat: see <a href="#cid-version">CID version</a> under Unresolved Issues.)</em></p>
+<p><strong>CID byte decoding summary</strong></p>
+<p><em>See the <a href="https://github.com/multiformats/cid">CID specification</a> for full details.</em></p>
+<p>A CIDv0 is indicated by a first byte of <code>0x12</code> followed by <code>0x20</code> which specifies a 32-byte (<code>0x20</code>) length SHA2-256 (<a href="https://github.com/multiformats/multicodec/blob/master/table.csv"><code>0x12</code></a>) digest.</p>
+<p>Failure to find <code>0x12, 0x20</code> indicates a CIDv1 which is decoded by reading:</p>
+<ol>
+<li>Version as an unsigned varint (should be <code>1</code>)</li>
+<li>Codec as an unsigned varint (valid according to the <a href="https://github.com/multiformats/multicodec/blob/master/table.csv">multicodec table</a>)</li>
+<li>The raw bytes of a <a href="https://github.com/multiformats/multihash">multihash</a></li>
+</ol>
+<p>Reading the multihash requires a partial decode in order to determine the length:</p>
+<pre><code>| hash function code (varint) | digest size (varint) | digest |
+</code></pre>
+<p>The first two bytes of a multihash are varints, where the second varint is an unsigned integer indicating the length of the remaining portion of the multihash. Therefore, a manual decode requires two varint reads and then copying the bytes of those varints in addition to the number of bytes indicated by the second varint into a byte array.</p>
+<h4 id="data-1" tabindex="-1"><a class="header-anchor" href="#data-1">Data</a></h4>
+<p>The remainder of a Section, after length-prefix and CID, comprises the raw byte data of the IPLD block. The encoded block may be any IPLD block format as specified by the codec in the CID. Typical codecs will be <a href="../../../codecs/dag-pb/">DAG-PB</a>, <a href="../../../codecs/dag-cbor/">DAG-CBOR</a> or <a href="https://github.com/ipld/specs/issues/223">RAW</a>.</p>
+
+
+
+    <!-- XXX end material -->
+    <section>
+      <h2>Additional Considerations</h2>
+      <section>
+        <h3>Determinism</h3>
+        <p>
+          Deterministic CAR creation is not covered by this specification. However, deterministic
+          generation of a CAR from a given graph is possible and is relied upon by certain uses of
+          the format, most notably, <a href="https://filecoin-project.github.io/specs">Filecoin</a>.
+          dCAR may be the topic of a future specification.
+        </p>
+        <p>
+          Care regarding the ordering of the <code>roots</code> array in the Header and avoidance
+          of duplicate blocks may also be required for strict determinism.
+        </p>
+      </section>
+      <section>
+        <h3>Security &amp; Verifiability</h3>
+        <p>
+          The roots specified by the Header of a CAR must appear somewhere in its Data section,
+          however there is no requirement that the roots define entire DAGs, nor that all blocks
+          in a CAR must be part of DAGs described by the root CIDs in the Header. Therefore, the
+          roots must not be used alone to determine or differentiate the contents of a CAR.
+        </p>
+        <p>
+          The CAR format contains no internal means, beyond the blocks and their CIDs, to verify
+          or differentiate contents. Where such a requirement exists, this must be performed
+          externally, such as creating a digest of the entire CAR (and refer to it using a CID).
+        </p>
+      </section>
+    </section>
+    <section>
+      <h2>Appendix: Media Type</h2>
+      <p>
+        The media type for CAR is
+        <a href="https://www.iana.org/assignments/media-types/application/vnd.ipld.car"><code>application/vnd.ipld.car</code></a>.
+      </p>
+      <p>
+        The conventional file extension for CAR is <code>.car</code>.
+      </p>
+    </section>
+  
+
+<section><h2>References</h2><dl><dt id="ref-cid">[cid]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/cid.html"><cite>Content IDs (CIDs)</cite></a>. 2024-12-11. URL:&nbsp;<a href="https://dasl.ing/cid.html">https://dasl.ing/cid.html</a></dd><dt id="ref-dcbor42">[dcbor42]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/dcbor42.html"><cite>Deterministic CBOR with tag 42 (dCBOR42)</cite></a>. 2024-12-11. URL:&nbsp;<a href="https://dasl.ing/dcbor42.html">https://dasl.ing/dcbor42.html</a></dd></dl></section></main></body></html>

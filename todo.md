@@ -4,8 +4,8 @@
 - [x] spec gen script
   - [ ] anchors to section headings
   - [ ] make it easy to link to dfns
-- [ ] intro clarity
-- [ ] Unix philosophy
+- [x] intro clarity
+- [x] Unix philosophy
 - [ ] Specs
   - [x] CIDs
   - [ ] dCBOR42

@@ -66,6 +66,9 @@ a.dfn-ref {
   /* text-decoration-thickness: 1px; */
   color: inherit;
 }
+pre {
+  white-space: pre-wrap;
+}
 
 @media only screen and (max-width:800px) {
   header table, header tr, header th, header td {
