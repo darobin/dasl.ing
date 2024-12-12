@@ -10,7 +10,7 @@
   - [x] CIDs
   - [ ] dCBOR42
   - [x] BDASL
-  - [ ] CAR
+  - [x] CAR
   - [ ] MASL (Metadata for Arbitrary Structures and Links)
   - [ ] RASL
 - [ ] Test Suite
