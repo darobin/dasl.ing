@@ -76,7 +76,8 @@ a.dfn-ref {
   color: inherit;
 }
 pre {
-  white-space: pre-wrap;
+  /* white-space: pre-wrap; */
+  overflow: auto;
 }
 
 @media only screen and (max-width:800px) {

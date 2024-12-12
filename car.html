@@ -39,8 +39,8 @@
         This integer specifies the number of remaining bytes for that block entry, excluding
         the bytes used to encode the integer, but including the CID for non-header blocks.
       </p>
-      <pre><code>|--------- Header --------| |---------------------------------- Data -----------------------------------|
-[ leb128 | DAG-CBOR block ] [ leb128 | CID | block ] [ leb128 | CID | block ] [ leb128 | CID | block ] …
+      <pre><code>|------- Header -------| |------------------- Data -------------------|
+[ int | DAG-CBOR block ] [ int | CID | block ] [ int | CID | block ] …
       </code></pre>
       <p>
         The steps to <dfn id="dfn-parse-a-car">parse a CAR</dfn> are:
