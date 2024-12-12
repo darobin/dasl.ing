@@ -97,7 +97,7 @@
       </p>
       <ol>
         <li>Accept a byte stream <var>bytes</var>.</li>
-        <li>Read and LEB128 <var>length</var> from <var>bytes</var>.</li>
+        <li>Read an LEB128 <var>length</var> from <var>bytes</var>.</li>
         <li>If <var>length</var> is 0, throw an error.</li>
         <li>
           Read <var>length</var> bytes from <var>bytes</var> and decode them as
@@ -129,7 +129,7 @@
       </p>
       <ol>
         <li>Accept a byte stream <var>bytes</var>.</li>
-        <li>Read and LEB128 <var>length</var> from <var>bytes</var>.</li>
+        <li>Read an LEB128 <var>length</var> from <var>bytes</var>.</li>
         <li>If <var>length</var> is 0, throw an error.</li>
         <li>
           Read a CID ([[cid]]) from <var>bytes</var> and store it in <var>cid</var>.

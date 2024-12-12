@@ -94,17 +94,29 @@
           throw an error ([<a href="#ref-dcbor42" class="ref">dcbor42</a>]).
         </li>
         <li>
-          Remove the next two bytes in <var>CID bytes</var> and store them in <var>hash type</var> and
-          <var>hash size</var>, respectively.
+          Remove the next byte in <var>CID bytes</var> and store it in <var>hash type</var>.
         </li>
         <li>
           If <var>hash type</var> is not equal to <code>0x12</code> (SHA-256), throw an error ([<a href="#ref-sha256" class="ref">sha256</a>]).
         </li>
+        <li>Read an LEB128 <var>hash size</var> from <var>CID bytes</var> ([<a href="#ref-leb128" class="ref">leb128</a>]).</li>
         <li>
-          If the number of bytes left in <var>CID bytes</var> differs from <var>hash size</var>,
-          throw an error. Store the remaining <var>CID bytes</var> in <code>digest</code>.
-          Note that it is possible for <var>hash size</var> to be zero in order to code
-          for an empty CID.
+          If the number of bytes left in <var>CID bytes</var> is smaller than <var>hash size</var>,
+          throw an error. Note that it is possible for <var>hash size</var> to be zero in order to code
+          for an empty CID. At this point, we have two options:
+          <ul>
+            <li>
+              <u>We are expecting <var>CID bytes</var> to <em>only</em> contain a CID.</u> If
+              the number of bytes left in <var>CID bytes</var> is greater than <var>hash size</var>,
+              throw an error. Store the remaining <var>CID bytes</var> in <code>digest</code>.
+            </li>
+            <li>
+              <u>We are reading from the beginning of <var>CID bytes</var> and it may contain more data.</u>
+              This is the case for instance when processing a CAR block ([<a href="#ref-car" class="ref">car</a>]). Only read <var>hash size</var>
+              bytes from <var>CID bytes</var> and leave the rest available for further processing.
+              Store the <var>hash size</var> bytes from <var>CID bytes</var> in <code>digest</code>.
+            </li>
+          </ul>
         </li>
         <li>
           Return <var>version</var>, <var>codec</var>, <var>hash type</var>, <var>hash size</var>,
@@ -148,4 +160,4 @@
     </section>
   
 
-<section><h2>References</h2><dl><dt id="ref-dcbor42">[dcbor42]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/dcbor42.html"><cite>Deterministic CBOR with tag 42 (dCBOR42)</cite></a>. 2024-12-12. URL:&nbsp;<a href="https://dasl.ing/dcbor42.html">https://dasl.ing/dcbor42.html</a></dd><dt id="ref-rfc4648">[rfc4648]</dt><dd>S. Josefsson. <a href="https://www.rfc-editor.org/rfc/rfc4648"><cite>The Base16, Base32, and Base64 Data Encodings</cite></a>. October 2006. URL:&nbsp;<a href="https://www.rfc-editor.org/rfc/rfc4648">https://www.rfc-editor.org/rfc/rfc4648</a></dd><dt id="ref-sha256">[sha256]</dt><dd>National Institute of Standards and Technology, <cite>Secure Hash Algorithm. NIST FIPS 180-2</cite>. August 2002.</dd></dl></section></main></body></html>
+<section><h2>References</h2><dl><dt id="ref-car">[car]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/car.html"><cite>Content-Addressable aRchives (CAR)</cite></a>. 2024-12-12. URL:&nbsp;<a href="https://dasl.ing/car.html">https://dasl.ing/car.html</a></dd><dt id="ref-dcbor42">[dcbor42]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/dcbor42.html"><cite>Deterministic CBOR with tag 42 (dCBOR42)</cite></a>. 2024-12-12. URL:&nbsp;<a href="https://dasl.ing/dcbor42.html">https://dasl.ing/dcbor42.html</a></dd><dt id="ref-leb128">[leb128]</dt><dd>Wikipedia. <a href="https://en.wikipedia.org/wiki/LEB128"><cite>LEB128</cite></a>. Retrieved December 2024. URL:&nbsp;<a href="https://en.wikipedia.org/wiki/LEB128">https://en.wikipedia.org/wiki/LEB128</a></dd><dt id="ref-rfc4648">[rfc4648]</dt><dd>S. Josefsson. <a href="https://www.rfc-editor.org/rfc/rfc4648"><cite>The Base16, Base32, and Base64 Data Encodings</cite></a>. October 2006. URL:&nbsp;<a href="https://www.rfc-editor.org/rfc/rfc4648">https://www.rfc-editor.org/rfc/rfc4648</a></dd><dt id="ref-sha256">[sha256]</dt><dd>National Institute of Standards and Technology, <cite>Secure Hash Algorithm. NIST FIPS 180-2</cite>. August 2002.</dd></dl></section></main></body></html>
