@@ -41,6 +41,9 @@ section, ul, ol {
   margin: 0 1rem 1rem 1rem;
   max-width: 70ch;
 }
+section section {
+  margin: 0 0 1rem 0;
+}
 ul, ol {
   padding-left: 1rem;
   max-width: calc(70ch - 1rem);
@@ -57,6 +60,12 @@ h2 {
   text-decoration: underline;
   text-decoration-thickness: 5px;
   text-transform: uppercase;
+}
+h3 {
+  margin-bottom: 0;
+}
+h3 + p {
+  margin-top: 0;
 }
 header table a, a.ref {
   text-decoration: none;

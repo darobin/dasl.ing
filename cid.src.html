@@ -105,6 +105,8 @@
         <li>
           If the number of bytes left in <var>CID bytes</var> differs from <var>hash size</var>,
           throw an error. Store the remaining <var>CID bytes</var> in <code>digest</code>.
+          Note that it is possible for <var>hash size</var> to be zero in order to code
+          for an empty CID.
         </li>
         <li>
           Return <var>version</var>, <var>codec</var>, <var>hash type</var>, <var>hash size</var>,
