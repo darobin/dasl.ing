@@ -2,28 +2,75 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Deterministic CBOR with tag 42 (dCBOR42)</title>
-  <link rel="stylesheet" href="spec.css"><link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%220%22 y=%220%22 width=%22100%22 height=%22100%22 fill=%22%2300ff75%22></rect></svg>"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" property="og:title" content="DASL: Deterministic CBOR with tag 42 (dCBOR42)"><meta name="twitter:description" property="og:description" content="dCBOR42 is a form of IPLD that serializes only to deterministic CBOR, by normalizing and reducing some type         flexibility. Notably, we support no ADLs."><meta name="twitter:image" property="og:image" content="https://dasl.ing/dcbor42.png"><meta name="twitter:image:alt" content="Very colourful stripes, so colourful it hurts"><meta name="twitter:url" property="og:url" content="https://dasl.ing/"><meta property="og:site_name" content="DASL"><meta property="og:locale" content="en"><meta name="theme-color" content="#00ff75"></head>
+  <link rel="stylesheet" href="spec.css"><link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%220%22 y=%220%22 width=%22100%22 height=%22100%22 fill=%22%2300ff75%22></rect></svg>"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" property="og:title" content="DASL: Deterministic CBOR with tag 42 (dCBOR42)"><meta name="twitter:description" property="og:description" content="dCBOR42 is a serialization format that is deterministic (so that the same         data will have the same CID) and that features native support for using         CIDs as links."><meta name="twitter:image" property="og:image" content="https://dasl.ing/dcbor42.png"><meta name="twitter:image:alt" content="Very colourful stripes, so colourful it hurts"><meta name="twitter:url" property="og:url" content="https://dasl.ing/"><meta property="og:site_name" content="DASL"><meta property="og:locale" content="en"><meta name="theme-color" content="#00ff75"></head>
   <body><div class="nav-back">A specification of the <a href="/">DASL Project</a>.</div><main><header><h1>Deterministic CBOR with tag 42 (dCBOR42)</h1><table><tbody><tr><th>date</th><td>2024-12-12</td></tr><tr><th>editors</th><td><a href="https://berjon.com/">Robin Berjon</a> &lt;<a href="mailto:robin@berjon.com">robin@berjon.com</a>&gt;<br><a href="https://bumblefudge.com/">Juan Caballero</a> &lt;<a href="mailto:bumblefudge@learningproof.xyz">bumblefudge@learningproof.xyz</a>&gt;</td></tr><tr><th>issues</th><td><a href="https://github.com/darobin/dasl.ing/issues">list</a>, <a href="https://github.com/darobin/dasl.ing/issues/new">new</a></td></tr><tr><th>abstract</th><td><div id="abstract">
       <p>
-        dCBOR42 is a form of IPLD that serializes only to deterministic CBOR, by normalizing and reducing some type
-        flexibility. Notably, we support no ADLs.
+        dCBOR42 is a serialization format that is deterministic (so that the same
+        data will have the same CID) and that features native support for using
+        CIDs as links.
       </p>
     </div></td></tr></tbody></table></header>
     
     <section>
-      <h2>Basics</h2>
+      <h2>Introduction</h2>
       <p>
-        (See the <a href="https://datatracker.ietf.org/doc/draft-mcnally-deterministic-cbor/">current draft specification for dCBOR</a>,
-        and <a href="https://ftp.linux.cz/pub/internet-drafts/draft-bormann-cbor-det-01.html">Carsten Bormann's BCP document
-        on the underspecified determinism of Section 4.2 of the CBOR specification</a>). For debugging purposes, either
-        one-way conversion to DAG-JSON or <a href="https://datatracker.ietf.org/doc/draft-ietf-cbor-edn-literals/">CBOR
-        Extended Diagnostic Notation</a> can be used, but either way, note that the CIDs in such debugging outputs
-        should be the CIDs of the dCBOR42 content, not of other debugging resources.
+        Deterministic encodings that produce the same stream of bytes for any
+        given data with the same semantics are particularly useful in a content-addressed
+        context. dCBOR42 provides that. Additionally, it supports CBOR Tag 42 that
+        contains a CID ([<a href="#ref-cid" class="ref">cid</a>]). This CID can be used for content-addressed linking
+        between dCBOR42 documents and to raw resources.
       </p>
       <p>
-        Further details forthcoming.
+        dCBOR42 does not fork CBOR, CDE, or dCBOR ([<a href="#ref-cbor" class="ref">cbor</a>], [<a href="#ref-cde" class="ref">cde</a>], [<a href="#ref-dcbor" class="ref">dcbor</a>]).
+        Any decoder for any of those CBOR variants will be able to read dCBOR42
+        content, and an encoder for those variants should be able to produce
+        correct dCBOR42 if configured with the right option and given
+        appropriately-prepared data.
+      </p>
+    </section>
+    <section>
+      <h2>Format</h2>
+      <p>
+        dCBOR42 is an application profile of dCBOR ([<a href="#ref-dcbor" class="ref">dcbor</a>]) with the following
+        constraints:
+      </p>
+      <ul>
+        <li>
+          Implementations must support Tag 42 (see <a href="https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml">CBOR
+          Tag registry</a>).
+        </li>
+        <li>
+          Implementations must reject all other tags, this includes any of the tags
+          listed in <a href="https://tools.ietf.org/html/rfc8949#section-3.4">section
+          3.4 of RFC 8949</a>.
+        </li>
+        <li>
+          Implementations must reject map keys that are not strings.
+        </li>
+      </ul>
+      <p>
+        All other requirements are as dCBOR ([<a href="#ref-dcbor" class="ref">dcbor</a>]).
+      </p>
+    </section>
+    <section>
+      <h2>Debugging Considerations</h2>
+      <p>
+        It is often convenient to represent dCBOR42 in textual formats for debugging
+        purposes, for example using JSON.
+      </p>
+      <p>
+        One common convention to do so is "DAG-JSON" which is a JSON expression
+        of the dCBOR42 data in which CIDs are represented as
+        <code>{ "/": "string CID" }</code>. Another option is
+        <a href="https://datatracker.ietf.org/doc/draft-ietf-cbor-edn-literals/">CBOR
+        Extended Diagnostic Notation</a>.
+      </p>
+      <p>
+        In any case, note that the CIDs used in such debugging outputs that may
+        point to <em>other</em> parts of the debugging output should be the CIDs
+        of the dCBOR42 content, not of the debugging resources.
       </p>
     </section>
   
 
-</main></body></html>
+<section><h2>References</h2><dl><dt id="ref-cbor">[cbor]</dt><dd>C. Bormann. &amp; P. Hoffman. <a href="https://www.rfc-editor.org/info/rfc8949"><cite>Concise Binary Object Representation (CBOR)</cite></a>. October 2024. URL:&nbsp;<a href="https://www.rfc-editor.org/info/rfc8949">https://www.rfc-editor.org/info/rfc8949</a></dd><dt id="ref-cde">[cde]</dt><dd>C. Bormann. <a href="https://datatracker.ietf.org/doc/html/draft-ietf-cbor-cde-06"><cite>CBOR Common Deterministic Encoding (CDE)</cite></a>. October 2024. URL:&nbsp;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-cbor-cde-06">https://datatracker.ietf.org/doc/html/draft-ietf-cbor-cde-06</a></dd><dt id="ref-cid">[cid]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/cid.html"><cite>Content IDs (CIDs)</cite></a>. 2024-12-12. URL:&nbsp;<a href="https://dasl.ing/cid.html">https://dasl.ing/cid.html</a></dd><dt id="ref-dcbor">[dcbor]</dt><dd>W. McNally, C. Allen, C. Bormann, &amp; L. Lundblade. <a href="https://datatracker.ietf.org/doc/draft-mcnally-deterministic-cbor/"><cite>dCBOR: A Deterministic CBOR Application Profile</cite></a>. October 2024. URL:&nbsp;<a href="https://datatracker.ietf.org/doc/draft-mcnally-deterministic-cbor/">https://datatracker.ietf.org/doc/draft-mcnally-deterministic-cbor/</a></dd></dl></section></main></body></html>

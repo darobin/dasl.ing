@@ -8,22 +8,69 @@
   <body>
     <div id="abstract">
       <p>
-        dCBOR42 is a form of IPLD that serializes only to deterministic CBOR, by normalizing and reducing some type
-        flexibility. Notably, we support no ADLs.
+        dCBOR42 is a serialization format that is deterministic (so that the same
+        data will have the same CID) and that features native support for using
+        CIDs as links.
       </p>
     </div>
     <section>
-      <h2>Basics</h2>
+      <h2>Introduction</h2>
       <p>
-        (See the <a href="https://datatracker.ietf.org/doc/draft-mcnally-deterministic-cbor/">current draft specification for dCBOR</a>,
-        and <a href="https://ftp.linux.cz/pub/internet-drafts/draft-bormann-cbor-det-01.html">Carsten Bormann's BCP document
-        on the underspecified determinism of Section 4.2 of the CBOR specification</a>). For debugging purposes, either
-        one-way conversion to DAG-JSON or <a href="https://datatracker.ietf.org/doc/draft-ietf-cbor-edn-literals/">CBOR
-        Extended Diagnostic Notation</a> can be used, but either way, note that the CIDs in such debugging outputs
-        should be the CIDs of the dCBOR42 content, not of other debugging resources.
+        Deterministic encodings that produce the same stream of bytes for any
+        given data with the same semantics are particularly useful in a content-addressed
+        context. dCBOR42 provides that. Additionally, it supports CBOR Tag 42 that
+        contains a CID ([[cid]]). This CID can be used for content-addressed linking
+        between dCBOR42 documents and to raw resources.
       </p>
       <p>
-        Further details forthcoming.
+        dCBOR42 does not fork CBOR, CDE, or dCBOR ([[cbor]], [[cde]], [[dcbor]]).
+        Any decoder for any of those CBOR variants will be able to read dCBOR42
+        content, and an encoder for those variants should be able to produce
+        correct dCBOR42 if configured with the right option and given
+        appropriately-prepared data.
+      </p>
+    </section>
+    <section>
+      <h2>Format</h2>
+      <p>
+        dCBOR42 is an application profile of dCBOR ([[dcbor]]) with the following
+        constraints:
+      </p>
+      <ul>
+        <li>
+          Implementations must support Tag 42 (see <a href="https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml">CBOR
+          Tag registry</a>).
+        </li>
+        <li>
+          Implementations must reject all other tags, this includes any of the tags
+          listed in <a href="https://tools.ietf.org/html/rfc8949#section-3.4">section
+          3.4 of RFC 8949</a>.
+        </li>
+        <li>
+          Implementations must reject map keys that are not strings.
+        </li>
+      </ul>
+      <p>
+        All other requirements are as dCBOR ([[dcbor]]).
+      </p>
+    </section>
+    <section>
+      <h2>Debugging Considerations</h2>
+      <p>
+        It is often convenient to represent dCBOR42 in textual formats for debugging
+        purposes, for example using JSON.
+      </p>
+      <p>
+        One common convention to do so is "DAG-JSON" which is a JSON expression
+        of the dCBOR42 data in which CIDs are represented as
+        <code>{ "/": "string CID" }</code>. Another option is
+        <a href="https://datatracker.ietf.org/doc/draft-ietf-cbor-edn-literals/">CBOR
+        Extended Diagnostic Notation</a>.
+      </p>
+      <p>
+        In any case, note that the CIDs used in such debugging outputs that may
+        point to <em>other</em> parts of the debugging output should be the CIDs
+        of the dCBOR42 content, not of the debugging resources.
       </p>
     </section>
   </body>
