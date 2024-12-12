@@ -80,7 +80,7 @@ class SISL {
       el('meta', { name: 'twitter:card', content: 'summary_large_image' }, [], head);
       el('meta', { name: 'twitter:title', property: 'og:title', content: `DASL: ${doc.title}` }, [], head);
       if (abstract) el('meta', { name: 'twitter:description', property: 'og:description', content: norm(abstract.textContent) }, [], head);
-      el('meta', { name: 'twitter:image', property: 'og:image', content: 'https://dasl.ing/banner.png' }, [], head);
+      el('meta', { name: 'twitter:image', property: 'og:image', content: `https://dasl.ing/${shortname}.png` }, [], head);
       el('meta', { name: 'twitter:image:alt', content: 'Very colourful stripes, so colourful it hurts' }, [], head);
       el('meta', { name: 'twitter:url', property: 'og:url', content: 'https://dasl.ing/' }, [], head);
       el('meta', { property: 'og:site_name', content: 'DASL' }, [], head);
