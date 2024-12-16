@@ -73,7 +73,13 @@ section ul > li {
 #code > h2 { text-decoration-color: var(--blue); }
 #spec > h2 { text-decoration-color: var(--red); }
 footer {
+  display: flex;
   border: var(--brutal-border);
+  align-items: center;
+}
+footer p {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 @media only screen and (max-width:800px) {
