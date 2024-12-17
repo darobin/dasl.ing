@@ -34,14 +34,16 @@ nav > ul > li > a {
 }
 nav > ul > li > a[href="#what"] { text-decoration-color: var(--orange); }
 nav > ul > li > a[href="#what"]:hover { color: var(--orange); }
+nav > ul > li > a[href="#how"] { text-decoration-color: var(--purple); }
+nav > ul > li > a[href="#how"]:hover { color: var(--purple); }
 nav > ul > li > a[href="#code"] { text-decoration-color: var(--blue); }
 nav > ul > li > a[href="#code"]:hover { color: var(--blue); }
 nav > ul > li > a[href="#spec"] { text-decoration-color: var(--red); }
 nav > ul > li > a[href="#spec"]:hover { color: var(--red); }
 nav > ul > li > a[href="https://github.com/darobin/dasl.ing"] { text-decoration-color: var(--yellow); }
 nav > ul > li > a[href="https://github.com/darobin/dasl.ing"]:hover { color: var(--yellow); }
-nav > ul > li > a[href="https://github.com/darobin/dasl.ing/issues"] { text-decoration-color: var(--purple); }
-nav > ul > li > a[href="https://github.com/darobin/dasl.ing/issues"]:hover { color: var(--purple); }
+nav > ul > li > a[href="https://github.com/darobin/dasl.ing/issues"] { text-decoration-color: var(--green); }
+nav > ul > li > a[href="https://github.com/darobin/dasl.ing/issues"]:hover { color: var(--green); }
 h2 {
   border: var(--brutal-border);
   font-weight: 400;
@@ -70,6 +72,7 @@ section ul > li {
   list-style-type: square;
 }
 #what > h2 { text-decoration-color: var(--orange); }
+#how > h2 { text-decoration-color: var(--purple); }
 #code > h2 { text-decoration-color: var(--blue); }
 #spec > h2 { text-decoration-color: var(--red); }
 footer {
