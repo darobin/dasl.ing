@@ -8,19 +8,165 @@
   <body>
     <div id="abstract">
       <p>
-        tk
+        RASL is a URL scheme used to identify content-addressed DASL resources
+        along with a simple HTTP-based retrieval method.
       </p>
     </div>
+    <!--
+      XXX FOR FUTURE WORK
+      - API for publishing & looking up over AT, with storage in repos
+      - do we want hosts gossipping to one another or is AT enough?
+    -->
     <section>
       <h2>Introduction</h2>
       <p>
-        tk
+        Content-addressed resources are "self-certifying," which is to say that
+        you don't need any external authority to certify that the content you
+        have when you resolve the identifier is correct: because the identifier
+        contains a hash, you can (and should) verify that you obtained the right
+        content yourself ([[ipfs-principles]]). The identifier is enough to
+        certify the content. This has several implications, but two are
+        particularly relevant for this specification:
       </p>
-      <!--
-      - NI with multiple hosts as hints in the authority
-      - API for publishing & looking up over AT, with storage in repos
-      - do we want hosts gossipping to one another or is AT enough?
-      -->
+      <ul>
+        <li>
+          When resolving a content-addressed identifier, you can obtain the content
+          from anyone. It doesn't have to be the content's author. You can even
+          obtain it from entirely untrusted sources — given that you can always
+          certify it, you don't need to trust whoever gives it to you. As a result,
+          the authority part of a URL — the part that can certify the content you
+          get, which is the domain part in an <code>https</code> URL — is the
+          CID itself ([[cid]]).
+        </li>
+        <li>
+          Because it doesn't matter where you get content from, content-addressed
+          URLs are inherently transport-independent. There are benefits to agreeing
+          on transport (if only so that people can find one another's content)
+          but as a client, if you know of several potential ways of obtaining a
+          CID you are free to use whichever you prefer or to try several in
+          whatever order.
+        </li>
+      </ul>
+      <p>
+        Taking these aspects into consideration, this specification defines a URL
+        scheme in which the CID is the authority, along with optional hints of
+        potential look-up locations, and defines a retrieval method but does not
+        mandate that RASL retrieval rely on it.
+      </p>
+      <section>
+        <h2>The <code>web+rasl</code> URL Scheme</h2>
+        <p>
+          RASL URLs look like this:
+          <code>web+rasl://bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4;berjon.com,bsky.app/</code>.
+          This breaks down into the following components:
+        </p>
+        <ul>
+          <li>
+            The <code>web+rasl</code> scheme. This uses the <code>web+</code> prefix
+            to facilitate registration of the scheme in browser contexts so that
+            RASL URLs can be used on the web directly.
+          </li>
+          <li>
+            An authority composed of:
+            <ul>
+              <li>a DASL CID <code>bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4</code> and</li>
+              <li>
+                (optionally) a comma-separated list of hostnames (any authority parts that are
+                acceptable in HTTP) that can be used to attempt retrieval from.
+              </li>
+            </ul>
+          </li>
+          <li>
+            A path (here just <code>/</code>) that is empty or <code>/</code> for raw
+            CIDs like the above but can contain a complete path if the CID resolves
+            to MASL data ([[masl]]).
+          </li>
+        </ul>
+        <div class="flag">
+          <p>
+            Need to specify parsing based on URL spec:
+          </p>
+          <ul>
+            <li>Use regular URL parsing</li>
+            <li>Extract CID from <code>host</code> up to <code>;</code> or end</li>
+            <li>Return failure if it's not a valid [[cid]]</li>
+            <li>If there was <code>;</code> process the rest as a comma-separated list</li>
+            <li>Each item in the list is a hint, they don't get validated here</li>
+            <li>Use CID as authority, provide hints separately</li>
+            <li>Specify origin tuple using the authority</li>
+          </ul>
+        </div>
+      </section>
+      <section>
+        <h2>RASL Retrieval</h2>
+        <p>
+          A user agent may retrieve a CID in whichever way it prefers. This section
+          provides a simple standard for HTTP-based CID retrieval, to make it
+          easy for authors to publish content to their own sites and have it
+          retrieved, without having to worry about operating any infrastructure
+          beyond the web server they already have.
+        </p>
+        <div class="flag">
+          <p>
+            RASL retrieval works this way:
+          </p>
+          <ul>
+            <li>
+              Obtain the [[cid]] by extracting the authority from the URL (or
+              whatever other way).
+            </li>
+            <li>
+              If there are hints, you can use them as hosts to construct a
+              retrieval request from. But you don't have to.
+            </li>
+            <li>
+              Constructing a request works by constructing an HTTPS URL this way:
+              <ul>
+                <li>Always use <code>https</code></li>
+                <li>Use the host you have (from hint or yours)</li>
+                <li>Path is <code>/.well-known/rasl/${cid}</code></li>
+                <li>No further pathing information is provided</li>
+              </ul>
+            </li>
+            <li>
+              Use that URL to make a stateless HTTP request (no cookies, nothing
+              gets saved), don't use conneg, just the most vanilla side-effect  free
+              <code>GET</code> that money can buy.
+            </li>
+            <li>
+              The <code>.well-known</code> path may redirect, so be ready to handle
+              that. This makes it possible to create sites that are published
+              the usual way and to have a RASL that is simply a redirect to the
+              resource. So for instance, you may have an existing
+              <code>https://berjon.com/kitten.jpg</code> the CID for which is
+              <code>bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4</code>.
+              This can be published as this RASL URL:
+              <code>web+rasl://bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4;berjon.com/</code>.
+              A client can retrieve it by constructing the a request to this URL:
+              <code>https://berjon.com/.well-known/rasl/bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4</code>.
+              In turn, the latter may simply 307 back to <code>https://berjon.com/kitten.jpg</code>.
+              (Yes, this is HTTP with extra steps, but the extra steps get you
+              self-certifying content.)
+            </li>
+            <li>
+              If there's a redirect and it's not a 307, the client should treat
+              it as such anyway.
+            </li>
+          </ul>
+        </div>
+      </section>
+    </section>
+    <section>
+      <h2>RASL Pathing</h2>
+      <div class="flag">
+        <p>
+          Mention that the path is only meaningful if the CID is a dCBOR42 one AND
+          if the content is MASL AND if it has a <code>resources</code> map. If it
+          is, look it up. If it's there, return that, with the right headers. If
+          not, then return 404. If the conditions don't match, we need to pick the
+          right 4xx error.
+        </p>
+      </div>
     </section>
   </body>
 </html>

@@ -2,24 +2,170 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RASL — Retrieval of Arbitrary Structures &amp; Links</title>
-  <link rel="stylesheet" href="spec.css"><link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%220%22 y=%220%22 width=%22100%22 height=%22100%22 fill=%22%2300ff75%22></rect></svg>"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" property="og:title" content="DASL: RASL — Retrieval of Arbitrary Structures &amp; Links"><meta name="twitter:description" property="og:description" content="tk"><meta name="twitter:image" property="og:image" content="https://dasl.ing/rasl.png"><meta name="twitter:image:alt" content="Very colourful stripes, so colourful it hurts"><meta name="twitter:url" property="og:url" content="https://dasl.ing/"><meta property="og:site_name" content="DASL"><meta property="og:locale" content="en"><meta name="theme-color" content="#00ff75"></head>
-  <body><div class="nav-back">A specification of the <a href="/">DASL Project</a>.</div><main><header><h1>RASL — Retrieval of Arbitrary Structures &amp; Links</h1><table><tbody><tr><th>date</th><td>2024-12-17</td></tr><tr><th>editors</th><td><a href="https://berjon.com/">Robin Berjon</a> &lt;<a href="mailto:robin@berjon.com">robin@berjon.com</a>&gt;<br><a href="https://bumblefudge.com/">Juan Caballero</a> &lt;<a href="mailto:bumblefudge@learningproof.xyz">bumblefudge@learningproof.xyz</a>&gt;</td></tr><tr><th>issues</th><td><a href="https://github.com/darobin/dasl.ing/issues">list</a>, <a href="https://github.com/darobin/dasl.ing/issues/new">new</a></td></tr><tr><th>abstract</th><td><div id="abstract">
+  <link rel="stylesheet" href="spec.css"><link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%220%22 y=%220%22 width=%22100%22 height=%22100%22 fill=%22%2300ff75%22></rect></svg>"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" property="og:title" content="DASL: RASL — Retrieval of Arbitrary Structures &amp; Links"><meta name="twitter:description" property="og:description" content="RASL is a URL scheme used to identify content-addressed DASL resources         along with a simple HTTP-based retrieval method."><meta name="twitter:image" property="og:image" content="https://dasl.ing/rasl.png"><meta name="twitter:image:alt" content="Very colourful stripes, so colourful it hurts"><meta name="twitter:url" property="og:url" content="https://dasl.ing/"><meta property="og:site_name" content="DASL"><meta property="og:locale" content="en"><meta name="theme-color" content="#00ff75"></head>
+  <body><div class="nav-back">A specification of the <a href="/">DASL Project</a>.</div><main><header><h1>RASL — Retrieval of Arbitrary Structures &amp; Links</h1><table><tbody><tr><th>date</th><td>2025-01-17</td></tr><tr><th>editors</th><td><a href="https://berjon.com/">Robin Berjon</a> &lt;<a href="mailto:robin@berjon.com">robin@berjon.com</a>&gt;<br><a href="https://bumblefudge.com/">Juan Caballero</a> &lt;<a href="mailto:bumblefudge@learningproof.xyz">bumblefudge@learningproof.xyz</a>&gt;</td></tr><tr><th>issues</th><td><a href="https://github.com/darobin/dasl.ing/issues">list</a>, <a href="https://github.com/darobin/dasl.ing/issues/new">new</a></td></tr><tr><th>abstract</th><td><div id="abstract">
       <p>
-        tk
+        RASL is a URL scheme used to identify content-addressed DASL resources
+        along with a simple HTTP-based retrieval method.
       </p>
     </div></td></tr></tbody></table></header>
     
+    <!--
+      XXX FOR FUTURE WORK
+      - API for publishing & looking up over AT, with storage in repos
+      - do we want hosts gossipping to one another or is AT enough?
+    -->
     <section>
       <h2>Introduction</h2>
       <p>
-        tk
+        Content-addressed resources are "self-certifying," which is to say that
+        you don't need any external authority to certify that the content you
+        have when you resolve the identifier is correct: because the identifier
+        contains a hash, you can (and should) verify that you obtained the right
+        content yourself ([<a href="#ref-ipfs-principles" class="ref">ipfs-principles</a>]). The identifier is enough to
+        certify the content. This has several implications, but two are
+        particularly relevant for this specification:
       </p>
-      <!--
-      - NI with multiple hosts as hints in the authority
-      - API for publishing & looking up over AT, with storage in repos
-      - do we want hosts gossipping to one another or is AT enough?
-      -->
+      <ul>
+        <li>
+          When resolving a content-addressed identifier, you can obtain the content
+          from anyone. It doesn't have to be the content's author. You can even
+          obtain it from entirely untrusted sources — given that you can always
+          certify it, you don't need to trust whoever gives it to you. As a result,
+          the authority part of a URL — the part that can certify the content you
+          get, which is the domain part in an <code>https</code> URL — is the
+          CID itself ([<a href="#ref-cid" class="ref">cid</a>]).
+        </li>
+        <li>
+          Because it doesn't matter where you get content from, content-addressed
+          URLs are inherently transport-independent. There are benefits to agreeing
+          on transport (if only so that people can find one another's content)
+          but as a client, if you know of several potential ways of obtaining a
+          CID you are free to use whichever you prefer or to try several in
+          whatever order.
+        </li>
+      </ul>
+      <p>
+        Taking these aspects into consideration, this specification defines a URL
+        scheme in which the CID is the authority, along with optional hints of
+        potential look-up locations, and defines a retrieval method but does not
+        mandate that RASL retrieval rely on it.
+      </p>
+      <section>
+        <h2>The <code>web+rasl</code> URL Scheme</h2>
+        <p>
+          RASL URLs look like this:
+          <code>web+rasl://bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4;berjon.com,bsky.app/</code>.
+          This breaks down into the following components:
+        </p>
+        <ul>
+          <li>
+            The <code>web+rasl</code> scheme. This uses the <code>web+</code> prefix
+            to facilitate registration of the scheme in browser contexts so that
+            RASL URLs can be used on the web directly.
+          </li>
+          <li>
+            An authority composed of:
+            <ul>
+              <li>a DASL CID <code>bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4</code> and</li>
+              <li>
+                (optionally) a comma-separated list of hostnames (any authority parts that are
+                acceptable in HTTP) that can be used to attempt retrieval from.
+              </li>
+            </ul>
+          </li>
+          <li>
+            A path (here just <code>/</code>) that is empty or <code>/</code> for raw
+            CIDs like the above but can contain a complete path if the CID resolves
+            to MASL data ([<a href="#ref-masl" class="ref">masl</a>]).
+          </li>
+        </ul>
+        <div class="flag">
+          <p>
+            Need to specify parsing based on URL spec:
+          </p>
+          <ul>
+            <li>Use regular URL parsing</li>
+            <li>Extract CID from <code>host</code> up to <code>;</code> or end</li>
+            <li>Return failure if it's not a valid [<a href="#ref-cid" class="ref">cid</a>]</li>
+            <li>If there was <code>;</code> process the rest as a comma-separated list</li>
+            <li>Each item in the list is a hint, they don't get validated here</li>
+            <li>Use CID as authority, provide hints separately</li>
+            <li>Specify origin tuple using the authority</li>
+          </ul>
+        </div>
+      </section>
+      <section>
+        <h2>RASL Retrieval</h2>
+        <p>
+          A user agent may retrieve a CID in whichever way it prefers. This section
+          provides a simple standard for HTTP-based CID retrieval, to make it
+          easy for authors to publish content to their own sites and have it
+          retrieved, without having to worry about operating any infrastructure
+          beyond the web server they already have.
+        </p>
+        <div class="flag">
+          <p>
+            RASL retrieval works this way:
+          </p>
+          <ul>
+            <li>
+              Obtain the [<a href="#ref-cid" class="ref">cid</a>] by extracting the authority from the URL (or
+              whatever other way).
+            </li>
+            <li>
+              If there are hints, you can use them as hosts to construct a
+              retrieval request from. But you don't have to.
+            </li>
+            <li>
+              Constructing a request works by constructing an HTTPS URL this way:
+              <ul>
+                <li>Always use <code>https</code></li>
+                <li>Use the host you have (from hint or yours)</li>
+                <li>Path is <code>/.well-known/rasl/${cid}</code></li>
+                <li>No further pathing information is provided</li>
+              </ul>
+            </li>
+            <li>
+              Use that URL to make a stateless HTTP request (no cookies, nothing
+              gets saved), don't use conneg, just the most vanilla side-effect  free
+              <code>GET</code> that money can buy.
+            </li>
+            <li>
+              The <code>.well-known</code> path may redirect, so be ready to handle
+              that. This makes it possible to create sites that are published
+              the usual way and to have a RASL that is simply a redirect to the
+              resource. So for instance, you may have an existing
+              <code>https://berjon.com/kitten.jpg</code> the CID for which is
+              <code>bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4</code>.
+              This can be published as this RASL URL:
+              <code>web+rasl://bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4;berjon.com/</code>.
+              A client can retrieve it by constructing the a request to this URL:
+              <code>https://berjon.com/.well-known/rasl/bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4</code>.
+              In turn, the latter may simply 307 back to <code>https://berjon.com/kitten.jpg</code>.
+              (Yes, this is HTTP with extra steps, but the extra steps get you
+              self-certifying content.)
+            </li>
+            <li>
+              If there's a redirect and it's not a 307, the client should treat
+              it as such anyway.
+            </li>
+          </ul>
+        </div>
+      </section>
+    </section>
+    <section>
+      <h2>RASL Pathing</h2>
+      <div class="flag">
+        <p>
+          Mention that the path is only meaningful if the CID is a dCBOR42 one AND
+          if the content is MASL AND if it has a <code>resources</code> map. If it
+          is, look it up. If it's there, return that, with the right headers. If
+          not, then return 404. If the conditions don't match, we need to pick the
+          right 4xx error.
+        </p>
+      </div>
     </section>
   
 
-</main></body></html>
+<section><h2>References</h2><dl><dt id="ref-cid">[cid]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/cid.html"><cite>Content IDs (CIDs)</cite></a>. 2025-01-17. URL:&nbsp;<a href="https://dasl.ing/cid.html">https://dasl.ing/cid.html</a></dd><dt id="ref-ipfs-principles">[ipfs-principles]</dt><dd>Robin Berjon. <a href="https://specs.ipfs.tech/architecture/principles/"><cite>IPFS Principles</cite></a>. march 2023. URL:&nbsp;<a href="https://specs.ipfs.tech/architecture/principles/">https://specs.ipfs.tech/architecture/principles/</a></dd><dt id="ref-masl">[masl]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/masl.html"><cite>MASL — Metadata for Arbitrary Structures &amp; Links</cite></a>. 2025-01-17. URL:&nbsp;<a href="https://dasl.ing/masl.html">https://dasl.ing/masl.html</a></dd></dl></section></main></body></html>

@@ -1,6 +1,11 @@
 
 @import "shared.css";
 
+:root {
+  --flag-colour: gold;
+  --flag-border-size: 3px;
+}
+
 body {
   line-height: 1.4;
   font-size: 1.2rem;
@@ -78,6 +83,24 @@ a.dfn-ref {
 pre {
   /* white-space: pre-wrap; */
   overflow: auto;
+}
+div.flag {
+  border: var(--flag-border-size) solid var(--flag-colour);
+  padding: 1rem;
+  position: relative;
+  margin-top: 3rem;
+}
+div.flag::before {
+  content: "Issue";
+  display: block;
+  position: absolute;
+  top: -2.4rem;
+  background: var(--flag-colour);
+  left: calc(-1 * var(--flag-border-size));
+  border: var(--flag-border-size) solid var(--flag-colour);
+  padding: 0.4rem 1rem;
+  text-transform: uppercase;
+  line-height: 1;
 }
 
 @media only screen and (max-width:800px) {
