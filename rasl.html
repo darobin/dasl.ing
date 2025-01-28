@@ -150,6 +150,10 @@
               If there's a redirect and it's not a 307, the client should treat
               it as such anyway.
             </li>
+            <li>
+              Note that the response media type for ALL RASL requests is <code>application/octet-stream</code>.
+              This is done explicitly to avoid people using RASL endpoints to serve sites directly.
+            </li>
           </ul>
         </div>
       </section>
