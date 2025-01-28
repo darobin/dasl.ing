@@ -12,16 +12,33 @@
     <section>
       <h2>Introduction</h2>
       <p>
-        tk
+        Anywhere you have resources that will be deployed in real-world systems, the potential metadata needs of those systems are effectively unbounded.
+        Designing or constraining a syntax for all metadata needs would be hubris and madness.
+        Instead, this document tries to minimally constrain applications while illustrating "where to stick" that metadata, as there are so few layers and hiding places in the DASL system.
       </p>
-      <!--
-      - encode HTTP headers (binary version?)
-      - list which ones?
-      - extensions:
-        - BAO
-        - content claims
-      -->
+      <p>
+        The recommended structure for DASL metadata is to insert a dCBOR42 document "between" each CID and its resource.
+        To do this, simply replace a CID of a resource with a CID to a dCBOR42 document that contains a mandatory top-level [type 42] property <code>resource</code>, the value of which is a CID of the resource it describes.
+      </p>
     </section>
-  
-
+    <section>
+      <h2>How to use a MASL document</h2>
+      <p>
+        It is recommended to nest any metadata in a top-level object to namespace your own metadata standard (inside an object named, for example, `my-cool-project-v1`) rather than opaque version-bits or magic numbers.
+      </p>
+      <p>
+        There are many metadata standards that can be embedded in this way to facilitate preservation of metadata at ingress as well as translatability.
+        For example, the IPFS-based storage system Storacha has a robust CID-based metadata system called [content credentials](https://github.com/storacha/content-claims) which includes UCAN-based permissioning and CID "equivalence," i.e. one or more IPFS CIDs equivalent to given DASL CID.  
+      </p>      
+    </section>
+    <section>
+      <h2>MASL versus RASL documents</h2>
+      <p>
+        As DASL is not a "file system" it does not have a concept isomorphic to directories or "folders"; there is, however, the RASL concept of a "bundle," which could be thought of as the MASL metadata document for a collection of DASL resources, each accessible at one or more "paths" within that collection. (The isomorphism here is to a web service, which maps URIs to resources arbitrarily).
+        Note that the mandatory top-level property of a RASL metadata document is the array <code>resources</code>, containing a map of paths or URIs (or other identifiers) to resource CIDs or to MASL CIDs.
+      </p>
+      <p>
+        Note: a MASL document containing a top-level <code>resources</code> array is invalid, and a RASL document containing a top-level <code>resource</code> CID value is also invalid.
+      </p>
+    </section>
 </main></body></html>
