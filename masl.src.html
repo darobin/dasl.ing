@@ -14,15 +14,82 @@
     <section>
       <h2>Introduction</h2>
       <p>
-        tk
+        Anywhere you have resources that will be deployed in real-world systems, the potential
+        metadata needs of those systems are effectively unbounded.
+        Designing or constraining a syntax for all metadata needs would be hubris and madness.
+        Instead, this document tries to minimally constrain applications while illustrating "where to stick"
+        that metadata, as there are so few layers and hiding places in the DASL system.
       </p>
-      <!--
-      - encode HTTP headers (binary version?)
-      - list which ones?
-      - extensions:
-        - BAO
-        - content claims
-      -->
+      <p>
+        The recommended structure for DASL metadata is to insert a dCBOR42 document "between" each
+        CID and its resource(s), essentially using dCBOR42 as headers wrapping a CID-addressed resource.
+        To do this, simply replace a CID of a resource with a CID to a dCBOR42 document that contains either a
+        top-level [type 42] property <code>src</code> (for a single resource), containing the
+        CID of the resource it describes, or a top-level mapping <code>resources</code> (for a collection
+        of resources), mapping paths to resource CIDs, each with optional dCBOR42 metadata ([[cid]], [[dcbor42]]).
+      </p>
+    </section>
+    <section>
+      <h2>How to use a MASL document</h2>
+      <p>
+        It is preferable to nest any metadata in a top-level object to namespace your own metadata
+        standard (inside an object named, for example, `my-cool-project-v1`) rather than opaque version-bits or magic numbers.
+        There are a few reserved words at the top-level, but these can be avoided by nesting any conflicts.
+      </p>
+      <p>
+        There are many metadata standards that can be embedded in this way to facilitate the preservation of
+        metadata at ingress as well as translatability. For example, the IPFS-based storage system Storacha
+        has a robust CID-based metadata system called
+        <a href="https://github.com/storacha/content-claims">content credentials</a> which includes UCAN-based
+        permissioning and CID "equivalence," i.e. one or more IPFS CIDs equivalent to given DASL CID.
+      </p>
+    </section>
+    <section>
+      <h2>Reserved words: HTTP headers</h2>
+      <p>
+        HTTP use cases use best served by setting a HTTP headers per resourcej. What follows is a list of
+        lowercase top-level properties and the HTTP headers they map to, as well as constraints on values
+        for them:
+      </p>
+        <ul>
+          <li><code>content-type</code>: Content-Type. No constraints.</li>
+          <div class="flag">
+            <li>...</li>
+          </div>
+        </ul>
+      <p>
+        No other HTTP headers should be encoded into MASL documents for RASL purposes if wide
+        interoperability is expected.
+      </p>
+      <p>
+        <div class="flag">
+          Does it make sense to add a warning-flag, i.e.:
+          If you are adding use-case specific headers into a usecase, it recommended to add the
+          top-level flag <code>unsafe</code> : "true".
+        </div>
+      </p>
+    </section>
+    <section>
+      <h2>Reserved words: Previous Version Chaining</h2>
+      <p>
+        In addition to <code>resources</code>, <code>src</code>, and the HTTP header values mentioned
+        above, there is a final reserved word for refering to the previous version of an updated MASL document by CID.
+        This value is called <code>prv</code>, and can be used to create verifiable chains of mutated documents.
+      </p>
+    </section>
+    <section>
+      <h2>Collections are not Directories</h2>
+      <p>
+        As DASL is not a "file system" it does not have a concept isomorphic to directories or "folders"; there is, however, the RASL concept of a transport-agnostic collection, for which a MASL metadata document can be used to describe a service or behavior.
+        In such a usage, the <code>resources</code> mapping contains, in addition to an identifer --> CID mapping, additional metadata properties that would be at the top level in a single-CID MASL file, including the <code>src</code> property containing that CID.
+        (The isomorphism here is to a web service, which maps URIs to resources arbitrarily, and can map multiple paths or filenames to the same resource).
+      </p>
+      <p>
+        TODO: Example codeblock
+      </p>
+      <p>
+        Note: a MASL document containing both a top-level <code>resources</code> mapping and a top-level <code>src</code> should be considered malformed, and <code>resources</code> should be treated as canonical over a <code>src</code> if both are present.
+      </p>
     </section>
   </body>
 </html>

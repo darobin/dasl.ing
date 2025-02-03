@@ -3,7 +3,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MASL — Metadata for Arbitrary Structures &amp; Links</title>
   <link rel="stylesheet" href="spec.css"><link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%220%22 y=%220%22 width=%22100%22 height=%22100%22 fill=%22%2300ff75%22></rect></svg>"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" property="og:title" content="DASL: MASL — Metadata for Arbitrary Structures &amp; Links"><meta name="twitter:description" property="og:description" content="tk"><meta name="twitter:image" property="og:image" content="https://dasl.ing/masl.png"><meta name="twitter:image:alt" content="Very colourful stripes, so colourful it hurts"><meta name="twitter:url" property="og:url" content="https://dasl.ing/"><meta property="og:site_name" content="DASL"><meta property="og:locale" content="en"><meta name="theme-color" content="#00ff75"></head>
-  <body><div class="nav-back">A specification of the <a href="/">DASL Project</a>.</div><main><header><h1>MASL — Metadata for Arbitrary Structures &amp; Links</h1><table><tbody><tr><th>date</th><td>2025-01-17</td></tr><tr><th>editors</th><td><a href="https://berjon.com/">Robin Berjon</a> &lt;<a href="mailto:robin@berjon.com">robin@berjon.com</a>&gt;<br><a href="https://bumblefudge.com/">Juan Caballero</a> &lt;<a href="mailto:bumblefudge@learningproof.xyz">bumblefudge@learningproof.xyz</a>&gt;</td></tr><tr><th>issues</th><td><a href="https://github.com/darobin/dasl.ing/issues">list</a>, <a href="https://github.com/darobin/dasl.ing/issues/new">new</a></td></tr><tr><th>abstract</th><td><div id="abstract">
+  <body><div class="nav-back">A specification of the <a href="/">DASL Project</a>.</div><main><header><h1>MASL — Metadata for Arbitrary Structures &amp; Links</h1><table><tbody><tr><th>date</th><td>2025-02-03</td></tr><tr><th>editors</th><td><a href="https://berjon.com/">Robin Berjon</a> &lt;<a href="mailto:robin@berjon.com">robin@berjon.com</a>&gt;<br><a href="https://bumblefudge.com/">Juan Caballero</a> &lt;<a href="mailto:bumblefudge@learningproof.xyz">bumblefudge@learningproof.xyz</a>&gt;</td></tr><tr><th>issues</th><td><a href="https://github.com/darobin/dasl.ing/issues">list</a>, <a href="https://github.com/darobin/dasl.ing/issues/new">new</a></td></tr><tr><th>abstract</th><td><div id="abstract">
       <p>
         tk
       </p>
@@ -12,52 +12,66 @@
     <section>
       <h2>Introduction</h2>
       <p>
-        Anywhere you have resources that will be deployed in real-world systems, the potential metadata needs of those systems are effectively unbounded.
+        Anywhere you have resources that will be deployed in real-world systems, the potential
+        metadata needs of those systems are effectively unbounded.
         Designing or constraining a syntax for all metadata needs would be hubris and madness.
-        Instead, this document tries to minimally constrain applications while illustrating "where to stick" that metadata, as there are so few layers and hiding places in the DASL system.
+        Instead, this document tries to minimally constrain applications while illustrating "where to stick"
+        that metadata, as there are so few layers and hiding places in the DASL system.
       </p>
       <p>
-        The recommended structure for DASL metadata is to insert a dCBOR42 document "between" each CID and its resource(s).
-        To do this, simply replace a CID of a resource with a CID to a dCBOR42 document that contains a mandatory top-level [type 42] property <code>src</code> (for a single resource), containing the CID of the resource it describes, or a top-level mapping <code>resources</code> (for a collection of resources), mapping identifiers/paths/URIs/etc to resource CIDs.
+        The recommended structure for DASL metadata is to insert a dCBOR42 document "between" each
+        CID and its resource(s), essentially using dCBOR42 as headers wrapping a CID-addressed resource.
+        To do this, simply replace a CID of a resource with a CID to a dCBOR42 document that contains either a
+        top-level [type 42] property <code>src</code> (for a single resource), containing the
+        CID of the resource it describes, or a top-level mapping <code>resources</code> (for a collection
+        of resources), mapping paths to resource CIDs, each with optional dCBOR42 metadata ([<a href="#ref-cid" class="ref">cid</a>], [<a href="#ref-dcbor42" class="ref">dcbor42</a>]).
       </p>
     </section>
     <section>
       <h2>How to use a MASL document</h2>
       <p>
-        It is recommended to nest any metadata in a top-level object to namespace your own metadata standard (inside an object named, for example, `my-cool-project-v1`) rather than opaque version-bits or magic numbers.
-        There are a few reserve-words at the top-level, but these can be avoided by nesting any conflicts.
+        It is preferable to nest any metadata in a top-level object to namespace your own metadata
+        standard (inside an object named, for example, `my-cool-project-v1`) rather than opaque version-bits or magic numbers.
+        There are a few reserved words at the top-level, but these can be avoided by nesting any conflicts.
       </p>
       <p>
-        There are many metadata standards that can be embedded in this way to facilitate preservation of metadata at ingress as well as translatability.
-        For example, the IPFS-based storage system Storacha has a robust CID-based metadata system called <a href="https://github.com/storacha/content-claims">content credentials</a> which includes UCAN-based permissioning and CID "equivalence," i.e. one or more IPFS CIDs equivalent to given DASL CID.  
-      </p>      
+        There are many metadata standards that can be embedded in this way to facilitate the preservation of
+        metadata at ingress as well as translatability. For example, the IPFS-based storage system Storacha
+        has a robust CID-based metadata system called
+        <a href="https://github.com/storacha/content-claims">content credentials</a> which includes UCAN-based
+        permissioning and CID "equivalence," i.e. one or more IPFS CIDs equivalent to given DASL CID.
+      </p>
     </section>
     <section>
-      <h2>Reserve words: HTTP headers</h2>
+      <h2>Reserved words: HTTP headers</h2>
       <p>
-        HTTP use cases use best served by setting a few HTTP headers per resource programmatically, and allowing others to be set contextually.
-        What follows is a list of lowercase top-level properties and the HTTP headers they map to, as well as constraints on values for them:
+        HTTP use cases use best served by setting a HTTP headers per resourcej. What follows is a list of
+        lowercase top-level properties and the HTTP headers they map to, as well as constraints on values
+        for them:
       </p>
         <ul>
           <li><code>content-type</code>: Content-Type. No constraints.</li>
           <div class="flag">
             <li>...</li>
           </div>
-        </ul> 
+        </ul>
       <p>
-        No other HTTP headers should be encoded into MASL documents for RASL purposes if wide interoperability is expected.
+        No other HTTP headers should be encoded into MASL documents for RASL purposes if wide
+        interoperability is expected.
       </p>
       <p>
-        <div class="flag">
+        </p><div class="flag">
           Does it make sense to add a warning-flag, i.e.:
-          If you are adding use-case specific headers into a usecase, it recommended to add the top-level flag <code>unsafe</code> : "true".
+          If you are adding use-case specific headers into a usecase, it recommended to add the
+          top-level flag <code>unsafe</code> : "true".
         </div>
-      </p>
+      <p></p>
     </section>
     <section>
-      <h2>Reserve words: Previous Version Chaining</h2>
+      <h2>Reserved words: Previous Version Chaining</h2>
       <p>
-        In addition to <code>resources</code>, <code>src</code>, and the HTTP header values mentioned above, there is a final reserve-word for refering to the previous version of an updated MASL document by CID.
+        In addition to <code>resources</code>, <code>src</code>, and the HTTP header values mentioned
+        above, there is a final reserved word for refering to the previous version of an updated MASL document by CID.
         This value is called <code>prv</code>, and can be used to create verifiable chains of mutated documents.
       </p>
     </section>
@@ -65,7 +79,7 @@
       <h2>Collections are not Directories</h2>
       <p>
         As DASL is not a "file system" it does not have a concept isomorphic to directories or "folders"; there is, however, the RASL concept of a transport-agnostic collection, for which a MASL metadata document can be used to describe a service or behavior.
-        In such a usage, the <code>resources</code> mapping contains, in addition to an identifer --> CID mapping, additional metadata properties that would be at the top level in a single-CID MASL file, including the <code>src</code> property containing that CID.
+        In such a usage, the <code>resources</code> mapping contains, in addition to an identifer --&gt; CID mapping, additional metadata properties that would be at the top level in a single-CID MASL file, including the <code>src</code> property containing that CID.
         (The isomorphism here is to a web service, which maps URIs to resources arbitrarily, and can map multiple paths or filenames to the same resource).
       </p>
       <p>
@@ -75,4 +89,6 @@
         Note: a MASL document containing both a top-level <code>resources</code> mapping and a top-level <code>src</code> should be considered malformed, and <code>resources</code> should be treated as canonical over a <code>src</code> if both are present.
       </p>
     </section>
-</main></body></html>
+  
+
+<section><h2>References</h2><dl><dt id="ref-cid">[cid]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/cid.html"><cite>Content IDs (CIDs)</cite></a>. 2025-02-03. URL:&nbsp;<a href="https://dasl.ing/cid.html">https://dasl.ing/cid.html</a></dd><dt id="ref-dcbor42">[dcbor42]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/dcbor42.html"><cite>Deterministic CBOR with tag 42 (dCBOR42)</cite></a>. 2025-02-03. URL:&nbsp;<a href="https://dasl.ing/dcbor42.html">https://dasl.ing/dcbor42.html</a></dd></dl></section></main></body></html>
