@@ -130,9 +130,12 @@
             </li>
             <li>
               Use that URL to make a stateless HTTP request (no cookies, nothing
-              gets saved), don't use conneg, just the most vanilla side-effect  free
+              gets saved), don't use conneg, just the most vanilla side-effect free
               <code>GET</code> that money can buy.
             </li>
+            <!--
+            - also support HEAD
+            -->
             <li>
               The <code>.well-known</code> path may redirect, so be ready to handle
               that. This makes it possible to create sites that are published
