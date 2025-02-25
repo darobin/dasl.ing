@@ -110,61 +110,67 @@
           retrieved, without having to worry about operating any infrastructure
           beyond the web server they already have.
         </p>
-        <div class="flag">
-          <p>
-            RASL retrieval works this way:
-          </p>
-          <ul>
-            <li>
-              Obtain the [<a href="#ref-cid" class="ref">cid</a>] by extracting the authority from the URL (or
-              whatever other way).
-            </li>
-            <li>
-              If there are hints, you can use them as hosts to construct a
-              retrieval request from. But you don't have to.
-            </li>
-            <li>
-              Constructing a request works by constructing an HTTPS URL this way:
-              <ul>
-                <li>Always use <code>https</code></li>
-                <li>Use the host you have (from hint or yours)</li>
-                <li>Path is <code>/.well-known/rasl/${cid}</code></li>
-                <li>No further pathing information is provided</li>
-              </ul>
-            </li>
-            <li>
-              Use that URL to make a stateless HTTP request (no cookies, nothing
-              gets saved), don't use conneg, just the most vanilla side-effect free
-              <code>GET</code> that money can buy.
-            </li>
-            <!--
-            - also support HEAD
-            -->
-            <li>
-              The <code>.well-known</code> path may redirect, so be ready to handle
-              that. This makes it possible to create sites that are published
-              the usual way and to have a RASL that is simply a redirect to the
-              resource. So for instance, you may have an existing
-              <code>https://berjon.com/kitten.jpg</code> the CID for which is
-              <code>bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4</code>.
-              This can be published as this RASL URL:
-              <code>web+rasl://bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4;berjon.com/</code>.
-              A client can retrieve it by constructing the a request to this URL:
-              <code>https://berjon.com/.well-known/rasl/bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4</code>.
-              In turn, the latter may simply 307 back to <code>https://berjon.com/kitten.jpg</code>.
-              (Yes, this is HTTP with extra steps, but the extra steps get you
-              self-certifying content.)
-            </li>
-            <li>
-              If there's a redirect and it's not a 307, the client should treat
-              it as such anyway.
-            </li>
-            <li>
-              Note that the response media type for ALL RASL requests is <code>application/octet-stream</code>.
-              This is done explicitly to avoid people using RASL endpoints to serve sites directly.
-            </li>
-          </ul>
-        </div>
+        <p>
+          Use the following steps to <dfn id="dfn-fetch-a-rasl-url">fetch a RASL URL</dfn>:
+        </p>
+        <ol>
+          <li>Accept a string <var>url</var> and parse it according to the steps to <a href="#dfn-parse-a-rasl-url" class="dfn-ref">parse a RASL URL</a>.</li>
+          <li>
+            Construct a <var>request</var> using <var>cid</var> from the <var>url</var> as well as <var>hints</var> that may
+            be from the URL or from elsewhere (this is entirely up to you):
+            <ol>
+              <li>
+                For each hint, construct a request URL that is the concatenation of <code>https://</code>,
+                the hint as host, <code>/.well-known/rasl/</code>, and the <var>cid</var>.
+              </li>
+              <li>
+                Prepare the request such that it has a method of either <code>GET</code> or <code>HEAD</code>,
+                that it is stateless (no cookies, no credentials of any kind), and that it uses no content
+                negotiation.
+              </li>
+            </ol>
+          </li>
+          <li>
+            Fetch the <var>request</var>s. How these get prioritised is entirely up to the implementation. It
+            is common to run them all in parallel and abort them with the first success response.
+            Note that the <code>.well-known</code> path may redirect, so be ready to handle
+            that. This makes it possible to create sites that are published
+            the usual way and to have a RASL that is simply a redirect to the
+            resource. So for instance, you may have an existing
+            <code>https://berjon.com/kitten.jpg</code> the CID for which is
+            <code>bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4</code>.
+            This can be published as this RASL URL:
+            <code>web+rasl://bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4;berjon.com/</code>.
+            A client can retrieve it by constructing the a request to this URL:
+            <code>https://berjon.com/.well-known/rasl/bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4</code>.
+            In turn, the latter may simply 307 back to <code>https://berjon.com/kitten.jpg</code>.
+            (Yes, this is HTTP with extra steps, but the extra steps get you
+            self-certifying content.)
+          </li>
+          <li>
+            If the response is a redirect but not a 307, the client should treat it as if it
+            had been a 307 anyway.
+          </li>
+          <li>
+            If none of the responses are successful, return failure.
+          </li>
+          <li>
+            Set the response's media type to <code>application/octet-stream</code>. (The server should have
+            done that already, but may not have done so, notably if it relied on a redirect.) The purpose
+            of RASL is to retrieve data in ways that are independent of the server — any media type
+            processing must therefore take place at another layer. Without this, we lose the self-certifying
+            nature of the system. (Note that servers are encouraged to enforce that so as not to have their
+            RASL endpoints used for general-purpose web serving, which can be a security vector depending on
+            where the data being served came from.)
+          </li>
+          <li>
+            Produce a CID for the retrieved data. If that CID does not match the requested <var>cid</var>,
+            return failure.
+          </li>
+          <li>
+            Return the data.
+          </li>
+        </ol>
       </section>
     </section>
     <section>
