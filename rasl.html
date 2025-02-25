@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RASL — Retrieval of Arbitrary Structures &amp; Links</title>
   <link rel="stylesheet" href="spec.css"><link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%220%22 y=%220%22 width=%22100%22 height=%22100%22 fill=%22%2300ff75%22></rect></svg>"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" property="og:title" content="DASL: RASL — Retrieval of Arbitrary Structures &amp; Links"><meta name="twitter:description" property="og:description" content="RASL is a URL scheme used to identify content-addressed DASL resources         along with a simple HTTP-based retrieval method."><meta name="twitter:image" property="og:image" content="https://dasl.ing/rasl.png"><meta name="twitter:image:alt" content="Very colourful stripes, so colourful it hurts"><meta name="twitter:url" property="og:url" content="https://dasl.ing/"><meta property="og:site_name" content="DASL"><meta property="og:locale" content="en"><meta name="theme-color" content="#00ff75"></head>
-  <body><div class="nav-back">A specification of the <a href="/">DASL Project</a>.</div><main><header><h1>RASL — Retrieval of Arbitrary Structures &amp; Links</h1><table><tbody><tr><th>date</th><td>2025-02-05</td></tr><tr><th>editors</th><td><a href="https://berjon.com/">Robin Berjon</a> &lt;<a href="mailto:robin@berjon.com">robin@berjon.com</a>&gt;<br><a href="https://bumblefudge.com/">Juan Caballero</a> &lt;<a href="mailto:bumblefudge@learningproof.xyz">bumblefudge@learningproof.xyz</a>&gt;</td></tr><tr><th>issues</th><td><a href="https://github.com/darobin/dasl.ing/issues">list</a>, <a href="https://github.com/darobin/dasl.ing/issues/new">new</a></td></tr><tr><th>abstract</th><td><div id="abstract">
+  <body><div class="nav-back">A specification of the <a href="/">DASL Project</a>.</div><main><header><h1>RASL — Retrieval of Arbitrary Structures &amp; Links</h1><table><tbody><tr><th>date</th><td>2025-02-25</td></tr><tr><th>editors</th><td><a href="https://berjon.com/">Robin Berjon</a> &lt;<a href="mailto:robin@berjon.com">robin@berjon.com</a>&gt;<br><a href="https://bumblefudge.com/">Juan Caballero</a> &lt;<a href="mailto:bumblefudge@learningproof.xyz">bumblefudge@learningproof.xyz</a>&gt;</td></tr><tr><th>issues</th><td><a href="https://github.com/darobin/dasl.ing/issues">list</a>, <a href="https://github.com/darobin/dasl.ing/issues/new">new</a></td></tr><tr><th>abstract</th><td><div id="abstract">
       <p>
         RASL is a URL scheme used to identify content-addressed DASL resources
         along with a simple HTTP-based retrieval method.
@@ -71,7 +71,7 @@
             <ul>
               <li>a DASL CID <code>bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4</code> and</li>
               <li>
-                (optionally) a comma-separated list of hostnames (any authority parts that are
+                (optionally) a comma-separated list of URI-encoded hostnames (any authority parts that are
                 acceptable in HTTP) that can be used to attempt retrieval from.
               </li>
             </ul>
@@ -82,20 +82,24 @@
             to MASL data ([<a href="#ref-masl" class="ref">masl</a>]).
           </li>
         </ul>
-        <div class="flag">
-          <p>
-            Need to specify parsing based on URL spec:
-          </p>
-          <ul>
-            <li>Use regular URL parsing</li>
-            <li>Extract CID from <code>host</code> up to <code>;</code> or end</li>
-            <li>Return failure if it's not a valid [<a href="#ref-cid" class="ref">cid</a>]</li>
-            <li>If there was <code>;</code> process the rest as a comma-separated list</li>
-            <li>Each item in the list is a hint, they don't get validated here</li>
-            <li>Use CID as authority, provide hints separately</li>
-            <li>Specify origin tuple using the authority</li>
-          </ul>
-        </div>
+        <p>
+          Use the following steps to <dfn id="dfn-parse-a-rasl-url">parse a RASL URL</dfn>:
+        </p>
+        <ol>
+          <li>Accept a string <var>url</var> and parse it according to the <a href="https://url.spec.whatwg.org/#url-parsing">URL Standard</a> ([<a href="#ref-url" class="ref">url</a>]).</li>
+          <li>If that's a failure, return the failure.</li>
+          <li>Read the <code>host</code> part of the parsed URL up to either the first <code>;</code> character or to the end of the string. Store that in <var>cid</var>.</li>
+          <li>If <var>cid</var> is not a valid CID ([<a href="#ref-cid" class="ref">cid</a>]), return failure.</li>
+          <li>
+            If there was no <code>;</code> then <var>hints</var> is an empty array. Otherwise:
+            <ol>
+              <li>Split the remainder of the string on <code>,</code>.</li>
+              <li>Apply <code>decodeURIComponent()</code> to each part.</li>
+              <li>The results is the <var>hints</var> array.</li>
+            </ol>
+          </li>
+          <li>Return the URL's parts as well as <var>cid</var> and <var>hints</var>.</li>
+        </ol>
       </section>
       <section>
         <h2>RASL Retrieval</h2>
@@ -177,4 +181,4 @@
     </section>
   
 
-<section><h2>References</h2><dl><dt id="ref-cid">[cid]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/cid.html"><cite>Content IDs (CIDs)</cite></a>. 2025-02-05. URL:&nbsp;<a href="https://dasl.ing/cid.html">https://dasl.ing/cid.html</a></dd><dt id="ref-ipfs-principles">[ipfs-principles]</dt><dd>Robin Berjon. <a href="https://specs.ipfs.tech/architecture/principles/"><cite>IPFS Principles</cite></a>. march 2023. URL:&nbsp;<a href="https://specs.ipfs.tech/architecture/principles/">https://specs.ipfs.tech/architecture/principles/</a></dd><dt id="ref-masl">[masl]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/masl.html"><cite>MASL — Metadata for Arbitrary Structures &amp; Links</cite></a>. 2025-02-05. URL:&nbsp;<a href="https://dasl.ing/masl.html">https://dasl.ing/masl.html</a></dd></dl></section></main></body></html>
+<section><h2>References</h2><dl><dt id="ref-cid">[cid]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/cid.html"><cite>Content IDs (CIDs)</cite></a>. 2025-02-25. URL:&nbsp;<a href="https://dasl.ing/cid.html">https://dasl.ing/cid.html</a></dd><dt id="ref-ipfs-principles">[ipfs-principles]</dt><dd>Robin Berjon. <a href="https://specs.ipfs.tech/architecture/principles/"><cite>IPFS Principles</cite></a>. march 2023. URL:&nbsp;<a href="https://specs.ipfs.tech/architecture/principles/">https://specs.ipfs.tech/architecture/principles/</a></dd><dt id="ref-masl">[masl]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/masl.html"><cite>MASL — Metadata for Arbitrary Structures &amp; Links</cite></a>. 2025-02-25. URL:&nbsp;<a href="https://dasl.ing/masl.html">https://dasl.ing/masl.html</a></dd><dt id="ref-url">[url]</dt><dd>WHATWG. <a href="https://url.spec.whatwg.org/"><cite>URL</cite></a>. Living Standard. URL:&nbsp;<a href="https://url.spec.whatwg.org/">https://url.spec.whatwg.org/</a></dd></dl></section></main></body></html>
