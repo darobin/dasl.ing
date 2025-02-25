@@ -102,7 +102,7 @@
         </ol>
       </section>
       <section>
-        <h2>RASL Retrieval</h2>
+        <h2>Fetching RASL</h2>
         <p>
           A user agent may retrieve a CID in whichever way it prefers. This section
           provides a simple standard for HTTP-based CID retrieval, to make it
@@ -169,15 +169,16 @@
     </section>
     <section>
       <h2>RASL Pathing</h2>
-      <div class="flag">
-        <p>
-          Mention that the path is only meaningful if the CID is a dCBOR42 one AND
-          if the content is MASL AND if it has a <code>resources</code> map. If it
-          is, look it up. If it's there, return that, with the right headers. If
-          not, then return 404. If the conditions don't match, we need to pick the
-          right 4xx error.
-        </p>
-      </div>
+      <p>
+        The <code>pathname</code> component of a RASL URL can only be interpreted in the context of the
+        content that is retrieved. It is never transmitted to the RASL server and is purely interpreted
+        on the client side.
+      </p>
+      <p>
+        As of this time, the only case in which pathing is defined is if the CID has a dCBOR42 type
+        ([[dcbor42]]) <em>and</em> the content is MASL ([[masl]]) <em>and</em> it has a
+        <code>resources</code> map. But carrying that resolution happens outside of RASL fetching.
+      </p>
     </section>
   </body>
 </html>

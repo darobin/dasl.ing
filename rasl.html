@@ -102,7 +102,7 @@
         </ol>
       </section>
       <section>
-        <h2>RASL Retrieval</h2>
+        <h2>Fetching RASL</h2>
         <p>
           A user agent may retrieve a CID in whichever way it prefers. This section
           provides a simple standard for HTTP-based CID retrieval, to make it
@@ -169,16 +169,17 @@
     </section>
     <section>
       <h2>RASL Pathing</h2>
-      <div class="flag">
-        <p>
-          Mention that the path is only meaningful if the CID is a dCBOR42 one AND
-          if the content is MASL AND if it has a <code>resources</code> map. If it
-          is, look it up. If it's there, return that, with the right headers. If
-          not, then return 404. If the conditions don't match, we need to pick the
-          right 4xx error.
-        </p>
-      </div>
+      <p>
+        The <code>pathname</code> component of a RASL URL can only be interpreted in the context of the
+        content that is retrieved. It is never transmitted to the RASL server and is purely interpreted
+        on the client side.
+      </p>
+      <p>
+        As of this time, the only case in which pathing is defined is if the CID has a dCBOR42 type
+        ([<a href="#ref-dcbor42" class="ref">dcbor42</a>]) <em>and</em> the content is MASL ([<a href="#ref-masl" class="ref">masl</a>]) <em>and</em> it has a
+        <code>resources</code> map. But carrying that resolution happens outside of RASL fetching.
+      </p>
     </section>
   
 
-<section><h2>References</h2><dl><dt id="ref-cid">[cid]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/cid.html"><cite>Content IDs (CIDs)</cite></a>. 2025-02-25. URL:&nbsp;<a href="https://dasl.ing/cid.html">https://dasl.ing/cid.html</a></dd><dt id="ref-ipfs-principles">[ipfs-principles]</dt><dd>Robin Berjon. <a href="https://specs.ipfs.tech/architecture/principles/"><cite>IPFS Principles</cite></a>. march 2023. URL:&nbsp;<a href="https://specs.ipfs.tech/architecture/principles/">https://specs.ipfs.tech/architecture/principles/</a></dd><dt id="ref-masl">[masl]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/masl.html"><cite>MASL — Metadata for Arbitrary Structures &amp; Links</cite></a>. 2025-02-25. URL:&nbsp;<a href="https://dasl.ing/masl.html">https://dasl.ing/masl.html</a></dd><dt id="ref-url">[url]</dt><dd>WHATWG. <a href="https://url.spec.whatwg.org/"><cite>URL</cite></a>. Living Standard. URL:&nbsp;<a href="https://url.spec.whatwg.org/">https://url.spec.whatwg.org/</a></dd></dl></section></main></body></html>
+<section><h2>References</h2><dl><dt id="ref-cid">[cid]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/cid.html"><cite>Content IDs (CIDs)</cite></a>. 2025-02-25. URL:&nbsp;<a href="https://dasl.ing/cid.html">https://dasl.ing/cid.html</a></dd><dt id="ref-dcbor42">[dcbor42]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/dcbor42.html"><cite>Deterministic CBOR with tag 42 (dCBOR42)</cite></a>. 2025-02-25. URL:&nbsp;<a href="https://dasl.ing/dcbor42.html">https://dasl.ing/dcbor42.html</a></dd><dt id="ref-ipfs-principles">[ipfs-principles]</dt><dd>Robin Berjon. <a href="https://specs.ipfs.tech/architecture/principles/"><cite>IPFS Principles</cite></a>. march 2023. URL:&nbsp;<a href="https://specs.ipfs.tech/architecture/principles/">https://specs.ipfs.tech/architecture/principles/</a></dd><dt id="ref-masl">[masl]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/masl.html"><cite>MASL — Metadata for Arbitrary Structures &amp; Links</cite></a>. 2025-02-25. URL:&nbsp;<a href="https://dasl.ing/masl.html">https://dasl.ing/masl.html</a></dd><dt id="ref-url">[url]</dt><dd>WHATWG. <a href="https://url.spec.whatwg.org/"><cite>URL</cite></a>. Living Standard. URL:&nbsp;<a href="https://url.spec.whatwg.org/">https://url.spec.whatwg.org/</a></dd></dl></section></main></body></html>
