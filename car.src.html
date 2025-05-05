@@ -54,7 +54,7 @@
         </li>
         <li>
           Run the steps to <a>parse a CAR header</a> with <var>bytes</var> to obtain
-          <var>version</var> and <var>roots</var>.
+          <var>metadata</var>.
         </li>
         <li>
           Set up array <var>blocks</var> and run these substeps:
@@ -76,21 +76,38 @@
           </ol>
         </li>
         <li>
-          Return <var>version</var>, <var>roots</var>, and <var>blocks</var>.
+          Return <var>metadata</var> and <var>blocks</var>.
         </li>
       </ol>
       <p>
-        The CAR header encodes both a <code>version</code>, which is always 1, and
-        an array of <code>roots</code>, which is a list of CIDs. A CAR can be used
-        to contain one or more DAGs of dCBOR42 content and the purpose of the
-        <code>roots</code> is to list one or more roots for those DAGs. The array
-        may be empty if you do not care about encoding DAGs.
+        Note that the CAR header contains a near-arbitrary dCBOR42 object that is to be
+        treated as metadata ([[dcbor42]]). For historical reasons, there are two
+        constraints on the header:
       </p>
+      <ul>
+        <li>
+          The object MUST contain a <code>version</code> map entry, the value of which
+          is always integer-type <code>1</code>. Version numbers is data formats are
+          an anti-pattern, and as a result this number is guaranteed never to change.
+        </li>
+        <li>
+          The object MUST contain a <code>roots</code> entry, which MUST be of type
+          array. It MAY be empty, but if it isn't then it must be an array of CIDs
+          encoded using tag 42 ([[cid]]). A CAR can be used
+          to contain one or more DAGs of dCBOR42 content and the purpose of the
+          <code>roots</code> is to list one or more roots for those DAGs. The array
+          may be empty if you do not care about encoding DAGs. <strong>NOTE</strong>:
+          Some implementations expect there to always be at least one root. If you do
+         not wish to indicate a root but have to interoperate with those implementations,
+         you can always use the empty DASL CID <code>\x01\x55\x12\x00</code> instead.
+        </li>
+      </ul>
       <p>
-        <strong>NOTE</strong>: Some implementations expect there to always be at
-        least one root. If you do not wish to indicate a root but have to
-        interoperate with those implementations, you can always use the empty
-        DASL CID <code>\x01\x55\x12\x00</code> instead.
+        Some implementations will only return <var>version</var> and <var>roots</var>,
+        but it is RECOMMENDED that they make the entire <var>metadata</var> object
+        available. A best practice for authors is to use the <var>metadata</var>
+        to capture MASL content, which is able to provide metadata and a pathing
+        mapping for the entire content of the CAR stream if needed ([[masl]]).
       </p>
       <p>
         The steps to <dfn>parse a CAR header</dfn> are:
@@ -101,22 +118,22 @@
         <li>If <var>length</var> is 0, throw an error.</li>
         <li>
           Read <var>length</var> bytes from <var>bytes</var> and decode them as
-          dCBOR42 ([[dcbor42]]) into <var>object</var>. If <var>object</var> is
+          dCBOR42 ([[dcbor42]]) into <var>metadata</var>. If <var>metadata</var> is
           not a map, throw an error.
         </li>
         <li>
-          If <var>object</var> does not have a <code>version</code> key entry
+          If <var>metadata</var> does not have a <code>version</code> key entry
           with integer value <code>1</code>, throw an error. Otherwise, store
           <code>version</code> in <var>version</var>.
         </li>
         <li>
-          If <var>object</var> does not have a <code>roots</code> key entry
+          If <var>metadata</var> does not have a <code>roots</code> key entry
           that is an array, or if that array contains anything other than DASL
           CIDs, throw an error. Otherwise, store <code>roots</code> in
           <var>roots</var>.
         </li>
         <li>
-          Return <var>version</var> and <var>roots</var>.
+          Return <var>metadata</var>.
         </li>
       </ol>
       <p>
