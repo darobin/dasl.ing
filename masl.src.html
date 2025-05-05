@@ -8,34 +8,38 @@
   <body>
     <div id="abstract">
       <p>
-        tk
+        MASL is a CBOR-based metadata system that is designed to work well with content-addressed
+        and decentralised systems, to enable fully self-contained, self-certified content
+        distribution.
       </p>
     </div>
     <section>
-      <!--
-      - explain that this is good for one resource or for a reasonable-size app or site
-      - for something deeper, use this but wrapped in MST or whatever
-      - make sure this is captured in an example
-      -->
       <h2>Introduction</h2>
       <p>
         Anywhere you have resources that will be deployed in real-world systems, the potential
-        metadata needs of those systems are effectively unbounded.
+        metadata needs of those systems are effectively unbounded. This is particularly true of
+        decentralised systems that need to exhibit "web-like" behaviour: in order to have
+        reproducible and safe execution when content is sourced from arbitrary sources, it is
+        necessary to have an equivalent to HTTP headers that is as verifiable as the content
+        itself and not the lossy behaviour incurred from treating the web as a file system (which
+        it isn't).
+      </p>
+      <p>
         Designing or constraining a syntax for all metadata needs would be hubris and madness.
         Instead, this document tries to minimally constrain applications while illustrating "where to stick"
         that metadata, as there are so few layers and hiding places in the DASL system.
       </p>
-      <p>
-        The recommended structure for DASL metadata is to insert a dCBOR42 document "between" each
-        CID and its resource(s), essentially using dCBOR42 as headers wrapping a CID-addressed resource.
-        To do this, simply replace a CID of a resource with a CID to a dCBOR42 document that contains either a
-        top-level [type 42] property <code>src</code> (for a single resource), containing the
-        CID of the resource it describes, or a top-level mapping <code>resources</code> (for a collection
-        of resources), mapping paths to resource CIDs, each with optional dCBOR42 metadata ([[cid]], [[dcbor42]]).
-      </p>
     </section>
     <section>
       <h2>How to use a MASL document</h2>
+      <p>
+        The recommended structure for DASL metadata is to insert a dCBOR42 document "between" each
+        CID and its resource(s), essentially using dCBOR42 as headers wrapping a CID-addressed resource.
+        To do this, simply replace the CID of a resource with the CID of a dCBOR42 document that contains either a
+        top-level (tag 42) property <code>src</code> (for a single resource), containing the
+        CID of the resource it describes, or a top-level mapping <code>resources</code> (for a collection
+        of resources), mapping paths to resource CIDs, each with optional dCBOR42 metadata ([[cid]], [[dcbor42]]).
+      </p>
       <p>
         It is preferable to nest any metadata in a top-level object to namespace your own metadata
         standard (inside an object named, for example, `my-cool-project-v1`) rather than opaque version-bits or magic numbers.
@@ -48,53 +52,429 @@
         <a href="https://github.com/storacha/content-claims">content credentials</a> which includes UCAN-based
         permissioning and CID "equivalence," i.e. one or more IPFS CIDs equivalent to given DASL CID.
       </p>
+      <section>
+        <h3>Using MASL with CAR</h3>
+        <p>
+          CAR files ([[car]]) have a space reserved for metadata in their header. A MASL metadata document,
+          particularly the variant using a <code>resources</code> map, is well suited to be used there. The
+          <var>resources</var> field can be used to map paths to the CIDs of resources contained in CAR
+          blocks.
+        </p>
+        <p>
+          In order to work within CAR files, the <code>version</code> and <code>roots</code> fields must
+          be set to integer <code>1</code> and a possibly-empty array of tag 42 CIDs respectively. Neither
+          of these fields has any meaning in MASL, but they must be provided for historical compatibility
+          reasons.
+        </p>
+      </section>
     </section>
     <section>
-      <h2>Reserved words: HTTP headers</h2>
+      <h2>Fields</h2>
       <p>
-        HTTP use cases use best served by setting a HTTP headers per resourcej. What follows is a list of
-        lowercase top-level properties and the HTTP headers they map to, as well as constraints on values
-        for them:
+        MASL is designed to host arbitrary metadata but for interoperability purposes a number of root
+        fields have predetermined values. Authors are invited to add their own metadata by creating
+        namespaced objects at the top level.
       </p>
+      <p>
+        <strong>NOTE</strong>: In examples below, whenever we represent a CID as JSON for, say, field
+        <code>src</code>, we use <code>"src": { "$link": "CID value…" }</code> as a convention.
+      </p>
+      <section>
+        <h3>Single or Multiple Resources</h3>
+        <p>
+          MASL documents are primarily used to wrap around other resources for which they provide
+          metadata. This can happen in one of two modes:
+        </p>
         <ul>
-          <li><code>content-type</code>: Content-Type. No constraints.</li>
-          <div class="flag">
-            <li>...</li>
-          </div>
+          <li>
+            <strong>Single Mode</strong> (using <code>src</code>): the metadata is only for <em>one</em>
+            resource, which is the one that can be retrieved from the CID pointed to by <code>src</code>.
+            HTTP metadata, if specified, goes at the root. App manifest metadata on a single resource
+            can be used if that resource a fully standalone document (e.g. a PDF).
+          </li>
+          <li>
+            <strong>Bundle Mode</strong> (using <code>resources</code>): the metadata is used to
+            describe a whole set of resources. These resources SHOULD be related to one another in some
+            way (e.g. components that go into building an app or document). The keys of the <code>resources</code>
+            map are complete paths that MUST start with <code>/</code> and the values are metadata
+            objects that MUST have an <code>src</code> field pointing to the resource's CID and SHOULD have a
+            <code>mediaType</code> field giving its MIME type, along with other HTTP headers.
+          </li>
         </ul>
-      <p>
-        No other HTTP headers should be encoded into MASL documents for RASL purposes if wide
-        interoperability is expected.
-      </p>
-      <p>
+        <p>
+          Note that if both <code>src</code> and <code>resources</code> are specified, then
+          <code>src</code> MUST be ignored.
+        </p>
+        <p>
+          The Bundle Mode has some specific processing rules:
+          Loading bundles: default, relative, no directory, note not zip
+        </p>
+        <ul>
+          <li>
+            The entry with path <code>/</code> is the default path that is loaded if the bundle
+            itself is being rendered. Implementations MUST only recognise this as the default
+            and MUST NOT automatically decide to pick a given entry (e.g. <code>/index.html</code>).
+          </li>
+          <li>
+            When loading a bundle into a web context, the root of the bundle is given an opaque origin,
+            and all internal links are resolved relative to that.
+          </li>
+          <li>
+            There is no notion of directory. If a resource is indicating as sitting at <code>/cats/reds/kitsune.jpg</code>
+            this does not entail that <code>/cats/</code> or <code>/cats/reds/</code> somehow exist. As
+            in web contexts, it is the full path that is matched, not <code>/</code>-separated subsets. URLs
+            do <em>not</em> map to file systems.
+          </li>
+          <li>
+            When resolving a URL inside a bundle, implementation MUST only make use of the URL's pathname and
+            MUST ignore the query string. (Note that this departs from typical URL processing but makes it easier
+            to pass parameters between resources internally.)
+          </li>
+        </ul>
+        <p>
+          There is no requirement in MASL that bundles have to be stored in a specific manner. The relevant CIDs
+          may be loaded through whatever way the implementation knows about such as RASL ([[rasl]]) or may be
+          provided in a CAR file ([[car]]). Note that one value of this approach when compared to bundling using
+          for instance Zip archives is that the resource map may contain an arbitrarily high number of resources
+          that need not be loaded for the bundle to work other than on demand.
+        </p>
         <div class="flag">
-          Does it make sense to add a warning-flag, i.e.:
-          If you are adding use-case specific headers into a usecase, it recommended to add the
-          top-level flag <code>unsafe</code> : "true".
+          Specify a scheme and fetch rules properly.
         </div>
-      </p>
+        <p>
+          Example with <code>src</code>:
+        </p>
+        <pre>
+{
+  "src": { "$link": "bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4" },
+  "mediaType": "application/pdf",
+}
+        </pre>
+        <p>
+          Example with <code>resources</code>:
+        </p>
+        <pre>
+{
+  "name": "A Simple Page With Pic",
+  "resources": {
+    "/": {
+      "src": { "$link": "bafk…" },
+      "mediaType": "text/html"
+    },
+    "/picture.jpg": {
+      "src": { "$link": "bafk…" },
+      "mediaType": "image/jpeg"
+    }
+  }
+}
+        </pre>
+      </section>
+      <section>
+        <h3>HTTP Headers</h3>
+        <p>
+          MASL supports a subset of HTTP response headers that are meaningful in decentralised
+          contexts. This doesn't preclude headers not listed here from being used, but implementations
+          that support using HTTP headers SHOULD NOT reflect the value of arbitrary HTTP headers
+          without considering the potential attack surface they create.
+        </p>
+        <p>
+          When using HTTP headers as MASL metadata, there are two modes. If the MASL document
+          contains a root <code>resources</code> field then it is a MASL document for multiple resources
+          and the HTTP headers are only meaningful if they are set on values of the <code>resources</code>
+          map (and MUST be ignored if set on the root object). Conversely, if this MASL document
+          contains a <code>src</code> field (and no <code>resources</code>) then the HTTP headers MUST
+          be set on the root and ignored otherwise. If neither <code>src</code> nor <code>resources</code>
+          are specified, the meaning of HTTP fields is undefined.
+        </p>
+        <p>
+          All HTTP headers, where specified, are lowercased except for <code>mediaType</code> which
+          for historical reasons maps to <code>content-type</code>.
+        </p>
+        <p>
+          Supported headers:
+        </p>
+        <ul>
+          <li><code>content-disposition</code></li>
+          <li><code>content-encoding</code></li>
+          <li><code>content-language</code></li>
+          <li>
+            <code>content-security-policy</code>: keep in mind however that runtime contexts are likely
+            to already have a strict CSP that will override or constrain this one.
+          </li>
+          <li><code>mediaType</code>: used instead of <code>content-type</code>.</li>
+          <li><code>link</code></li>
+          <li><code>permissions-policy</code></li>
+          <li><code>referrer-policy</code></li>
+          <li><code>service-worker-allowed</code></li>
+          <li>
+            <code>sourcemap</code>: this must point to another resource in the <code>resources</code> map.
+            Implementations SHOULD verify that this is the case as source maps could otherwise be used to
+            exfiltrate information.
+          </li>
+          <li>
+            <code>speculation-rules</code>: this must point to another resource in the <code>resources</code> map.
+          </li>
+          <li><code>supports-loading-mode</code></li>
+          <li><code>x-content-type-options</code></li>
+        </ul>
+        <p>
+          Example with <code>src</code>:
+        </p>
+        <pre>
+{
+  "src": { "$link": "bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4" },
+  "mediaType": "text/html",
+  "content-language": "en",
+  "service-worker-allowed": "/"
+}
+        </pre>
+        <p>
+          Example with <code>resources</code>:
+        </p>
+        <pre>
+{
+  "name": "My Doc",
+  "resources": {
+    "/": {
+      "src": { "$link": "bafk…" },
+      "mediaType": "text/html",
+      "content-encoding": "gzip",
+      "content-language": "fr"
+    },
+    "/interactive.js": {
+      "src": { "$link": "bafk…" },
+      "mediaType": "application/javascript",
+      "sourcemap": "/interactive.js.map"
+    },
+    "/interactive.js.map": {
+      "src": { "$link": "bafk…" },
+      "mediaType": "application/json"
+    },
+    "/picture.jpg": {
+      "src": { "$link": "bafk…" },
+      "mediaType": "image/jpeg"
+    }
+  }
+}
+        </pre>
+      </section>
+      <section>
+        <h3>App Manifest</h3>
+        <p>
+          One useful pattern with MASL is to describe an entire app or document, with all of its
+          resources available for content addressing, possibly within a common CAR ([[car]]). Such
+          docs or apps should use Web App Manifest metadata ([[manifest]]) as it is widely understood.
+        </p>
+        <p>
+          The following manifest fields are guaranteed to be usable:
+          <code>background_color</code>,
+          <code>categories</code>,
+          <code>description</code>,
+          <code>icons</code>,
+          <code>id</code>,
+          <code>name</code>,
+          <code>screenshots</code>,
+          <code>short_name</code>, and
+          <code>theme_color</code>.
+          Note: other manifest fields MAY be used, but their behaviour is not guaranteed in the kind
+          of contexts that MASL is used in.
+        </p>
+        <p>
+          For both <code>icons</code> and <code>screenshots</code>, the <code>src</code> field MUST
+          be a path that matches an entry in the <code>resources</code> map, and the <code>type</code>
+          field that is normally accepted in manifests there MUST NOT be used and MUST be ignored
+          if specified. Media type information for that resource is specific on the resource entry
+          that <code>src</code> maps to.
+        </p>
+        <p>
+          Example:
+        </p>
+        <pre>
+{
+  "name": "Unicorn Editor",
+  "short_name": "Unicorn",
+  "description": "This is simply the best app to edit unicorns with.",
+  "background_color": "#00ff75",
+  "icons": [{ "src": "/unicorn.svg" }],
+  "resources": {
+    "/": {
+      "src": { "$link": "bafk…" },
+      "mediaType": "text/html"
+    },
+    "/unicorn.svg": {
+      "src": { "$link": "bafk…" },
+      "mediaType": "image/svg"
+    }
+  }
+}
+        </pre>
+      </section>
+      <section>
+        <h3>CAR Compatibility</h3>
+        <p>
+          As indicated in the CAR specification ([[car]]), the metadata object in the CAR header
+          must contain a <code>version</code> field set to integer <code>1</code> and a
+          <code>roots</code> field set to an array (that may be empty) of tag 42 CIDs. These
+          fields have no meaning for MASL, but are expected to be set when MASL is used for CAR
+          metadata for historical compatibility. Note that using versions in this way is an
+          antipattern, and we expect the value never to change.
+        </p>
+        <p>
+          Example:
+        </p>
+        <pre>
+{
+  "name": "Get in the CAR if you want to live",
+  "version": 1,
+  "roots": []
+}
+        </pre>
+      </section>
+      <section>
+        <h3>AT Compatibility</h3>
+        <p>
+          When used with the AT Protocol ([[at]]), it is common that objects will need to feature
+          a <code>$type</code> field. If present, it MUST be a string and SHOULD be set to the
+          value <code>ing.dasl.masl</code>.
+        </p>
+      </section>
+      <section>
+        <h3>Versioning</h3>
+        <p>
+          When manipulating DAGs, it can be useful to keep track of history by referencing
+          earlier versions of the same data or metadata. This can be done using the <code>prev</code>
+          field, which if present MUST be a tag 42 CID pointing to a previous MASL document.
+        </p>
+        <p>
+          Example:
+        </p>
+        <pre>
+{
+  "name": "Unicorn Editor",
+  "prev": { "$link": "bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4" }
+}
+        </pre>
+      </section>
     </section>
     <section>
-      <h2>Reserved words: Previous Version Chaining</h2>
+      <h2>Lexicon</h2>
       <p>
-        In addition to <code>resources</code>, <code>src</code>, and the HTTP header values mentioned
-        above, there is a final reserved word for refering to the previous version of an updated MASL document by CID.
-        This value is called <code>prv</code>, and can be used to create verifiable chains of mutated documents.
+        Making a precise lexicon ([[lexicon]]) for MASL is impossible because lexicons lack a way of
+        constraining objects with arbitrary keys. However, the following may still prove useful when
+        MASL is integrated with the AT Protocol ([[at]]).
       </p>
-    </section>
-    <section>
-      <h2>Collections are not Directories</h2>
-      <p>
-        As DASL is not a "file system" it does not have a concept isomorphic to directories or "folders"; there is, however, the RASL concept of a transport-agnostic collection, for which a MASL metadata document can be used to describe a service or behavior.
-        In such a usage, the <code>resources</code> mapping contains, in addition to an identifer --> CID mapping, additional metadata properties that would be at the top level in a single-CID MASL file, including the <code>src</code> property containing that CID.
-        (The isomorphism here is to a web service, which maps URIs to resources arbitrarily, and can map multiple paths or filenames to the same resource).
-      </p>
-      <p>
-        TODO: Example codeblock
-      </p>
-      <p>
-        Note: a MASL document containing both a top-level <code>resources</code> mapping and a top-level <code>src</code> should be considered malformed, and <code>resources</code> should be treated as canonical over a <code>src</code> if both are present.
-      </p>
+      <pre>
+{
+  "lexicon": 1,
+  "id": "ing.dasl.masl",
+  "defs": {
+    "main": {
+      "type": "object",
+      "properties": {
+        "src": {
+          "type": "string",
+          "format": "cid"
+        },
+        "resources": {
+          "type": "object"
+        },
+        // HTTP
+        "mediaType": { "type": "string" },
+        "content-disposition": { "type": "string" },
+        "content-encoding": { "type": "string" },
+        "content-language": { "type": "string" },
+        "content-security-policy": { "type": "string" },
+        "link": { "type": "string" },
+        "permissions-policy": { "type": "string" },
+        "referrer-policy": { "type": "string" },
+        "service-worker-allowed": { "type": "string" },
+        "sourcemap": { "type": "string" },
+        "speculation-rules": { "type": "string" },
+        "supports-loading-mode": { "type": "string" },
+        "x-content-type-options": { "type": "string" },
+        // Manifest
+        "background_color": {
+          "type": "string"
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "description": {
+          "type": "string"
+        },
+        "icons": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties":{
+              "src": { "type": "string" },
+              "sizes": { "type": "string" },
+              "purpose": { "type": "string" }
+            },
+            "required": ["src"]
+          }
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "screenshots": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties":{
+              "src": { "type": "string" },
+              "sizes": { "type": "string" },
+              "label": { "type": "string" },
+              "form_factor": {
+                "type": "string",
+                "enum": ["narrow", "wide"]
+              },
+              "platform": {
+                "type": "string",
+                "enum": [""android", "chromeos", "ios", "ipados", "kaios", "macos", "windows", "xbox", "chrome_web_store", "itunes", "microsoft", "microsoft", "play"]
+              },
+            },
+            "required": ["src"]
+          }
+        },
+        "short_name": {
+          "type": "string"
+        },
+        "theme_color": {
+          "type": "string"
+        },
+        // CAR compatibility
+        "version": {
+          "type": "integer",
+          "const": 1
+        },
+        "roots": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "cid"
+          }
+        },
+        // AT (specifying this might not be AT compatible)
+        "$type": {
+          "type": "string"
+        },
+        // versioning
+        "prev": {
+          "type": "string",
+          "format": "cid"
+        }
+      }
+    }
+  }
+}
+      </pre>
     </section>
   </body>
 </html>
