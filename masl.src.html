@@ -19,10 +19,9 @@
         Anywhere you have resources that will be deployed in real-world systems, the potential
         metadata needs of those systems are effectively unbounded. This is particularly true of
         decentralised systems that need to exhibit "web-like" behaviour: in order to have
-        reproducible and safe execution when content is sourced from arbitrary sources, it is
+        reproducible and safe execution when content is sourced from arbitrary authorities, it is
         necessary to have an equivalent to HTTP headers that is as verifiable as the content
-        itself and not the lossy behaviour incurred from treating the web as a file system (which
-        it isn't).
+        itself and not suffer the lossy behaviour that can occur when one treats the web as a file system (which it is not).
       </p>
       <p>
         Designing or constraining a syntax for all metadata needs would be hubris and madness.
@@ -34,37 +33,38 @@
       <h2>How to use a MASL document</h2>
       <p>
         The recommended structure for DASL metadata is to insert a dCBOR42 document "between" each
-        CID and its resource(s), essentially using dCBOR42 as headers wrapping a CID-addressed resource.
+        CID and its resource(s), essentially using dCBOR42 as headers wrapping one or more CID-addressed resource(s).
         To do this, simply replace the CID of a resource with the CID of a dCBOR42 document that contains either a
-        top-level (tag 42) property <code>src</code> (for a single resource), containing the
-        CID of the resource it describes, or a top-level mapping <code>resources</code> (for a collection
-        of resources), mapping paths to resource CIDs, each with optional dCBOR42 metadata ([[cid]], [[dcbor42]]).
+        top-level (tag 42) property named <code>src</code>.
+        To bundle a set of CIDs in a logical unit, drop the top-level <code>src</code> and replace it with a mapping of relative paths to CIDs (if free of metadata) or to dCBOR42 metadata objects including <code>src</code>.
       </p>
       <p>
         It is preferable to nest any metadata in a top-level object to namespace your own metadata
-        standard (inside an object named, for example, `my-cool-project-v1`) rather than opaque version-bits or magic numbers.
-        There are a few reserved words at the top-level, but these can be avoided by nesting any conflicts.
+        template (inside an object named, for example, `my-cool-project-v1`) rather than using opaque UUIDs, version-bits inserted into values, or magic numbers.
+        There are a few reserved words at the top-level, but even these can be avoided by nesting any conflicts as needed.
       </p>
       <p>
         There are many metadata standards that can be embedded in this way to facilitate the preservation of
         metadata at ingress as well as translatability. For example, the IPFS-based storage system Storacha
         has a robust CID-based metadata system called
         <a href="https://github.com/storacha/content-claims">content credentials</a> which includes UCAN-based
-        permissioning and CID "equivalence," i.e. one or more IPFS CIDs equivalent to given DASL CID.
+        permissioning, inclusion attestations, and CID "equivalences," e.g. mappings of multiple IPFS CIDs equivalent to each other and/or to a given DASL CID.
       </p>
       <section>
         <h3>Using MASL with CAR</h3>
         <p>
-          CAR files ([[car]]) have a space reserved for metadata in their header. A MASL metadata document,
-          particularly the variant using a <code>resources</code> map, is well suited to be used there. The
-          <var>resources</var> field can be used to map paths to the CIDs of resources contained in CAR
-          blocks.
+          CAR files ([[car]]) have a space reserved for metadata in their header.
+          A MASL metadata document can conformantly occupy that metadata header-space,
+          and the variant using a <code>resources</code> map is particularly well-suited to be used there.
+          The <var>resources</var> field can be used to map paths to the CIDs of resources contained in subsequent CAR
+          blocks after the metadata header.
         </p>
         <p>
-          In order to work within CAR files, the <code>version</code> and <code>roots</code> fields must
-          be set to integer <code>1</code> and a possibly-empty array of tag 42 CIDs respectively. Neither
-          of these fields has any meaning in MASL, but they must be provided for historical compatibility
+          In order to be inserted directly as metadata object within CAR files, MASL documents need to contain a top-level <code>version</code> property whose value MUST
+          be set to integer <code>1</code> and a top-level <code>roots</code> array must contain 0 or more tag 42 CIDs and nothing else.
+          Neither of these fields has any meaning in MASL, but they must be provided for historical compatibility
           reasons.
+          Note that there is no requirements that all the CIDs in a <code>roots</code> array also appear in the <code>resources</code> mapping or vice versa. 
         </p>
       </section>
     </section>
@@ -77,7 +77,7 @@
       </p>
       <p>
         <strong>NOTE</strong>: In examples below, whenever we represent a CID as JSON for, say, field
-        <code>src</code>, we use <code>"src": { "$link": "CID value…" }</code> as a convention.
+        <code>src</code>, we use <code>"src": { "$link": "CID value…" }</code> as a readability convention.
       </p>
       <section>
         <h3>Single or Multiple Resources</h3>
@@ -99,6 +99,7 @@
             map are complete paths that MUST start with <code>/</code> and the values are metadata
             objects that MUST have an <code>src</code> field pointing to the resource's CID and SHOULD have a
             <code>mediaType</code> field giving its MIME type, along with other HTTP headers.
+            Any other properties present which do not map to HTTP headers MUST be ignored.
           </li>
         </ul>
         <p>
@@ -106,37 +107,36 @@
           <code>src</code> MUST be ignored.
         </p>
         <p>
-          The Bundle Mode has some specific processing rules:
-          Loading bundles: default, relative, no directory, note not zip
+          The Bundle Mode has some specific processing rules when
+          loading bundles, which can be abbreviated to: default, relative, no directory, note not zip
         </p>
         <ul>
           <li>
-            The entry with path <code>/</code> is the default path that is loaded if the bundle
-            itself is being rendered. Implementations MUST only recognise this as the default
+            Default: The entry with path <code>/</code> is the default path that is loaded if the bundle
+            itself is dereferenced for rendering, e.g. in a browser or other user-agent. Implementations MUST only recognise this as the default
             and MUST NOT automatically decide to pick a given entry (e.g. <code>/index.html</code>).
           </li>
           <li>
-            When loading a bundle into a web context, the root of the bundle is given an opaque origin,
+            Relative: When loading a bundle into a web context, the root of the bundle is given an opaque origin,
             and all internal links are resolved relative to that.
           </li>
           <li>
-            There is no notion of directory. If a resource is indicating as sitting at <code>/cats/reds/kitsune.jpg</code>
+            No directory: There is no notion of directory. If a resource is indicated as sitting at <code>/cats/reds/kitsune.jpg</code>
             this does not entail that <code>/cats/</code> or <code>/cats/reds/</code> somehow exist. As
             in web contexts, it is the full path that is matched, not <code>/</code>-separated subsets. URLs
             do <em>not</em> map to file systems.
           </li>
           <li>
-            When resolving a URL inside a bundle, implementation MUST only make use of the URL's pathname and
+            Note not zip: When resolving a URL inside of a bundle, implementation MUST only make use of the URL's pathname and
             MUST ignore the query string. (Note that this departs from typical URL processing but makes it easier
             to pass parameters between resources internally.)
           </li>
         </ul>
         <p>
-          There is no requirement in MASL that bundles have to be stored in a specific manner. The relevant CIDs
+          There is no requirement in MASL that bundles have to be stored or dereferenced in any specific manner. The relevant CIDs
           may be loaded through whatever way the implementation knows about such as RASL ([[rasl]]) or may be
-          provided in a CAR file ([[car]]). Note that one value of this approach when compared to bundling using
-          for instance Zip archives is that the resource map may contain an arbitrarily high number of resources
-          that need not be loaded for the bundle to work other than on demand.
+          provided in a CAR file ([[car]]). 
+          Note that one value of this approach when compared to bundling metadata into bounded documents like zip archives (or CAR files!) is that the resource map can contain an arbitrarily high number or volume of resources; a MASL file can load data in parallel, in an arbitrary order informed by types and HTTP headers, and/or on-demand.
         </p>
         <div class="flag">
           Specify a scheme and fetch rules properly.
@@ -174,7 +174,7 @@
         <p>
           MASL supports a subset of HTTP response headers that are meaningful in decentralised
           contexts. This doesn't preclude headers not listed here from being used, but implementations
-          that support using HTTP headers SHOULD NOT reflect the value of arbitrary HTTP headers
+          that support using HTTP headers SHOULD NOT pass through values for additional HTTP headers
           without considering the potential attack surface they create.
         </p>
         <p>
@@ -277,7 +277,7 @@
           <code>short_name</code>, and
           <code>theme_color</code>.
           Note: other manifest fields MAY be used, but their behaviour is not guaranteed in the kind
-          of contexts that MASL is used in.
+          of web and web-like contexts for which MASL is optimized.
         </p>
         <p>
           For both <code>icons</code> and <code>screenshots</code>, the <code>src</code> field MUST
