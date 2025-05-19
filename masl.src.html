@@ -36,7 +36,7 @@
         CID and its resource(s), essentially using dCBOR42 as headers wrapping one or more CID-addressed resources.
         To do this, simply replace the CID of a resource with the CID of a dCBOR42 document that contains either a
         top-level (tag 42) property named <code>src</code>.
-        To bundle a set of CIDs in a logical unit, drop the top-level <code>src</code> and replace it with a mapping of relative paths to CIDs (if free of metadata) or to dCBOR42 metadata objects including <code>src</code>.
+        To bundle a set of CIDs in a logical unit, drop the top-level <code>src</code> and replace it with a mapping of paths-from-domain-root to dCBOR42 metadata objects including a <code>src</code> property containing the resource's CID.
       </p>
       <p>
         It is preferable to nest any metadata in a top-level object to namespace your own metadata
