@@ -181,9 +181,9 @@
         on the client side.
       </p>
       <p>
-        As of this time, the only case in which pathing is defined is if the CID has a dCBOR42 type
-        ([[dcbor42]]) <em>and</em> the content is MASL ([[masl]]) <em>and</em> it has a
-        <code>resources</code> map. But carrying that resolution happens outside of RASL fetching.
+        As of this time, the only case in which pathing is defined is if the CID has a <code>0x55</code> prefix (i.e. is marked as a [[drisl]] object),
+        <em>and</em> the content contents retrieved from that CID parse as valid MASL ([[masl]]) <em>and</em> it has a
+        <code>resources</code> map defining resources for each available path. But carrying out that resolution happens outside of RASL fetching.
       </p>
     </section>
   </body>

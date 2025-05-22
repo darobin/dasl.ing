@@ -33,8 +33,8 @@
       <h2>Parsing CAR</h2>
       <p>
         The CAR format comprises a sequence of length-prefixed block data, where the first
-        block in the CAR is the Header encoded as dCBOR42, and the remaining blocks form
-        the Data component of the CAR and are each additionally prefixed with their CIDs ([[dcbor42]], [[cid]]).
+        block in the CAR is the Header encoded as [[drisl]], and the remaining blocks form
+        the Data component of the CAR and are each additionally prefixed with their CIDs ([[drisl]], [[cid]]).
         The length prefix of each block in a CAR is encoded as an unsigned variable-length
         integer
         <a href="https://en.wikipedia.org/wiki/LEB128">LEB128</a> integer ([[leb128]]).
@@ -80,8 +80,8 @@
         </li>
       </ol>
       <p>
-        Note that the CAR header contains a near-arbitrary dCBOR42 object that is to be
-        treated as metadata ([[dcbor42]]). For historical reasons, there are two
+        Note that the CAR header contains a near-arbitrary DRISL object that is to be
+        treated as metadata ([[drisl]]). For historical reasons, there are two
         constraints on the header:
       </p>
       <ul>
@@ -94,7 +94,7 @@
           The object MUST contain a <code>roots</code> entry, which MUST be of type
           array. It MAY be empty, but if it isn't then it must be an array of CIDs
           encoded using tag 42 ([[cid]]). A CAR can be used
-          to contain one or more DAGs of dCBOR42 content and the purpose of the
+          to contain one or more DAGs of [[drisl]] content and the purpose of the
           <code>roots</code> is to list one or more roots for those DAGs. The array
           may be empty if you do not care about encoding DAGs. <strong>NOTE</strong>:
           Some implementations expect there to always be at least one root. If you do
@@ -118,7 +118,7 @@
         <li>If <var>length</var> is 0, throw an error.</li>
         <li>
           Read <var>length</var> bytes from <var>bytes</var> and decode them as
-          dCBOR42 ([[dcbor42]]) into <var>metadata</var>. If <var>metadata</var> is
+          DRISL ([[drisl]]) into <var>metadata</var>. If <var>metadata</var> is
           not a map, throw an error.
         </li>
         <li>

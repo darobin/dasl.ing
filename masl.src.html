@@ -32,11 +32,11 @@
     <section>
       <h2>How to use a MASL document</h2>
       <p>
-        The recommended structure for DASL metadata is to insert a dCBOR42 document "between" each
-        CID and its resource(s), essentially using dCBOR42 as headers wrapping one or more CID-addressed resources.
-        To do this, simply replace the CID of a resource with the CID of a dCBOR42 document that contains either a
+        The recommended structure for DASL metadata is to insert a [[drisl]] document "between" each
+        CID and its resource(s), essentially using DRISL to encode headers for one or more CID-addressed resources.
+        To do this, simply replace the CID of a resource with the CID of a DRISL object that contains a
         top-level (tag 42) property named <code>src</code>.
-        To bundle a set of CIDs in a logical unit, drop the top-level <code>src</code> and replace it with a mapping of paths-from-domain-root to dCBOR42 metadata objects including a <code>src</code> property containing the resource's CID.
+        To bundle a set of CIDs in a logical unit, drop the top-level <code>src</code> and replace it with a mapping of paths-from-domain-root to DRISL metadata objects including a <code>src</code> property containing the resource's CID.
       </p>
       <p>
         It is preferable to nest any metadata in a top-level object to namespace your own metadata
