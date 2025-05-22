@@ -18,7 +18,7 @@
       <p>
         DASL CIDs are a simple structured identifier format for content addressing. They encapsulate a hash
         with enough metadata to be extensible (to add new hash types in the future) and to indicate whether
-        they are pointing to raw bytes or to structured data. If you're simply DASL CIDs as identifiers, you
+        they are pointing to raw bytes or to structured data. If you're simply using DASL CIDs as identifiers, you
         can almost certainly just use the string as an opaque ID and worry no further.
       </p>
       <p>
@@ -92,8 +92,8 @@
           Remove the next byte in <var>CID bytes</var> and store it in <var>codec</var>.
         </li>
         <li>
-          If <var>codec</var> is not equal to <code>0x55</code> (raw) or <code>0x71</code> (dCBOR42),
-          throw an error ([[dcbor42]]).
+          If <var>codec</var> is not equal to <code>0x55</code> (raw) or <code>0x71</code> (DRISL),
+          throw an error ([[drisl]]).
         </li>
         <li>
           Remove the next byte in <var>CID bytes</var> and store it in <var>hash type</var>.
@@ -144,14 +144,14 @@
         </li>
         <li>
           Only the <code>raw</code> binary multicodec (0x55) and <code>dag-cbor</code> multicodec (0x71), with the
-          latter used only for dCBOR42-conformant DAGs.
+          latter used only for [[drisl]]-conformant DAGs of CBOR objects.
         </li>
         <li>Only SHA-256 (0x12) for the hash function .</li>
         <li>
           The CID isn't the boss of anyone, but the expectation is that, regardless of size, resources
           <em>should not</em> be "chunked" into a DAG or Merkle tree (as historically done with UnixFS canonicalization
           in IPFS systems) but rather hashed in their entirety and content-addressed directly. That being
-          said, a DASL CID can point to a piece of dCBOR42 metadata that describes this kind of
+          said, a DASL CID can point to a piece of [[drisl]] metadata that describes this kind of
           chunking, if needed. (A separate specification may be added for that.)
         </li>
         <li>
