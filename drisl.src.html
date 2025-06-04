@@ -8,13 +8,80 @@
   <body>
     <div id="abstract">
       <p>
-        tk
+        DRISL is a serialization format that is deterministic (so that the same
+        data will have the same CID) and that features native support for using
+        CIDs as links.
+        It is based on CBOR, using a narrow profile of CBOR's "Core" featureset called "[[cborc-42]]", specified formally in <a href="https://datatracker.ietf.org/doc/draft-caballero-cbor-cborc42/">this IETF document</a>.
       </p>
     </div>
     <section>
       <h2>Introduction</h2>
       <p>
-        tk
+        Deterministic encodings that produce the same stream of bytes for any
+        given data with the same semantics are particularly useful in a content-addressed
+        context. DRISL provides that, compactly encoded as CBOR. Additionally, it supports CBOR's Tag 42 to compactly encode CIDs ([[cid]]) as bytestreams. This CID can be used for content-addressed linking
+        between DRISL documents (such as MASL documents), or to resources (best wrapped in MASL documents where renderability as web documents or web apps is desired).
+      </p>
+      <p>
+        DRISL does not fork CBOR, CDE, or dCBOR ([[cbor]], [[cde]], [[dcbor]]), but it is a subset of features defined in CBOR "Core" ([[cborc]]), first defined in the earliest CBOR RFC and largely unaffected by refinements made since.
+        Any decoder for any version of CBOR since v1 will be able to read DRISL
+        content as conformant CBOR, and with enough carefully configuration of a powerful CBOR library and in some case pre-processing of the data, DRISL can be encoded anywhere CBOR can.
+      </p>
+    </section>
+    <section>
+      <h2>Format</h2>
+      <p>
+        DRISL is an application profile of CBOR ([[cbor]]) that subsets the more established [[cborc]] profile, with the following additional
+        constraints:
+      </p>
+      <ul>
+        <li>
+          Implementations MUST support Tag 42 in the <a href="https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml">CBOR
+          Tag registry</a>; this tag compactly encodes CIDs as bytestrings, as specified below.
+        </li>
+        <li>
+          Implementations MUST reject all other tags, including any of the tags
+          listed in the <a href="https://tools.ietf.org/html/rfc8949#section-3.4">section
+          3.4 of RFC 8949</a>.
+        </li>
+        <li>
+          Implementations MUST reject map keys that are not strings.
+        </li>
+        <li>
+          Floating-point numbers MUST always be encoded using the longest
+          variant; completely avoiding floating-point numbers is RECOMMENDED to minimize interoperability and tooling issues.
+        </li>
+      </ul>
+      <p>
+        All other requirements are as CBOR/c ([[cborc]]).
+      </p>
+    </section>
+    <section>
+      <h2>CIDs in CBOR</h2>
+      <p>
+        Content-identifiers used in DASL are actually LEB128 binary numbers, canonically, which is a detail one can easily forget since in code and, e.g., in JSON APIs, CIDs are conventionally represented as base-32 ASCII strings. But in CBOR contexts, simply affixing one extra <code>0x00</code> bit in front of the same LEB128 bytestring that would get base-32-encoded to ASCII turns that bytestring into a valid value for tag 42, CBOR's bespoke minor type for binary CIDs.
+      </p>
+      <p>
+        For more information, see the [[cbor-tag42]] appendix to the [[drisl]] specification.
+      </p>
+    </section>
+    <section>
+      <h2>Debugging Considerations</h2>
+      <p>
+        It is often convenient to represent DRISL in textual formats for debugging
+        purposes, for example using JSON.
+      </p>
+      <p>
+        One common convention for doing so is historically referred to as "DAG-JSON," which is a JSON expression
+        of the DRISL data in which CIDs are represented as the object
+        <code>{ "/": "string CID" }</code>, i.e., DASL CIDs in their base-32 ASCII representation ([[cid]]), NOT in their CBOR representation ([[cbor-tag42]])). Another option is
+        <a href="https://datatracker.ietf.org/doc/draft-ietf-cbor-edn-literals/">CBOR
+        Extended Diagnostic Notation</a>.
+      </p>
+      <p>
+        In any case, note that the CIDs used in such debugging outputs that may
+        point to <em>other</em> parts of the debugging output should be the CIDs
+        of the DRISL content, not of the debugging resources.
       </p>
     </section>
   </body>

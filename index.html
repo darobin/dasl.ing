@@ -93,7 +93,7 @@
         <h2>Implementations</h2>
         <p>
           DASL is a strict subset of IPFS CIDs and IPLD, so existing IPFS and IPLD implementations will just
-          read DASL CIDs and dCBOR42 without so much as a hiccup. Some implementations also specifically target a DASL subset.
+          read DASL CIDs and the MASL documents they point to without so much as a hiccup. Some implementations also specifically target a DASL subset.
         </p>
         <p>Here are some implementations that partially or fully support DASL:</p>
         <ul>
@@ -144,11 +144,11 @@
             with limited metadata.
           </dd>
           <dt>
-            <a href="dcbor42.html">Deterministically-serialized CBOR with Tag 42 (dCBOR42)</a>
+            <a href="drisl.html">Deterministic Representation for Interoperable Structures and Links (DRISL)</a>
           </dt>
           <dd>
-            dCBOR42 is a serialization format that is deterministic (so that the same data will have the same CID)
-            and that features native support for using CIDs as links.
+            DRISL is a profile of deterministic CBOR used to ensure that the same data will have the same CID;
+            it features native support for using binary CIDs as compact links between documents.
           </dd>
           <dt>
             <a href="car.html">Content-Addressable aRchives (CAR)</a>
@@ -162,7 +162,7 @@
             <a href="masl.html">MASL — Metadata for Arbitrary Structures &amp; Links</a>
           </dt>
           <dd>
-            MASL is a CBOR-based metadata system that is designed to work well with content-addressed
+            MASL is a type of CBOR metadata document that is designed to work well with content-addressed
             and decentralised systems, to enable fully self-contained, self-certified content
             distribution.
           </dd>
