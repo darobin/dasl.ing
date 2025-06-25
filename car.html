@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Content-Addressable aRchives (CAR)</title>
   <link rel="stylesheet" href="spec.css"><link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%220%22 y=%220%22 width=%22100%22 height=%22100%22 fill=%22%2300ff75%22></rect></svg>"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" property="og:title" content="DASL: Content-Addressable aRchives (CAR)"><meta name="twitter:description" property="og:description" content="The CAR format offers a serialized representation of set of content-addressed         resources in one single concatenated stream, alongside a header that describes         that content."><meta name="twitter:image" property="og:image" content="https://dasl.ing/car.png"><meta name="twitter:image:alt" content="Very colourful stripes, so colourful it hurts"><meta name="twitter:url" property="og:url" content="https://dasl.ing/"><meta property="og:site_name" content="DASL"><meta property="og:locale" content="en"><meta name="theme-color" content="#00ff75"></head>
-  <body><div class="nav-back">A specification of the <a href="/">DASL Project</a>.</div><main><header><h1>Content-Addressable aRchives (CAR)</h1><table><tbody><tr><th>date</th><td>2025-05-05</td></tr><tr><th>editors</th><td><a href="https://berjon.com/">Robin Berjon</a> &lt;<a href="mailto:robin@berjon.com">robin@berjon.com</a>&gt;<br><a href="https://bumblefudge.com/">Juan Caballero</a> &lt;<a href="mailto:bumblefudge@learningproof.xyz">bumblefudge@learningproof.xyz</a>&gt;</td></tr><tr><th>issues</th><td><a href="https://github.com/darobin/dasl.ing/issues">list</a>, <a href="https://github.com/darobin/dasl.ing/issues/new">new</a></td></tr><tr><th>abstract</th><td><div id="abstract">
+  <body><div class="nav-back">A specification of the <a href="/">DASL Project</a>.</div><main><header><h1>Content-Addressable aRchives (CAR)</h1><table><tbody><tr><th>date</th><td>2025-06-25</td></tr><tr><th>editors</th><td><a href="https://berjon.com/">Robin Berjon</a> &lt;<a href="mailto:robin@berjon.com">robin@berjon.com</a>&gt;<br><a href="https://bumblefudge.com/">Juan Caballero</a> &lt;<a href="mailto:bumblefudge@learningproof.xyz">bumblefudge@learningproof.xyz</a>&gt;</td></tr><tr><th>issues</th><td><a href="https://github.com/darobin/dasl.ing/issues">list</a>, <a href="https://github.com/darobin/dasl.ing/issues/new">new</a></td></tr><tr><th>abstract</th><td><div id="abstract">
       <p>
         The CAR format offers a serialized representation of set of content-addressed
         resources in one single concatenated stream, alongside a header that describes
@@ -33,8 +33,8 @@
       <h2>Parsing CAR</h2>
       <p>
         The CAR format comprises a sequence of length-prefixed block data, where the first
-        block in the CAR is the Header encoded as [[drisl]], and the remaining blocks form
-        the Data component of the CAR and are each additionally prefixed with their CIDs ([[cid]]).
+        block in the CAR is the Header encoded as [<a href="#ref-drisl" class="ref">drisl</a>], and the remaining blocks form
+        the Data component of the CAR and are each additionally prefixed with their CIDs ([<a href="#ref-drisl" class="ref">drisl</a>], [<a href="#ref-cid" class="ref">cid</a>]).
         The length prefix of each block in a CAR is encoded as an unsigned variable-length
         integer
         <a href="https://en.wikipedia.org/wiki/LEB128">LEB128</a> integer ([<a href="#ref-leb128" class="ref">leb128</a>]).
@@ -80,8 +80,8 @@
         </li>
       </ol>
       <p>
-        Note that the CAR header contains a near-arbitrary dCBOR42 object that is to be
-        treated as metadata ([<a href="#ref-dcbor42" class="ref">dcbor42</a>]). For historical reasons, there are two
+        Note that the CAR header contains a near-arbitrary DRISL object that is to be
+        treated as metadata ([<a href="#ref-drisl" class="ref">drisl</a>]). For historical reasons, there are two
         constraints on the header:
       </p>
       <ul>
@@ -94,7 +94,7 @@
           The object MUST contain a <code>roots</code> entry, which MUST be of type
           array. It MAY be empty, but if it isn't then it must be an array of CIDs
           encoded using tag 42 ([<a href="#ref-cid" class="ref">cid</a>]). A CAR can be used
-          to contain one or more DAGs of dCBOR42 content and the purpose of the
+          to contain one or more DAGs of [<a href="#ref-drisl" class="ref">drisl</a>] content and the purpose of the
           <code>roots</code> is to list one or more roots for those DAGs. The array
           may be empty if you do not care about encoding DAGs. <strong>NOTE</strong>:
           Some implementations expect there to always be at least one root. If you do
@@ -118,7 +118,7 @@
         <li>If <var>length</var> is 0, throw an error.</li>
         <li>
           Read <var>length</var> bytes from <var>bytes</var> and decode them as
-          dCBOR42 ([<a href="#ref-dcbor42" class="ref">dcbor42</a>]) into <var>metadata</var>. If <var>metadata</var> is
+          DRISL ([<a href="#ref-drisl" class="ref">drisl</a>]) into <var>metadata</var>. If <var>metadata</var> is
           not a map, throw an error.
         </li>
         <li>
@@ -227,4 +227,4 @@
     </section>
   
 
-<section><h2>References</h2><dl><dt id="ref-cid">[cid]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/cid.html"><cite>Content IDs (CIDs)</cite></a>. 2025-05-05. URL:&nbsp;<a href="https://dasl.ing/cid.html">https://dasl.ing/cid.html</a></dd><dt id="ref-dcbor42">[dcbor42]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/dcbor42.html"><cite>Deterministic CBOR with tag 42 (dCBOR42)</cite></a>. 2025-05-05. URL:&nbsp;<a href="https://dasl.ing/dcbor42.html">https://dasl.ing/dcbor42.html</a></dd><dt id="ref-leb128">[leb128]</dt><dd>Wikipedia. <a href="https://en.wikipedia.org/wiki/LEB128"><cite>LEB128</cite></a>. Retrieved December 2024. URL:&nbsp;<a href="https://en.wikipedia.org/wiki/LEB128">https://en.wikipedia.org/wiki/LEB128</a></dd><dt id="ref-masl">[masl]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/masl.html"><cite>MASL — Metadata for Arbitrary Structures &amp; Links</cite></a>. 2025-05-05. URL:&nbsp;<a href="https://dasl.ing/masl.html">https://dasl.ing/masl.html</a></dd></dl></section></main></body></html>
+<section><h2>References</h2><dl><dt id="ref-cid">[cid]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/cid.html"><cite>Content IDs (CIDs)</cite></a>. 2025-06-25. URL:&nbsp;<a href="https://dasl.ing/cid.html">https://dasl.ing/cid.html</a></dd><dt id="ref-drisl">[drisl]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/drisl.html"><cite>DRISL — Deterministic Representation for Interoperable Structures &amp; Links</cite></a>. 2025-06-25. URL:&nbsp;<a href="https://dasl.ing/drisl.html">https://dasl.ing/drisl.html</a></dd><dt id="ref-leb128">[leb128]</dt><dd>Wikipedia. <a href="https://en.wikipedia.org/wiki/LEB128"><cite>LEB128</cite></a>. Retrieved December 2024. URL:&nbsp;<a href="https://en.wikipedia.org/wiki/LEB128">https://en.wikipedia.org/wiki/LEB128</a></dd><dt id="ref-masl">[masl]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/masl.html"><cite>MASL — Metadata for Arbitrary Structures &amp; Links</cite></a>. 2025-06-25. URL:&nbsp;<a href="https://dasl.ing/masl.html">https://dasl.ing/masl.html</a></dd></dl></section></main></body></html>
