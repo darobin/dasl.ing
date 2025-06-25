@@ -370,12 +370,9 @@
     "main": {
       "type": "object",
       "properties": {
-        "src": {
-          "type": "string",
-          "format": "cid"
-        },
+        "src": { "type": "cid-link" },
         "resources": {
-          "type": "object"
+          "type": "unknown"
         },
         // HTTP
         "mediaType": { "type": "string" },
@@ -408,12 +405,12 @@
           "type": "array",
           "items": {
             "type": "object",
+            "required": ["src"],
             "properties":{
               "src": { "type": "string" },
               "sizes": { "type": "string" },
               "purpose": { "type": "string" }
-            },
-            "required": ["src"]
+            }
           }
         },
         "id": {
@@ -426,20 +423,20 @@
           "type": "array",
           "items": {
             "type": "object",
+            "required": ["src"],
             "properties":{
               "src": { "type": "string" },
               "sizes": { "type": "string" },
               "label": { "type": "string" },
               "form_factor": {
                 "type": "string",
-                "enum": ["narrow", "wide"]
+                "knownValues": ["narrow", "wide"]
               },
               "platform": {
                 "type": "string",
-                "enum": [""android", "chromeos", "ios", "ipados", "kaios", "macos", "windows", "xbox", "chrome_web_store", "itunes", "microsoft", "microsoft", "play"]
-              },
-            },
-            "required": ["src"]
+                "knownValues": ["android", "chromeos", "ios", "ipados", "kaios", "macos", "windows", "xbox", "chrome_web_store", "itunes", "microsoft", "microsoft", "play"]
+              }
+            }
           }
         },
         "short_name": {
@@ -455,20 +452,10 @@
         },
         "roots": {
           "type": "array",
-          "items": {
-            "type": "string",
-            "format": "cid"
-          }
-        },
-        // AT (specifying this might not be AT compatible)
-        "$type": {
-          "type": "string"
+          "items": { "type": "cid-link" }
         },
         // versioning
-        "prev": {
-          "type": "string",
-          "format": "cid"
-        }
+        "prev": { "type": "cid-link" }
       }
     }
   }
