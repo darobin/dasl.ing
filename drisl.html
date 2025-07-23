@@ -59,7 +59,7 @@
     <section>
       <h2>CIDs in CBOR</h2>
       <p>
-        Content-identifiers used in DASL are actually LEB128 binary numbers, canonically, which is a detail one can easily forget since in code and, e.g., in JSON APIs, CIDs are conventionally represented as base-32 ASCII strings. But in CBOR contexts, simply affixing one extra <code>0x00</code> bit in front of the same LEB128 bytestring that would get base-32-encoded to ASCII turns that bytestring into a valid value for tag 42, CBOR's bespoke minor type for binary CIDs.
+        CIDs in CBOR are stored in binary format, as CBOR bytestrings under custom tag 42. For historical reasons the null byte <code>0x00</code> is prepended to the binary CID before storing in CBOR.
       </p>
       <p>
         For more information, see the [<a href="#ref-cbor-tag42" class="ref">cbor-tag42</a>] appendix to the [<a href="#ref-drisl" class="ref">drisl</a>] specification.
