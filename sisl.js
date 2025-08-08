@@ -75,8 +75,20 @@ class SISL {
       const abstract = doc.querySelector('#abstract');
       if (!abstract) this.err(`Missing abstract in ${doc.title}`);
       const head = doc.querySelector('head');
-      const cmt = doc.createComment('\n!!!!! GENERATED SPEC — DO NOT EDIT. Look for the .src.html instead !!!!\n');
-      head.prepend(cmt);
+      const cmt = doc.createComment(`
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!   GENERATED SPEC — DO NOT EDIT. Look for the .src.html instead   !!!!
+!!!!!                                                                  !!!!
+!!!!!   HEY YOU                                                        !!!!
+!!!!!   YES ***YOU****!                                                !!!!
+!!!!!                                                                  !!!!
+!!!!!   You're about to edit a generated document.                     !!!!
+!!!!!   Don't do that! Why would you do that.                          !!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+`);
+      head.prepend(doc.createTextNode('\n\n'), cmt, doc.createTextNode('\n\n'));
       el('link', { rel: 'stylesheet', href: 'spec.css' }, [], head);
       el('link', { rel: 'icon', href: 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%220%22 y=%220%22 width=%22100%22 height=%22100%22 fill=%22%2300ff75%22></rect></svg>' }, [], head);
       el('meta', { name: 'twitter:card', content: 'summary_large_image' }, [], head);
