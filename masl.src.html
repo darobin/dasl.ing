@@ -64,7 +64,7 @@
           be set to integer <code>1</code> and a top-level <code>roots</code> array that must contain 0 or more tag 42 CIDs and nothing else.
           Neither of these fields has any meaning in MASL, but they must be provided in the context of a CAR header for historical compatibility
           reasons.
-          Note that there is no requirements that all the CIDs in a <code>roots</code> array also appear in the <code>resources</code> mapping or vice versa. 
+          Note that there is no requirements that all the CIDs in a <code>roots</code> array also appear in the <code>resources</code> mapping or vice versa.
         </p>
       </section>
     </section>
@@ -134,7 +134,7 @@
         <p>
           There is no requirement in MASL that bundles have to be stored or dereferenced in any specific manner. The relevant CIDs
           may be loaded through whatever way the implementation knows about such as RASL ([[rasl]]) or may be
-          provided in a CAR file ([[car]]). 
+          provided in a CAR file ([[car]]).
           Note that one value of this approach when compared to bundling resources for instance into Zip archives (or CAR files!) is that the resource map can contain an arbitrarily high number or volume of resources; an implementation may load an arbitrary subset of the resources, may parallelize loading, in an arbitrary order informed by types and HTTP headers, or load some resources on-demand.
         </p>
         <div class="flag">
@@ -412,9 +412,6 @@
               "purpose": { "type": "string" }
             }
           }
-        },
-        "id": {
-          "type": "string"
         },
         "name": {
           "type": "string"

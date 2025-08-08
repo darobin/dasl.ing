@@ -78,7 +78,7 @@
           be set to integer <code>1</code> and a top-level <code>roots</code> array that must contain 0 or more tag 42 CIDs and nothing else.
           Neither of these fields has any meaning in MASL, but they must be provided in the context of a CAR header for historical compatibility
           reasons.
-          Note that there is no requirements that all the CIDs in a <code>roots</code> array also appear in the <code>resources</code> mapping or vice versa. 
+          Note that there is no requirements that all the CIDs in a <code>roots</code> array also appear in the <code>resources</code> mapping or vice versa.
         </p>
       </section>
     </section>
@@ -148,7 +148,7 @@
         <p>
           There is no requirement in MASL that bundles have to be stored or dereferenced in any specific manner. The relevant CIDs
           may be loaded through whatever way the implementation knows about such as RASL ([<a href="#ref-rasl" class="ref">rasl</a>]) or may be
-          provided in a CAR file ([<a href="#ref-car" class="ref">car</a>]). 
+          provided in a CAR file ([<a href="#ref-car" class="ref">car</a>]).
           Note that one value of this approach when compared to bundling resources for instance into Zip archives (or CAR files!) is that the resource map can contain an arbitrarily high number or volume of resources; an implementation may load an arbitrary subset of the resources, may parallelize loading, in an arbitrary order informed by types and HTTP headers, or load some resources on-demand.
         </p>
         <div class="flag">
@@ -376,12 +376,9 @@
     "main": {
       "type": "object",
       "properties": {
-        "src": {
-          "type": "string",
-          "format": "cid"
-        },
+        "src": { "type": "cid-link" },
         "resources": {
-          "type": "object"
+          "type": "unknown"
         },
         // HTTP
         "mediaType": { "type": "string" },
@@ -414,16 +411,13 @@
           "type": "array",
           "items": {
             "type": "object",
+            "required": ["src"],
             "properties":{
               "src": { "type": "string" },
               "sizes": { "type": "string" },
               "purpose": { "type": "string" }
-            },
-            "required": ["src"]
+            }
           }
-        },
-        "id": {
-          "type": "string"
         },
         "name": {
           "type": "string"
@@ -432,20 +426,20 @@
           "type": "array",
           "items": {
             "type": "object",
+            "required": ["src"],
             "properties":{
               "src": { "type": "string" },
               "sizes": { "type": "string" },
               "label": { "type": "string" },
               "form_factor": {
                 "type": "string",
-                "enum": ["narrow", "wide"]
+                "knownValues": ["narrow", "wide"]
               },
               "platform": {
                 "type": "string",
-                "enum": [""android", "chromeos", "ios", "ipados", "kaios", "macos", "windows", "xbox", "chrome_web_store", "itunes", "microsoft", "microsoft", "play"]
-              },
-            },
-            "required": ["src"]
+                "knownValues": ["android", "chromeos", "ios", "ipados", "kaios", "macos", "windows", "xbox", "chrome_web_store", "itunes", "microsoft", "microsoft", "play"]
+              }
+            }
           }
         },
         "short_name": {
@@ -461,20 +455,10 @@
         },
         "roots": {
           "type": "array",
-          "items": {
-            "type": "string",
-            "format": "cid"
-          }
-        },
-        // AT (specifying this might not be AT compatible)
-        "$type": {
-          "type": "string"
+          "items": { "type": "cid-link" }
         },
         // versioning
-        "prev": {
-          "type": "string",
-          "format": "cid"
-        }
+        "prev": { "type": "cid-link" }
       }
     }
   }
