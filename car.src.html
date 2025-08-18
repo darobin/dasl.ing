@@ -36,8 +36,7 @@
         block in the CAR is the Header encoded as [[drisl]], and the remaining blocks form
         the Data component of the CAR and are each additionally prefixed with their CIDs ([[drisl]], [[cid]]).
         The length prefix of each block in a CAR is encoded as an unsigned variable-length
-        integer
-        <a href="https://en.wikipedia.org/wiki/LEB128">LEB128</a> integer ([[leb128]]).
+        integer ([[varint]], a variant of <a href="https://en.wikipedia.org/wiki/LEB128">LEB128</a>).
         This integer specifies the number of remaining bytes for that block entry, excluding
         the bytes used to encode the integer, but including the CID for non-header blocks.
       </p>
@@ -114,7 +113,7 @@
       </p>
       <ol>
         <li>Accept a byte stream <var>bytes</var>.</li>
-        <li>Read an LEB128 <var>length</var> from <var>bytes</var>.</li>
+        <li>Read an unsigned varint <var>length</var> from <var>bytes</var> ([[varint]]).</li>
         <li>If <var>length</var> is 0, throw an error.</li>
         <li>
           Read <var>length</var> bytes from <var>bytes</var> and decode them as
@@ -146,7 +145,7 @@
       </p>
       <ol>
         <li>Accept a byte stream <var>bytes</var>.</li>
-        <li>Read an LEB128 <var>length</var> from <var>bytes</var>.</li>
+        <li>Read an unsigned varint <var>length</var> from <var>bytes</var> ([[varint]]).</li>
         <li>If <var>length</var> is 0, throw an error.</li>
         <li>
           Read a CID ([[cid]]) from <var>bytes</var> and store it in <var>cid</var>.

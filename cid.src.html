@@ -101,7 +101,7 @@
         <li>
           If <var>hash type</var> is not equal to <code>0x12</code> (SHA-256), throw an error ([[sha256]]).
         </li>
-        <li>Read an LEB128 <var>hash size</var> from <var>CID bytes</var> ([[leb128]]).</li>
+        <li>Read an unsigned varint <var>hash size</var> from <var>CID bytes</var> ([[varint]]).</li>
         <li>
           If the number of bytes left in <var>CID bytes</var> is smaller than <var>hash size</var>,
           throw an error. Note that it is possible for <var>hash size</var> to be zero in order to code
