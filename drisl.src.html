@@ -49,7 +49,24 @@
         </li>
         <li>
           Floating-point numbers MUST always be encoded using the longest
-          variant; completely avoiding floating-point numbers is RECOMMENDED to minimize interoperability and tooling issues.
+          variant.
+          <ul>
+            <li>
+              Completely avoiding floating-point numbers is RECOMMENDED to minimize interoperability and tooling issues.
+            </li>
+            <li>
+              Even where floating-point numbers are used, the IEEE 754 "special" floating points (infinity, negative zero, negative infinity, minimal NaN, and NaN with payloads) are all disallowed.
+            </li>
+          </ul>
+        </li>
+        <li>
+          Indefinite-length arrays (and the "break" code making them usable, in major type 7) are not allowed.
+        </li>
+        <li>
+          CBOR streams (defined in RFC 8742) are not allowed except in contexts where the corresponding MIME type can be established; otherwise, only (discrete) valid CBOR objects are valid DRISL objects.
+        </li>
+        <li>
+
         </li>
       </ul>
       <p>
