@@ -31,7 +31,7 @@
     <section>
       <h2>Format</h2>
       <p>
-        DRISL is an application profile of CBOR ([[cbor]]) that subsets the more established [[cborc]] profile, with the following additional
+        DRISL is an application profile of CBOR ([[cbor]]) that mostly subsets the more established [[cborc]] profile, with the following additional
         constraints:
       </p>
       <ul>
@@ -55,7 +55,8 @@
               Completely avoiding floating-point numbers is RECOMMENDED to minimize interoperability and tooling issues.
             </li>
             <li>
-              Even where floating-point numbers are used, the IEEE 754 "special" floating points (infinity, negative zero, negative infinity, minimal NaN, and NaN with payloads) are all disallowed.
+              Even where floating-point numbers are used, most of the IEEE 754 "special" floating points (infinity, negative infinity, minimal NaN, and NaN with payloads) MUST NOT be encoded.
+              Negative zero is the only allowed special floating point.
             </li>
           </ul>
         </li>
