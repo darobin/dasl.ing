@@ -74,10 +74,11 @@
       </p>
       <p>
         One common convention for debugging DRISL data in JSON is to use a JSON profile called DAG-JSON.
-        This profile can be translated to JSON using standard CBOR-JSON translation for everything except tag 42; 
-        for tag-42 (CIDs as bytestrings), the following JSON convention is used:
-        <br><code>"/": { "bytes": "<binnary CID bytestring base64-encoded>" }</code>
-        <br>Note that any DAG-JSON tooling will not parse any other representation of CIDs as links.
+        This profile can be translated to JSON using standard CBOR-JSON translation, but CBOR bytestrings will be represented as
+        <code>"/": { "bytes": String  * base64-encoded * }</code>
+        and tag-42 DRISL CIDs (whose values in CBOR are also bytestrings) will be represented as:
+        <code>"/": String * base58btc-encoded *</code>.
+        Note that legacy DAG-CBOR data MAY include a base32-encoded variant of older CIDs, which are not DRISL CIDs.
       </p>
       <p>  
         Another option more native to CBOR (and more useful for debugging problems at the CBOR conformance layer) is
