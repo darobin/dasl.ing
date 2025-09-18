@@ -48,8 +48,10 @@
           Implementations MUST reject map keys that are not strings.
         </li>
         <li>
-          Floating-point numbers MUST always be encoded using the longest
-          variant; completely avoiding floating-point numbers is RECOMMENDED to minimize interoperability and tooling issues.
+          Floating-point numbers MUST always be encoded as a 64-bit IEEE 754 binary floating-point, never as a "half-precision" (16-byte, major 7-25) or "single-precision (32-byte, major 7-26)" CBOR key.
+          <ul>
+            <li>completely avoiding floating-point numbers is RECOMMENDED to minimize interoperability and tooling issues.</li>
+          </ul>
         </li>
       </ul>
       <p>
