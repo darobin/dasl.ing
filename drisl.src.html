@@ -70,12 +70,17 @@
       <h2>Debugging Considerations</h2>
       <p>
         It is often convenient to represent DRISL in textual formats for debugging
-        purposes, for example using JSON.
+        purposes.
       </p>
       <p>
-        One common convention for doing so is historically referred to as "DAG-JSON," which is a JSON expression
-        of the DRISL data in which CIDs are represented as the object
-        <code>{ "/": "string CID" }</code>, i.e., DASL CIDs in their base-32 ASCII representation ([[cid]]), NOT in their CBOR representation ([[cbor-tag42]])). Another option is
+        One common convention for debugging DRISL data in JSON is to use a JSON profile called DAG-JSON.
+        This profile can be translated to JSON using standard CBOR-JSON translation for everything except tag 42; 
+        for tag-42 (CIDs as bytestrings), the following JSON convention is used:
+        <br><code>"/": { "bytes": "<binnary CID bytestring base64-encoded>" }</code>
+        <br>Note that any DAG-JSON tooling will not parse any other representation of CIDs as links.
+      </p>
+      <p>  
+        Another option more native to CBOR (and more useful for debugging problems at the CBOR conformance layer) is
         <a href="https://datatracker.ietf.org/doc/draft-ietf-cbor-edn-literals/">CBOR
         Extended Diagnostic Notation</a>.
       </p>
