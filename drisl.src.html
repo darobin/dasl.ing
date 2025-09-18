@@ -64,7 +64,18 @@
           Indefinite-length arrays (and the "break" code making them usable, in major type 7) are not allowed.
         </li>
         <li>
-          CBOR streams (defined in RFC 8742) are not allowed except in contexts where the corresponding MIME type can be established; otherwise, only (discrete) valid CBOR objects are valid DRISL objects.
+          Similarly, indefinite, incomplete, or streaming CBOR cannot be hashed and thus cannot be referenced by CID; for this reason, DRISL can only encode finite, bounded documents and resources.
+        </li>
+        <li> 
+          Concatenation of DRISL objects is generally discouraged and incurs both performance and interoperability risks.
+          <ul>
+            <li>
+              Note that DRISL objects cannot be streamed as CBOR streams (defined in RFC 8742) except in MIME-type aware contexts, as per the CBOR streams specification.
+            </li>
+            <li>
+              Applications are discouraged from handling concatenated DRISL objects or appending extra bytes of any kind to a DRISL object in memory or across interfaces, as doing so breaks the DRISL-wide assumption that each CID refers to one complete, discrete, and valid CBOR object, and that DRISL systems only ever will be expected to handle such objects.
+            </li>
+          </ul> 
         </li>
         <li>
 
