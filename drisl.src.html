@@ -51,6 +51,9 @@
           Floating-point numbers MUST always be encoded using the longest
           variant; completely avoiding floating-point numbers is RECOMMENDED to minimize interoperability and tooling issues.
         </li>
+        <li>
+          Encoders MUST NOT encode any simple values other than <code>true</code>, <code>false</code>, and <code>null</code> (20, 21, and 22 in section 3.3 of [[rfc8949]]).
+        </li>
       </ul>
       <p>
         All other requirements are as CBOR/c ([[cborc]]).
