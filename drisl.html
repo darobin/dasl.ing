@@ -84,25 +84,6 @@
         For more information, see the [<a href="#ref-cbor-tag42" class="ref">cbor-tag42</a>] appendix to the [<a href="#ref-drisl" class="ref">drisl</a>] specification.
       </p>
     </section>
-    <section>
-      <h2>Debugging Considerations</h2>
-      <p>
-        It is often convenient to represent DRISL in textual formats for debugging
-        purposes, for example using JSON.
-      </p>
-      <p>
-        One common convention for doing so is historically referred to as "DAG-JSON," which is a JSON expression
-        of the DRISL data in which CIDs are represented as the object
-        <code>{ "/": "string CID" }</code>, i.e., DASL CIDs in their base-32 ASCII representation ([<a href="#ref-cid" class="ref">cid</a>]), NOT in their CBOR representation ([<a href="#ref-cbor-tag42" class="ref">cbor-tag42</a>])). Another option is
-        <a href="https://datatracker.ietf.org/doc/draft-ietf-cbor-edn-literals/">CBOR
-        Extended Diagnostic Notation</a>.
-      </p>
-      <p>
-        In any case, note that the CIDs used in such debugging outputs that may
-        point to <em>other</em> parts of the debugging output should be the CIDs
-        of the DRISL content, not of the debugging resources.
-      </p>
-    </section>
   
 
 <section><h2>References</h2><dl><dt id="ref-cbor">[cbor]</dt><dd>C. Bormann. &amp; P. Hoffman. <a href="https://www.rfc-editor.org/info/rfc8949"><cite>Concise Binary Object Representation (CBOR)</cite></a>. October 2024. URL:&nbsp;<a href="https://www.rfc-editor.org/info/rfc8949">https://www.rfc-editor.org/info/rfc8949</a></dd><dt id="ref-cbor-tag42">[cbor-tag42]</dt><dd>J. Caballero. <a href="https://www.ietf.org/archive/id/draft-caballero-cbor-cborc42-00.html#name-binary-content-identifiers"><cite>Binary Content Identifiers</cite></a>. May 2025. URL:&nbsp;<a href="https://www.ietf.org/archive/id/draft-caballero-cbor-cborc42-00.html#name-binary-content-identifiers">https://www.ietf.org/archive/id/draft-caballero-cbor-cborc42-00.html#name-binary-content-identifiers</a></dd><dt id="ref-cborc">[cborc]</dt><dd>A. Rundgren. <a href="https://datatracker.ietf.org/doc/draft-rundgren-cbor-core/"><cite>Core CBOR Platform Profile</cite></a>. April 2025. URL:&nbsp;<a href="https://datatracker.ietf.org/doc/draft-rundgren-cbor-core/">https://datatracker.ietf.org/doc/draft-rundgren-cbor-core/</a></dd><dt id="ref-cborc-42">[cborc-42]</dt><dd>J. Caballero, R. Berjon. <a href="https://datatracker.ietf.org/doc/draft-caballero-cbor-cborc42/"><cite>The tag-42 profile of CBOR Core</cite></a>. May 2025. URL:&nbsp;<a href="https://datatracker.ietf.org/doc/draft-caballero-cbor-cborc42/">https://datatracker.ietf.org/doc/draft-caballero-cbor-cborc42/</a><a></a></dd><dt id="ref-cde">[cde]</dt><dd>C. Bormann. <a href="https://datatracker.ietf.org/doc/html/draft-ietf-cbor-cde-06"><cite>CBOR Common Deterministic Encoding (CDE)</cite></a>. October 2024. URL:&nbsp;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-cbor-cde-06">https://datatracker.ietf.org/doc/html/draft-ietf-cbor-cde-06</a></dd><dt id="ref-cid">[cid]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/cid.html"><cite>Content IDs (CIDs)</cite></a>. 2025-09-19. URL:&nbsp;<a href="https://dasl.ing/cid.html">https://dasl.ing/cid.html</a></dd><dt id="ref-dcbor">[dcbor]</dt><dd>W. McNally, C. Allen, C. Bormann, &amp; L. Lundblade. <a href="https://datatracker.ietf.org/doc/draft-mcnally-deterministic-cbor/"><cite>dCBOR: A Deterministic CBOR Application Profile</cite></a>. October 2024. URL:&nbsp;<a href="https://datatracker.ietf.org/doc/draft-mcnally-deterministic-cbor/">https://datatracker.ietf.org/doc/draft-mcnally-deterministic-cbor/</a></dd><dt id="ref-drisl">[drisl]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/drisl.html"><cite>DRISL — Deterministic Representation for Interoperable Structures &amp; Links</cite></a>. 2025-09-19. URL:&nbsp;<a href="https://dasl.ing/drisl.html">https://dasl.ing/drisl.html</a></dd><dt id="ref-rfc8949">[rfc8949]</dt><dd>C. Bormann, P. Hoffman. <a href="https://www.rfc-editor.org/rfc/rfc8949"><cite>Concise Binary Object Representation (CBOR)</cite></a>. December 2020. URL:&nbsp;<a href="https://www.rfc-editor.org/rfc/rfc8949">https://www.rfc-editor.org/rfc/rfc8949</a></dd></dl></section></main></body></html>
