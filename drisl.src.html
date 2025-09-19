@@ -66,30 +66,5 @@
         For more information, see the [[cbor-tag42]] appendix to the [[drisl]] specification.
       </p>
     </section>
-    <section>
-      <h2>Debugging Considerations</h2>
-      <p>
-        It is often convenient to represent DRISL in textual formats for debugging
-        purposes.
-      </p>
-      <p>
-        One common convention for debugging DRISL data in JSON is to use a JSON profile called DAG-JSON.
-        This profile can be translated to JSON using standard CBOR-JSON translation, but CBOR bytestrings will be represented as
-        <code>"/": { "bytes": String  * base64-encoded * }</code>
-        and tag-42 DRISL CIDs (whose values in CBOR are also bytestrings) will be represented as:
-        <code>"/": String * base58btc-encoded *</code>.
-        Note that legacy DAG-CBOR data MAY include a base32-encoded variant of older CIDs, which are not DRISL CIDs.
-      </p>
-      <p>  
-        Another option more native to CBOR (and more useful for debugging problems at the CBOR conformance layer) is
-        <a href="https://datatracker.ietf.org/doc/draft-ietf-cbor-edn-literals/">CBOR
-        Extended Diagnostic Notation</a>.
-      </p>
-      <p>
-        In any case, note that the CIDs used in such debugging outputs that may
-        point to <em>other</em> parts of the debugging output should be the CIDs
-        of the DRISL content, not of the debugging resources.
-      </p>
-    </section>
   </body>
 </html>
