@@ -19,7 +19,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MASL — Metadata for Arbitrary Structures &amp; Links</title>
   <link rel="stylesheet" href="spec.css"><link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%220%22 y=%220%22 width=%22100%22 height=%22100%22 fill=%22%2300ff75%22></rect></svg>"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" property="og:title" content="DASL: MASL — Metadata for Arbitrary Structures &amp; Links"><meta name="twitter:description" property="og:description" content="MASL is a CBOR-based metadata system that is designed to work well with content-addressed         and decentralised systems, to enable fully self-contained, self-certified content         distribution."><meta name="twitter:image" property="og:image" content="https://dasl.ing/masl.png"><meta name="twitter:image:alt" content="Very colourful stripes, so colourful it hurts"><meta name="twitter:url" property="og:url" content="https://dasl.ing/"><meta property="og:site_name" content="DASL"><meta property="og:locale" content="en"><meta name="theme-color" content="#00ff75"></head>
-  <body><div class="nav-back">A specification of the <a href="/">DASL Project</a>.</div><main><header><h1>MASL — Metadata for Arbitrary Structures &amp; Links</h1><table><tbody><tr><th>date</th><td>2025-09-22</td></tr><tr><th>editors</th><td><a href="https://berjon.com/">Robin Berjon</a> &lt;<a href="mailto:robin@berjon.com">robin@berjon.com</a>&gt;<br><a href="https://bumblefudge.com/">Juan Caballero</a> &lt;<a href="mailto:bumblefudge@learningproof.xyz">bumblefudge@learningproof.xyz</a>&gt;</td></tr><tr><th>issues</th><td><a href="https://github.com/darobin/dasl.ing/issues">list</a>, <a href="https://github.com/darobin/dasl.ing/issues/new">new</a></td></tr><tr><th>abstract</th><td><div id="abstract">
+  <body><div class="nav-back">A specification of the <a href="/">DASL Project</a>.</div><main><header><h1>MASL — Metadata for Arbitrary Structures &amp; Links</h1><table><tbody><tr><th>date</th><td>2025-09-29</td></tr><tr><th>editors</th><td><a href="https://berjon.com/">Robin Berjon</a> &lt;<a href="mailto:robin@berjon.com">robin@berjon.com</a>&gt;<br><a href="https://bumblefudge.com/">Juan Caballero</a> &lt;<a href="mailto:bumblefudge@learningproof.xyz">bumblefudge@learningproof.xyz</a>&gt;</td></tr><tr><th>issues</th><td><a href="https://github.com/darobin/dasl.ing/issues">list</a>, <a href="https://github.com/darobin/dasl.ing/issues/new">new</a></td></tr><tr><th>abstract</th><td><div id="abstract">
       <p>
         MASL is a CBOR-based metadata system that is designed to work well with content-addressed
         and decentralised systems, to enable fully self-contained, self-certified content
@@ -112,7 +112,7 @@
             way (e.g. components that go into building an app or document). The keys of the <code>resources</code>
             map are complete paths that MUST start with <code>/</code> and the values are metadata
             objects that MUST have an <code>src</code> field pointing to the resource's CID and SHOULD have a
-            <code>mediaType</code> field giving its MIME type, along with other HTTP headers.
+            <code>content-type</code> field giving its MIME type, along with other HTTP headers.
             Any other properties present which do not map to HTTP headers MUST be ignored.
           </li>
         </ul>
@@ -159,7 +159,7 @@
         </p>
         <pre>{
   "src": { "$link": "bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4" },
-  "mediaType": "application/pdf",
+  "content-type": "application/pdf",
 }
         </pre>
         <p>
@@ -170,11 +170,11 @@
   "resources": {
     "/": {
       "src": { "$link": "bafk…" },
-      "mediaType": "text/html"
+      "content-type": "text/html"
     },
     "/picture.jpg": {
       "src": { "$link": "bafk…" },
-      "mediaType": "image/jpeg"
+      "content-type": "image/jpeg"
     }
   }
 }
@@ -198,8 +198,7 @@
           are specified, the meaning of HTTP fields is undefined.
         </p>
         <p>
-          All HTTP headers, where specified, are lowercased except for <code>mediaType</code> which
-          for historical reasons maps to <code>content-type</code>.
+          All HTTP headers, where specified, are lowercased.
         </p>
         <p>
           Supported headers:
@@ -212,7 +211,7 @@
             <code>content-security-policy</code>: keep in mind however that runtime contexts are likely
             to already have a strict CSP that will override or constrain this one.
           </li>
-          <li><code>mediaType</code>: used instead of <code>content-type</code>.</li>
+          <li><code>content-type</code></li>
           <li><code>link</code></li>
           <li><code>permissions-policy</code></li>
           <li><code>referrer-policy</code></li>
@@ -233,7 +232,7 @@
         </p>
         <pre>{
   "src": { "$link": "bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4" },
-  "mediaType": "text/html",
+  "content-type": "text/html",
   "content-language": "en",
   "service-worker-allowed": "/"
 }
@@ -246,22 +245,22 @@
   "resources": {
     "/": {
       "src": { "$link": "bafk…" },
-      "mediaType": "text/html",
+      "content-type": "text/html",
       "content-encoding": "gzip",
       "content-language": "fr"
     },
     "/interactive.js": {
       "src": { "$link": "bafk…" },
-      "mediaType": "application/javascript",
+      "content-type": "application/javascript",
       "sourcemap": "/interactive.js.map"
     },
     "/interactive.js.map": {
       "src": { "$link": "bafk…" },
-      "mediaType": "application/json"
+      "content-type": "application/json"
     },
     "/picture.jpg": {
       "src": { "$link": "bafk…" },
-      "mediaType": "image/jpeg"
+      "content-type": "image/jpeg"
     }
   }
 }
@@ -307,11 +306,11 @@
   "resources": {
     "/": {
       "src": { "$link": "bafk…" },
-      "mediaType": "text/html"
+      "content-type": "text/html"
     },
     "/unicorn.svg": {
       "src": { "$link": "bafk…" },
-      "mediaType": "image/svg"
+      "content-type": "image/svg"
     }
   }
 }
@@ -381,7 +380,7 @@
           "type": "unknown"
         },
         // HTTP
-        "mediaType": { "type": "string" },
+        "content-type": { "type": "string" },
         "content-disposition": { "type": "string" },
         "content-encoding": { "type": "string" },
         "content-language": { "type": "string" },
@@ -467,4 +466,4 @@
     </section>
   
 
-<section><h2>References</h2><dl><dt id="ref-at">[at]</dt><dd><a href="https://atproto.com/specs/atp"><cite>AT Protocol</cite></a>. URL:&nbsp;<a href="https://atproto.com/">https://atproto.com/</a></dd><dt id="ref-car">[car]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/car.html"><cite>Content-Addressable aRchives (CAR)</cite></a>. 2025-09-22. URL:&nbsp;<a href="https://dasl.ing/car.html">https://dasl.ing/car.html</a></dd><dt id="ref-drisl">[drisl]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/drisl.html"><cite>DRISL — Deterministic Representation for Interoperable Structures &amp; Links</cite></a>. 2025-09-22. URL:&nbsp;<a href="https://dasl.ing/drisl.html">https://dasl.ing/drisl.html</a></dd><dt id="ref-lexicon">[lexicon]</dt><dd><a href="https://atproto.com/specs/lexicon"><cite>AT Protocol: Lexicon</cite></a>.</dd><dt id="ref-manifest">[manifest]</dt><dd>M. Cáceres, K. Rohde Christiansen, D. González, D. Murphy, C. Liebel. <a href="https://www.w3.org/TR/appmanifest/"><cite>Web Application Manifest</cite></a>. March 2025. URL:&nbsp;<a href="https://www.w3.org/TR/appmanifest/">https://www.w3.org/TR/appmanifest/</a></dd><dt id="ref-rasl">[rasl]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/rasl.html"><cite>RASL — Retrieval of Arbitrary Structures &amp; Links</cite></a>. 2025-09-22. URL:&nbsp;<a href="https://dasl.ing/rasl.html">https://dasl.ing/rasl.html</a></dd></dl></section></main></body></html>
+<section><h2>References</h2><dl><dt id="ref-at">[at]</dt><dd><a href="https://atproto.com/specs/atp"><cite>AT Protocol</cite></a>. URL:&nbsp;<a href="https://atproto.com/">https://atproto.com/</a></dd><dt id="ref-car">[car]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/car.html"><cite>Content-Addressable aRchives (CAR)</cite></a>. 2025-09-29. URL:&nbsp;<a href="https://dasl.ing/car.html">https://dasl.ing/car.html</a></dd><dt id="ref-drisl">[drisl]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/drisl.html"><cite>DRISL — Deterministic Representation for Interoperable Structures &amp; Links</cite></a>. 2025-09-29. URL:&nbsp;<a href="https://dasl.ing/drisl.html">https://dasl.ing/drisl.html</a></dd><dt id="ref-lexicon">[lexicon]</dt><dd><a href="https://atproto.com/specs/lexicon"><cite>AT Protocol: Lexicon</cite></a>.</dd><dt id="ref-manifest">[manifest]</dt><dd>M. Cáceres, K. Rohde Christiansen, D. González, D. Murphy, C. Liebel. <a href="https://www.w3.org/TR/appmanifest/"><cite>Web Application Manifest</cite></a>. March 2025. URL:&nbsp;<a href="https://www.w3.org/TR/appmanifest/">https://www.w3.org/TR/appmanifest/</a></dd><dt id="ref-rasl">[rasl]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/rasl.html"><cite>RASL — Retrieval of Arbitrary Structures &amp; Links</cite></a>. 2025-09-29. URL:&nbsp;<a href="https://dasl.ing/rasl.html">https://dasl.ing/rasl.html</a></dd></dl></section></main></body></html>
