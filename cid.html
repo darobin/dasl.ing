@@ -19,7 +19,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Content IDs (CIDs)</title>
   <link rel="stylesheet" href="spec.css"><link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%220%22 y=%220%22 width=%22100%22 height=%22100%22 fill=%22%2300ff75%22></rect></svg>"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" property="og:title" content="DASL: Content IDs (CIDs)"><meta name="twitter:description" property="og:description" content="DASL CIDs are a simple structured identifier format for content addressing. They encapsulate a hash         with enough metadata to be extensible (to add new hash types in the future) and to indicate whether         they are pointing to raw bytes or to structured data."><meta name="twitter:image" property="og:image" content="https://dasl.ing/cid.png"><meta name="twitter:image:alt" content="Very colourful stripes, so colourful it hurts"><meta name="twitter:url" property="og:url" content="https://dasl.ing/"><meta property="og:site_name" content="DASL"><meta property="og:locale" content="en"><meta name="theme-color" content="#00ff75"></head>
-  <body><div class="nav-back">A specification of the <a href="/">DASL Project</a>.</div><main><header><h1>Content IDs (CIDs)</h1><table><tbody><tr><th>date</th><td>2025-08-18</td></tr><tr><th>editors</th><td><a href="https://berjon.com/">Robin Berjon</a> &lt;<a href="mailto:robin@berjon.com">robin@berjon.com</a>&gt;<br><a href="https://bumblefudge.com/">Juan Caballero</a> &lt;<a href="mailto:bumblefudge@learningproof.xyz">bumblefudge@learningproof.xyz</a>&gt;</td></tr><tr><th>issues</th><td><a href="https://github.com/darobin/dasl.ing/issues">list</a>, <a href="https://github.com/darobin/dasl.ing/issues/new">new</a></td></tr><tr><th>abstract</th><td><div id="abstract">
+  <body><div class="nav-back">A specification of the <a href="/">DASL Project</a>.</div><main><header><h1>Content IDs (CIDs)</h1><table><tbody><tr><th>date</th><td>2025-09-29</td></tr><tr><th>editors</th><td><a href="https://berjon.com/">Robin Berjon</a> &lt;<a href="mailto:robin@berjon.com">robin@berjon.com</a>&gt;<br><a href="https://bumblefudge.com/">Juan Caballero</a> &lt;<a href="mailto:bumblefudge@learningproof.xyz">bumblefudge@learningproof.xyz</a>&gt;</td></tr><tr><th>issues</th><td><a href="https://github.com/darobin/dasl.ing/issues">list</a>, <a href="https://github.com/darobin/dasl.ing/issues/new">new</a></td></tr><tr><th>abstract</th><td><div id="abstract">
       <p>
         DASL CIDs are a simple structured identifier format for content addressing. They encapsulate a hash
         with enough metadata to be extensible (to add new hash types in the future) and to indicate whether
@@ -55,7 +55,7 @@
           A hash type, that is always SHA-256 ([<a href="#ref-sha256" class="ref">sha256</a>]).
         </li>
         <li>
-          A hash size, indicating how many bytes long the digest is.
+          A hash size, that is always 32 (<code>0x20</code>).
         </li>
         <li>
           A digest, which is the hash of the content being identified.
@@ -115,24 +115,13 @@
         <li>
           If <var>hash type</var> is not equal to <code>0x12</code> (SHA-256), throw an error ([<a href="#ref-sha256" class="ref">sha256</a>]).
         </li>
-        <li>Read an unsigned varint <var>hash size</var> from <var>CID bytes</var> ([<a href="#ref-varint" class="ref">varint</a>]).</li>
         <li>
-          If the number of bytes left in <var>CID bytes</var> is smaller than <var>hash size</var>,
-          throw an error. Note that it is possible for <var>hash size</var> to be zero in order to code
-          for an empty CID. At this point, we have two options:
-          <ul>
-            <li>
-              <u>We are expecting <var>CID bytes</var> to <em>only</em> contain a CID.</u> If
-              the number of bytes left in <var>CID bytes</var> is greater than <var>hash size</var>,
-              throw an error. Store the remaining <var>CID bytes</var> in <code>digest</code>.
-            </li>
-            <li>
-              <u>We are reading from the beginning of <var>CID bytes</var> and it may contain more data.</u>
-              This is the case for instance when processing a CAR block ([<a href="#ref-car" class="ref">car</a>]). Only read <var>hash size</var>
-              bytes from <var>CID bytes</var> and leave the rest available for further processing.
-              Store the <var>hash size</var> bytes from <var>CID bytes</var> in <code>digest</code>.
-            </li>
-          </ul>
+          Read one byte from <var>CID bytes</var> and store it in <var>hash size</var>. If <var>hash size</var>
+          is any value other than 32 (<code>0x20</code>) , throw an error.
+        </li>
+        <li>
+          Read 32 bytes from <var>CID bytes</var> and store them in <var>digest</var>. If there were
+          fewer than 32 bytes left in <var>CID bytes</var>, throw an error.
         </li>
         <li>
           Return <var>version</var>, <var>codec</var>, <var>hash type</var>, <var>hash size</var>,
@@ -176,4 +165,4 @@
     </section>
   
 
-<section><h2>References</h2><dl><dt id="ref-car">[car]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/car.html"><cite>Content-Addressable aRchives (CAR)</cite></a>. 2025-08-18. URL:&nbsp;<a href="https://dasl.ing/car.html">https://dasl.ing/car.html</a></dd><dt id="ref-drisl">[drisl]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/drisl.html"><cite>DRISL — Deterministic Representation for Interoperable Structures &amp; Links</cite></a>. 2025-08-18. URL:&nbsp;<a href="https://dasl.ing/drisl.html">https://dasl.ing/drisl.html</a></dd><dt id="ref-rfc4648">[rfc4648]</dt><dd>S. Josefsson. <a href="https://www.rfc-editor.org/rfc/rfc4648"><cite>The Base16, Base32, and Base64 Data Encodings</cite></a>. October 2006. URL:&nbsp;<a href="https://www.rfc-editor.org/rfc/rfc4648">https://www.rfc-editor.org/rfc/rfc4648</a></dd><dt id="ref-sha256">[sha256]</dt><dd>National Institute of Standards and Technology, <cite>Secure Hash Algorithm. NIST FIPS 180-2</cite>. August 2002.</dd><dt id="ref-varint">[varint]</dt><dd><a href="https://github.com/multiformats/unsigned-varint"><cite>unsigned varint</cite></a>. URL:&nbsp;<a href="https://github.com/multiformats/unsigned-varint">https://github.com/multiformats/unsigned-varint</a></dd></dl></section></main></body></html>
+<section><h2>References</h2><dl><dt id="ref-drisl">[drisl]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/drisl.html"><cite>DRISL — Deterministic Representation for Interoperable Structures &amp; Links</cite></a>. 2025-09-29. URL:&nbsp;<a href="https://dasl.ing/drisl.html">https://dasl.ing/drisl.html</a></dd><dt id="ref-rfc4648">[rfc4648]</dt><dd>S. Josefsson. <a href="https://www.rfc-editor.org/rfc/rfc4648"><cite>The Base16, Base32, and Base64 Data Encodings</cite></a>. October 2006. URL:&nbsp;<a href="https://www.rfc-editor.org/rfc/rfc4648">https://www.rfc-editor.org/rfc/rfc4648</a></dd><dt id="ref-sha256">[sha256]</dt><dd>National Institute of Standards and Technology, <cite>Secure Hash Algorithm. NIST FIPS 180-2</cite>. August 2002.</dd></dl></section></main></body></html>

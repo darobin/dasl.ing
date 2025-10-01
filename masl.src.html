@@ -98,7 +98,7 @@
             way (e.g. components that go into building an app or document). The keys of the <code>resources</code>
             map are complete paths that MUST start with <code>/</code> and the values are metadata
             objects that MUST have an <code>src</code> field pointing to the resource's CID and SHOULD have a
-            <code>mediaType</code> field giving its MIME type, along with other HTTP headers.
+            <code>content-type</code> field giving its MIME type, along with other HTTP headers.
             Any other properties present which do not map to HTTP headers MUST be ignored.
           </li>
         </ul>
@@ -146,7 +146,7 @@
         <pre>
 {
   "src": { "$link": "bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4" },
-  "mediaType": "application/pdf",
+  "content-type": "application/pdf",
 }
         </pre>
         <p>
@@ -158,11 +158,11 @@
   "resources": {
     "/": {
       "src": { "$link": "bafk…" },
-      "mediaType": "text/html"
+      "content-type": "text/html"
     },
     "/picture.jpg": {
       "src": { "$link": "bafk…" },
-      "mediaType": "image/jpeg"
+      "content-type": "image/jpeg"
     }
   }
 }
@@ -186,8 +186,7 @@
           are specified, the meaning of HTTP fields is undefined.
         </p>
         <p>
-          All HTTP headers, where specified, are lowercased except for <code>mediaType</code> which
-          for historical reasons maps to <code>content-type</code>.
+          All HTTP headers, where specified, are lowercased.
         </p>
         <p>
           Supported headers:
@@ -200,7 +199,7 @@
             <code>content-security-policy</code>: keep in mind however that runtime contexts are likely
             to already have a strict CSP that will override or constrain this one.
           </li>
-          <li><code>mediaType</code>: used instead of <code>content-type</code>.</li>
+          <li><code>content-type</code></li>
           <li><code>link</code></li>
           <li><code>permissions-policy</code></li>
           <li><code>referrer-policy</code></li>
@@ -222,7 +221,7 @@
         <pre>
 {
   "src": { "$link": "bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4" },
-  "mediaType": "text/html",
+  "content-type": "text/html",
   "content-language": "en",
   "service-worker-allowed": "/"
 }
@@ -236,22 +235,22 @@
   "resources": {
     "/": {
       "src": { "$link": "bafk…" },
-      "mediaType": "text/html",
+      "content-type": "text/html",
       "content-encoding": "gzip",
       "content-language": "fr"
     },
     "/interactive.js": {
       "src": { "$link": "bafk…" },
-      "mediaType": "application/javascript",
+      "content-type": "application/javascript",
       "sourcemap": "/interactive.js.map"
     },
     "/interactive.js.map": {
       "src": { "$link": "bafk…" },
-      "mediaType": "application/json"
+      "content-type": "application/json"
     },
     "/picture.jpg": {
       "src": { "$link": "bafk…" },
-      "mediaType": "image/jpeg"
+      "content-type": "image/jpeg"
     }
   }
 }
@@ -298,11 +297,11 @@
   "resources": {
     "/": {
       "src": { "$link": "bafk…" },
-      "mediaType": "text/html"
+      "content-type": "text/html"
     },
     "/unicorn.svg": {
       "src": { "$link": "bafk…" },
-      "mediaType": "image/svg"
+      "content-type": "image/svg"
     }
   }
 }
@@ -375,7 +374,7 @@
           "type": "unknown"
         },
         // HTTP
-        "mediaType": { "type": "string" },
+        "content-type": { "type": "string" },
         "content-disposition": { "type": "string" },
         "content-encoding": { "type": "string" },
         "content-language": { "type": "string" },
