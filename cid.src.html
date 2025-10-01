@@ -51,7 +51,7 @@
     <section>
       <h2>Parsing CIDs</h2>
       <p>
-        Use the following steps to <dfn>parse a CID string</dfn>:
+        Use the following steps to <dfn>parse a string-encoded CID</dfn>, i.e. translate it to a bytestring:
       </p>
       <ol>
         <li>Accept a string <var>CID</var>.</li>
@@ -62,15 +62,7 @@
           <a href="https://datatracker.ietf.org/doc/html/rfc4648#section-6">the base32 algorithm from
           RFC4648</a> with a lowercase alphabet and store the result in <var>CID bytes</var> ([[rfc4648]]).
         </li>
-        <li>Return the result of applying the steps to <a>decode a CID</a> to <var>CID bytes</var>.</li>
-      </ol>
-      <p>
-        Use the following steps to <dfn>parse a binary CID</dfn>:
-      </p>
-      <ol>
-        <li>Accept an array of bytes <var>binary CID</var> (e.g., the entire bytestring value of a tag-42 object in CBOR).</li>
-        <li>Store all the bytes from <var>binary CID</var> in <var>CID bytes</var>.</li>
-        <li>Return the result of applying the steps to <a>decode a CID</a> to <var>CID bytes</var>.</li>
+        <li>This results in <var>CID bytes</var>, which can be used to <a>decode a CID</a>.</li>
       </ol>
       <p>
         Use the following steps to <dfn>decode a CID</dfn>:
