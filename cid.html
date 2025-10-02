@@ -19,7 +19,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Content IDs (CIDs)</title>
   <link rel="stylesheet" href="spec.css"><link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%220%22 y=%220%22 width=%22100%22 height=%22100%22 fill=%22%2300ff75%22></rect></svg>"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" property="og:title" content="DASL: Content IDs (CIDs)"><meta name="twitter:description" property="og:description" content="DASL CIDs are a simple structured identifier format for content addressing. They encapsulate a hash         with enough metadata to be extensible (to add new hash types in the future) and to indicate whether         they are pointing to raw bytes or to structured data."><meta name="twitter:image" property="og:image" content="https://dasl.ing/cid.png"><meta name="twitter:image:alt" content="Very colourful stripes, so colourful it hurts"><meta name="twitter:url" property="og:url" content="https://dasl.ing/"><meta property="og:site_name" content="DASL"><meta property="og:locale" content="en"><meta name="theme-color" content="#00ff75"></head>
-  <body><div class="nav-back">A specification of the <a href="/">DASL Project</a>.</div><main><header><h1>Content IDs (CIDs)</h1><table><tbody><tr><th>date</th><td>2025-09-29</td></tr><tr><th>editors</th><td><a href="https://berjon.com/">Robin Berjon</a> &lt;<a href="mailto:robin@berjon.com">robin@berjon.com</a>&gt;<br><a href="https://bumblefudge.com/">Juan Caballero</a> &lt;<a href="mailto:bumblefudge@learningproof.xyz">bumblefudge@learningproof.xyz</a>&gt;</td></tr><tr><th>issues</th><td><a href="https://github.com/darobin/dasl.ing/issues">list</a>, <a href="https://github.com/darobin/dasl.ing/issues/new">new</a></td></tr><tr><th>abstract</th><td><div id="abstract">
+  <body><div class="nav-back">A specification of the <a href="/">DASL Project</a>.</div><main><header><h1>Content IDs (CIDs)</h1><table><tbody><tr><th>date</th><td>2025-10-02</td></tr><tr><th>editors</th><td><a href="https://berjon.com/">Robin Berjon</a> &lt;<a href="mailto:robin@berjon.com">robin@berjon.com</a>&gt;<br><a href="https://bumblefudge.com/">Juan Caballero</a> &lt;<a href="mailto:bumblefudge@learningproof.xyz">bumblefudge@learningproof.xyz</a>&gt;</td></tr><tr><th>issues</th><td><a href="https://github.com/darobin/dasl.ing/issues">list</a>, <a href="https://github.com/darobin/dasl.ing/issues/new">new</a></td></tr><tr><th>abstract</th><td><div id="abstract">
       <p>
         DASL CIDs are a simple structured identifier format for content addressing. They encapsulate a hash
         with enough metadata to be extensible (to add new hash types in the future) and to indicate whether
@@ -65,7 +65,7 @@
     <section>
       <h2>Parsing CIDs</h2>
       <p>
-        Use the following steps to <dfn id="dfn-parse-a-cid-string">parse a CID string</dfn>:
+        Use the following steps to <dfn id="dfn-parse-a-string-encoded-cid">parse a string-encoded CID</dfn>, i.e. translate it to a bytestring:
       </p>
       <ol>
         <li>Accept a string <var>CID</var>.</li>
@@ -76,22 +76,7 @@
           <a href="https://datatracker.ietf.org/doc/html/rfc4648#section-6">the base32 algorithm from
           RFC4648</a> with a lowercase alphabet and store the result in <var>CID bytes</var> ([<a href="#ref-rfc4648" class="ref">rfc4648</a>]).
         </li>
-        <li>Return the result of applying the steps to <a href="#dfn-decode-a-cid" class="dfn-ref">decode a CID</a> to <var>CID bytes</var>.</li>
-      </ol>
-      <p>
-        Use the following steps to <dfn id="dfn-parse-a-binary-cid">parse a binary CID</dfn>:
-      </p>
-      <ol>
-        <li>Accept an array of bytes <var>binary CID</var>.</li>
-        <li>
-          Remove the first byte in <var>binary CID</var> and store it in <var>prefix</var>.
-        </li>
-        <li>
-          If <var>prefix</var> is not equal to <code>0</code> (a null byte, the binary base256
-          prefix), throw an error.
-        </li>
-        <li>Store the rest of <var>binary CID</var> in <var>CID bytes</var>.</li>
-        <li>Return the result of applying the steps to <a href="#dfn-decode-a-cid" class="dfn-ref">decode a CID</a> to <var>CID bytes</var>.</li>
+        <li>This results in <var>CID bytes</var>, which can be used to <a href="#dfn-decode-a-cid" class="dfn-ref">decode a CID</a>.</li>
       </ol>
       <p>
         Use the following steps to <dfn id="dfn-decode-a-cid">decode a CID</dfn>:
@@ -165,4 +150,4 @@
     </section>
   
 
-<section><h2>References</h2><dl><dt id="ref-drisl">[drisl]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/drisl.html"><cite>DRISL — Deterministic Representation for Interoperable Structures &amp; Links</cite></a>. 2025-09-29. URL:&nbsp;<a href="https://dasl.ing/drisl.html">https://dasl.ing/drisl.html</a></dd><dt id="ref-rfc4648">[rfc4648]</dt><dd>S. Josefsson. <a href="https://www.rfc-editor.org/rfc/rfc4648"><cite>The Base16, Base32, and Base64 Data Encodings</cite></a>. October 2006. URL:&nbsp;<a href="https://www.rfc-editor.org/rfc/rfc4648">https://www.rfc-editor.org/rfc/rfc4648</a></dd><dt id="ref-sha256">[sha256]</dt><dd>National Institute of Standards and Technology, <cite>Secure Hash Algorithm. NIST FIPS 180-2</cite>. August 2002.</dd></dl></section></main></body></html>
+<section><h2>References</h2><dl><dt id="ref-drisl">[drisl]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/drisl.html"><cite>DRISL — Deterministic Representation for Interoperable Structures &amp; Links</cite></a>. 2025-10-02. URL:&nbsp;<a href="https://dasl.ing/drisl.html">https://dasl.ing/drisl.html</a></dd><dt id="ref-rfc4648">[rfc4648]</dt><dd>S. Josefsson. <a href="https://www.rfc-editor.org/rfc/rfc4648"><cite>The Base16, Base32, and Base64 Data Encodings</cite></a>. October 2006. URL:&nbsp;<a href="https://www.rfc-editor.org/rfc/rfc4648">https://www.rfc-editor.org/rfc/rfc4648</a></dd><dt id="ref-sha256">[sha256]</dt><dd>National Institute of Standards and Technology, <cite>Secure Hash Algorithm. NIST FIPS 180-2</cite>. August 2002.</dd></dl></section></main></body></html>
