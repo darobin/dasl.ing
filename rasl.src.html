@@ -54,15 +54,15 @@
         mandate that RASL retrieval rely on it.
       </p>
       <section>
-        <h2>The <code>web+rasl</code> URL Scheme</h2>
+        <h2>The <code>rasl</code> URL Scheme</h2>
         <p>
           RASL URLs look like this:
-          <code>web+rasl://bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4;berjon.com,bsky.app/</code>.
+          <code>rasl://bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4/?hint=berjon.com&hint=bsky.app</code>.
           This breaks down into the following components:
         </p>
         <ul>
           <li>
-            The <code>web+rasl</code> scheme. This uses the <code>web+</code> prefix
+            The <code>rasl</code> scheme. This uses the <code>web+</code> prefix
             to facilitate registration of the scheme in browser contexts so that
             RASL URLs can be used on the web directly.
           </li>
@@ -140,7 +140,7 @@
             <code>https://berjon.com/kitten.jpg</code> the CID for which is
             <code>bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4</code>.
             This can be published as this RASL URL:
-            <code>web+rasl://bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4;berjon.com/</code>.
+            <code>rasl://bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4;berjon.com/</code>.
             A client can retrieve it by constructing the a request to this URL:
             <code>https://berjon.com/.well-known/rasl/bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4</code>.
             In turn, the latter may simply 307 back to <code>https://berjon.com/kitten.jpg</code>.
