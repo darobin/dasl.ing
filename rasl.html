@@ -68,32 +68,27 @@
         mandate that RASL retrieval rely on it.
       </p>
       <section>
-        <h2>The <code>web+rasl</code> URL Scheme</h2>
+        <h2>The <code>rasl</code> URL Scheme</h2>
         <p>
           RASL URLs look like this:
-          <code>web+rasl://bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4;berjon.com,bsky.app/</code>.
+          <code>rasl://bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4/?hint=berjon.com&amp;hint=bsky.app</code>.
           This breaks down into the following components:
         </p>
         <ul>
           <li>
-            The <code>web+rasl</code> scheme. This uses the <code>web+</code> prefix
-            to facilitate registration of the scheme in browser contexts so that
-            RASL URLs can be used on the web directly.
+            The <code>rasl</code> scheme. This is simply used as an entry point into RASL semantics.
           </li>
           <li>
-            An authority composed of:
-            <ul>
-              <li>a DASL CID <code>bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4</code> and</li>
-              <li>
-                (optionally) a comma-separated list of URI-encoded hostnames (any authority parts that are
-                acceptable in HTTP) that can be used to attempt retrieval from.
-              </li>
-            </ul>
+            An authority, which is simply a DASL CID ([<a href="#ref-cid" class="ref">cid</a>]), here <code>bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4</code>.
           </li>
           <li>
-            A path (here just <code>/</code>) that is empty or <code>/</code> for raw
-            CIDs like the above but can contain a complete path if the CID resolves
-            to MASL data ([<a href="#ref-masl" class="ref">masl</a>]).
+            A path (here just <code>/</code>) that is empty or <code>/</code> and that is expected
+            to be ignored since RASL is only used for raw data retrieval.
+          </li>
+          <li>
+            A query string part, that is parsed according to CGI rules and that contains
+            zero or more <code>hint</code> entries, each of which is a host from which
+            that CID can be obtained.
           </li>
         </ul>
         <p>
@@ -102,15 +97,14 @@
         <ol>
           <li>Accept a string <var>url</var> and parse it according to the <a href="https://url.spec.whatwg.org/#url-parsing">URL Standard</a> ([<a href="#ref-url" class="ref">url</a>]).</li>
           <li>If that's a failure, return the failure.</li>
-          <li>Read the <code>host</code> part of the parsed URL up to either the first <code>;</code> character or to the end of the string. Store that in <var>cid</var>.</li>
+          <li>Read the <code>host</code> part of the parsed URL and store that in <var>cid</var>.</li>
           <li>If <var>cid</var> is not a valid CID ([<a href="#ref-cid" class="ref">cid</a>]), return failure.</li>
           <li>
-            If there was no <code>;</code> then <var>hints</var> is an empty array. Otherwise:
-            <ol>
-              <li>Split the remainder of the string on <code>,</code>.</li>
-              <li>Apply <code>decodeURIComponent()</code> to each part.</li>
-              <li>The results is the <var>hints</var> array.</li>
-            </ol>
+            Select all the tuples in the query object associated with the URL ([<a href="#ref-url" class="ref">url</a>]) whose name is
+            exaclty <code>hint</code>. Each value MUST match the syntax of a valid host for the
+            <code>https</code> scheme and values which do not match this syntax MUST be ignored
+            and removed from this list. Store the remaining values in <var>hints</var>. If there were none
+            then <var>hints</var> is an empty array.
           </li>
           <li>Return the URL's parts as well as <var>cid</var> and <var>hints</var>.</li>
         </ol>
@@ -147,22 +141,20 @@
           <li>
             Fetch the <var>request</var>s. How these get prioritised is entirely up to the implementation. It
             is common to run them all in parallel and abort them with the first success response.
-            Note that the <code>.well-known</code> path may redirect, so be ready to handle
-            that. This makes it possible to create sites that are published
-            the usual way and to have a RASL that is simply a redirect to the
-            resource. So for instance, you may have an existing
+            Note that the <code>.well-known</code> path may redirect, so be ready to handle that.
+            This makes it possible to create sites that are published the usual way and to have a RASL that
+            is simply a redirect to the resource. So for instance, you may have an existing
             <code>https://berjon.com/kitten.jpg</code> the CID for which is
             <code>bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4</code>.
             This can be published as this RASL URL:
-            <code>web+rasl://bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4;berjon.com/</code>.
+            <code>rasl://bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4/?hint=berjon.com</code>.
             A client can retrieve it by constructing the a request to this URL:
             <code>https://berjon.com/.well-known/rasl/bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4</code>.
-            In turn, the latter may simply 307 back to <code>https://berjon.com/kitten.jpg</code>.
-            (Yes, this is HTTP with extra steps, but the extra steps get you
-            self-certifying content.)
+            In turn, the latter may simply return a 307 redirect back to <code>https://berjon.com/kitten.jpg</code>.
+            (Yes, this is HTTP with extra steps, but the extra steps get you self-certifying content.)
           </li>
           <li>
-            If the response is a redirect but not a 307, the client should treat it as if it
+            If the response is a redirect but not a 307, the client SHOULD treat it as if it
             had been a 307 anyway.
           </li>
           <li>
@@ -190,16 +182,10 @@
     <section>
       <h2>RASL Pathing</h2>
       <p>
-        The <code>pathname</code> component of a RASL URL can only be interpreted in the context of the
-        content that is retrieved. It is never transmitted to the RASL server and is purely interpreted
-        on the client side.
-      </p>
-      <p>
-        As of this time, the only case in which pathing is defined is if the CID has a <code>0x71</code> prefix (i.e. is marked as a [<a href="#ref-drisl" class="ref">drisl</a>] object),
-        <em>and</em> the content contents retrieved from that CID parse as valid MASL ([<a href="#ref-masl" class="ref">masl</a>]) <em>and</em> it has a
-        <code>resources</code> map defining resources for each available path. But carrying out that resolution happens outside of RASL fetching.
+        Implementations SHOULD ignore paths in RASL URLs. They may be used in a future
+        iteration of this specification.
       </p>
     </section>
   
 
-<section><h2>References</h2><dl><dt id="ref-cid">[cid]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/cid.html"><cite>Content IDs (CIDs)</cite></a>. 2025-10-02. URL:&nbsp;<a href="https://dasl.ing/cid.html">https://dasl.ing/cid.html</a></dd><dt id="ref-drisl">[drisl]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/drisl.html"><cite>DRISL — Deterministic Representation for Interoperable Structures &amp; Links</cite></a>. 2025-10-02. URL:&nbsp;<a href="https://dasl.ing/drisl.html">https://dasl.ing/drisl.html</a></dd><dt id="ref-ipfs-principles">[ipfs-principles]</dt><dd>Robin Berjon. <a href="https://specs.ipfs.tech/architecture/principles/"><cite>IPFS Principles</cite></a>. march 2023. URL:&nbsp;<a href="https://specs.ipfs.tech/architecture/principles/">https://specs.ipfs.tech/architecture/principles/</a></dd><dt id="ref-masl">[masl]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/masl.html"><cite>MASL — Metadata for Arbitrary Structures &amp; Links</cite></a>. 2025-10-02. URL:&nbsp;<a href="https://dasl.ing/masl.html">https://dasl.ing/masl.html</a></dd><dt id="ref-url">[url]</dt><dd>WHATWG. <a href="https://url.spec.whatwg.org/"><cite>URL</cite></a>. Living Standard. URL:&nbsp;<a href="https://url.spec.whatwg.org/">https://url.spec.whatwg.org/</a></dd></dl></section></main></body></html>
+<section><h2>References</h2><dl><dt id="ref-cid">[cid]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/cid.html"><cite>Content IDs (CIDs)</cite></a>. 2025-10-02. URL:&nbsp;<a href="https://dasl.ing/cid.html">https://dasl.ing/cid.html</a></dd><dt id="ref-ipfs-principles">[ipfs-principles]</dt><dd>Robin Berjon. <a href="https://specs.ipfs.tech/architecture/principles/"><cite>IPFS Principles</cite></a>. march 2023. URL:&nbsp;<a href="https://specs.ipfs.tech/architecture/principles/">https://specs.ipfs.tech/architecture/principles/</a></dd><dt id="ref-url">[url]</dt><dd>WHATWG. <a href="https://url.spec.whatwg.org/"><cite>URL</cite></a>. Living Standard. URL:&nbsp;<a href="https://url.spec.whatwg.org/">https://url.spec.whatwg.org/</a></dd></dl></section></main></body></html>
