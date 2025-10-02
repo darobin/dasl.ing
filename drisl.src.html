@@ -31,7 +31,7 @@
     <section>
       <h2>Format</h2>
       <p>
-        DRISL is an application profile of CBOR ([[cbor]]) that subsets the more established [[cborc]] profile, with the following additional
+        DRISL is an application profile of CBOR ([[cbor]]) that mostly subsets the more established [[cborc]] profile, with the following additional
         constraints:
       </p>
       <ul>
@@ -51,6 +51,32 @@
           Floating-point numbers MUST always be encoded as a 64-bit IEEE 754 binary floating-point, never as a "half-precision" (16-byte, major 7-25) or "single-precision (32-byte, major 7-26)" CBOR key.
           <strong>NOTE</strong>: It is RECOMMENDED that users avoid encoding floating-point numbers as much as possible
           to minimize interoperability and tooling issues.
+          <ul>
+            <li>
+              Completely avoiding floating-point numbers is RECOMMENDED to minimize interoperability and tooling issues.
+            </li>
+            <li>
+              Even where floating-point numbers are used, most of the IEEE 754 "special" floating points (infinity, negative infinity, minimal NaN, and NaN with payloads) MUST NOT be encoded.
+              Negative zero is the only allowed special floating point.
+            </li>
+          </ul>
+        </li>
+        <li>
+          Indefinite-length arrays (and the "break" code making them usable, in major type 7) are not allowed.
+        </li>
+        <li>
+          Similarly, indefinite, incomplete, or streaming CBOR cannot be hashed and thus cannot be referenced by CID; for this reason, DRISL can only encode finite, bounded documents and resources.
+        </li>
+        <li> 
+          Concatenation of DRISL objects is generally discouraged and incurs both performance and interoperability risks.
+          <ul>
+            <li>
+              Note that DRISL objects cannot be streamed as CBOR streams (defined in RFC 8742) except in MIME-type aware contexts, as per the CBOR streams specification.
+            </li>
+            <li>
+              Applications are discouraged from handling concatenated DRISL objects or appending extra bytes of any kind to a DRISL object in memory or across interfaces, as doing so breaks the DRISL-wide assumption that each CID refers to one complete, discrete, and valid CBOR object, and that DRISL systems only ever will be expected to handle such objects.
+            </li>
+          </ul> 
         </li>
         <li>
           Encoders MUST NOT encode any simple values other than <code>true</code>, <code>false</code>, and <code>null</code> (20, 21, and 22 in section 3.3 of [[rfc8949]]).
