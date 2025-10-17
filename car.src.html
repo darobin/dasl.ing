@@ -200,10 +200,10 @@
       <section>
         <h3>Security &amp; Verifiability</h3>
         <p>
-          The roots specified by the Header of a CAR should appear somewhere in its Data section,
+          The <code>roots</code> specified by the Header of a CAR is expected to appear somewhere in its Data section,
           however there is no requirement that the roots define entire DAGs, nor that all blocks
           in a CAR must be part of DAGs described by the root CIDs in the Header. Therefore, the
-          roots must not be used alone to determine or differentiate the contents of a CAR.
+          <code>roots</code> must not be used alone to determine or differentiate the contents of a CAR.
         </p>
         <p>
           The CAR format contains no internal means, beyond the blocks and their CIDs, to verify
