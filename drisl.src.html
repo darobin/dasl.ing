@@ -67,7 +67,7 @@
         <li>
           Similarly, indefinite, incomplete, or streaming CBOR cannot be hashed and thus cannot be referenced by CID; for this reason, DRISL can only encode finite, bounded documents and resources.
         </li>
-        <li> 
+        <li>
           Concatenation of DRISL objects is generally discouraged and incurs both performance and interoperability risks.
           <ul>
             <li>
@@ -76,7 +76,7 @@
             <li>
               Applications are discouraged from handling concatenated DRISL objects or appending extra bytes of any kind to a DRISL object in memory or across interfaces, as doing so breaks the DRISL-wide assumption that each CID refers to one complete, discrete, and valid CBOR object, and that DRISL systems only ever will be expected to handle such objects.
             </li>
-          </ul> 
+          </ul>
         </li>
         <li>
           Encoders MUST NOT encode any simple values other than <code>true</code>, <code>false</code>, and <code>null</code> (20, 21, and 22 in section 3.3 of [[rfc8949]]).
@@ -94,6 +94,28 @@
       </p>
       <p>
         For more information, see the [[cbor-tag42]] appendix to the [[drisl]] specification.
+      </p>
+    </section>
+    <section>
+      <h2>Conversion with JSON</h2>
+      <p>
+        JSON lacks a native way to encode tag 42 for CIDs ([[cbor-tag42]], [[cid]]). Historically, there have
+        been different conventions to represent CIDs in JSON. For example, DAG-JSON, part of IPLD, used
+        an object with a single <code>/</code> key pointing to the stringified CID.
+      </p>
+      <p>
+        The AT Protocol uses an object with a <code>$link</code> key pointing to the stringified DASL CID:
+      </p>
+      <pre>
+        {
+          "someSrc": {
+            "$link": "bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4"
+          }
+        }
+      </pre>
+      <p>
+        This specification recommends that implementations default to the AT Protocol <code>$link</code>
+        convention, but may offer the option to support DAG-JSON or other conventions as well.
       </p>
     </section>
   </body>
