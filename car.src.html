@@ -32,16 +32,17 @@
     <section>
       <h2>Parsing CAR</h2>
       <p>
-        The CAR format comprises a sequence of length-prefixed block data, where the first
-        block in the CAR is the Header encoded as [[drisl]], and the remaining blocks form
-        the Data component of the CAR and are each additionally prefixed with their CIDs ([[drisl]], [[cid]]).
+        The CAR format is made of a Header followed by a Body. The Header is a length-prefixed
+        chunk of DRISL ([[drisl]]) and the Body is a sequence of zero or more length-prefixed
+        blocks that contain a tuple of a DASL CID ([[cid]]) which is always 36 bytes long and
+        the data addressed by that CID.
         The length prefix of each block in a CAR is encoded as an unsigned variable-length
         integer ([[varint]], a variant of <a href="https://en.wikipedia.org/wiki/LEB128">LEB128</a>).
         This integer specifies the number of remaining bytes for that block entry, excluding
-        the bytes used to encode the integer, but including the CID for non-header blocks.
+        the bytes used to encode the integer, but including the CID for non-Header blocks.
       </p>
-      <pre><code>|------- Header -------| |------------------- Data -------------------|
-[ int | DAG-CBOR block ] [ int | CID | block ] [ int | CID | block ] …
+      <pre><code>|------- Header -------| |------------------- Body -------------------|
+[ int | DAG-CBOR block ] [ int | CID | data ] [ int | CID | data ] …
       </code></pre>
       <p>
         The steps to <dfn>parse a CAR</dfn> are:
@@ -61,15 +62,15 @@
             <li>If <var>bytes</var> is empty, terminate these substeps.</li>
             <li>
               Run the steps to <a>parse a CAR block header</a> with <var>bytes</var>
-              to obtain <var>cid</var> and <var>block size</var>.
+              to obtain <var>cid</var> and <var>data size</var>.
             </li>
             <li>
-              Read <var>block size</var> bytes from <var>bytes</var> and store the
-              result in <var>block</var>.
+              Read <var>data size</var> bytes from <var>bytes</var> and store the
+              result in <var>data</var>.
             </li>
             <li>
               Push an entry onto <var>blocks</var> containing <var>cid</var>,
-              <var>block size</var>, and <var>block</var>.
+              <var>data size</var>, and <var>data</var>.
             </li>
             <li>Return to the beginning of these substeps.</li>
           </ol>
@@ -86,7 +87,7 @@
       <ul>
         <li>
           The object MUST contain a <code>version</code> map entry, the value of which
-          is always integer-type <code>1</code>. Version numbers is data formats are
+          is always integer-type <code>1</code>. Version numbers in data formats are
           an anti-pattern, and as a result this number is guaranteed never to change.
         </li>
         <li>
@@ -147,17 +148,11 @@
         <li>If <var>length</var> is 0, throw an error.</li>
         <li>
           Read a CID ([[cid]]) from <var>bytes</var> and store it in <var>cid</var>.
-          Note: the length of the CID can be inferred by reading its metadata
-          step by step until the <code>hash size</code> part, which is then used
-          to consume that many bytes from <var>bytes</var>.
+          Note: the length of the CID is always 36 bytes.
         </li>
+        <li>Set <var>data size</var> to <var>length</var> minus 36 (the CID length).</li>
         <li>
-          Set <var>CID length</var> to the number of bytes that were required to
-          read the CID.
-        </li>
-        <li>Set <var>block size</var> to <var>length</var> minus <var>CID length</var>.</li>
-        <li>
-          Return <var>block size</var> and <var>cid</var>.
+          Return <var>data size</var> and <var>cid</var>.
         </li>
       </ol>
     </section>
@@ -200,7 +195,7 @@
       <section>
         <h3>Security &amp; Verifiability</h3>
         <p>
-          The <code>roots</code> specified by the Header of a CAR is expected to appear somewhere in its Data section,
+          The <code>roots</code> specified by the Header of a CAR is expected to appear somewhere in its Body section,
           however there is no requirement that the roots define entire DAGs, nor that all blocks
           in a CAR must be part of DAGs described by the root CIDs in the Header. Therefore, the
           <code>roots</code> must not be used alone to determine or differentiate the contents of a CAR.
