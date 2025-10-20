@@ -36,13 +36,13 @@
         chunk of DRISL ([[drisl]]) and the Body is a sequence of zero or more length-prefixed
         blocks that contain a tuple of a DASL CID ([[cid]]) which is always 36 bytes long and
         the data addressed by that CID.
-        The length prefix of each block in a CAR is encoded as an unsigned variable-length
+        The length prefix in a CAR is encoded as an unsigned variable-length
         integer ([[varint]], a variant of <a href="https://en.wikipedia.org/wiki/LEB128">LEB128</a>).
-        This integer specifies the number of remaining bytes for that block entry, excluding
-        the bytes used to encode the integer, but including the CID for non-Header blocks.
+        This integer specifies the number of remaining bytes, excluding
+        the bytes used to encode the integer, but including the CID for Body blocks.
       </p>
-      <pre><code>|------- Header -------| |------------------- Body -------------------|
-[ int | DAG-CBOR block ] [ int | CID | data ] [ int | CID | data ] …
+      <pre><code>|------ Header -----| |------------------- Body -------------------|
+[ int | DRISL block ] [ int | CID | data ] [ int | CID | data ] …
       </code></pre>
       <p>
         The steps to <dfn>parse a CAR</dfn> are:
@@ -136,8 +136,8 @@
       </ol>
       <p>
         After its header, CAR contains a series of blocks each of which is
-        prefixed with a small header of its own capturing the block's size and
-        CID.
+        length-prefixed and has a small header capturing a CID followed by
+        the block's body data.
       </p>
       <p>
         The steps to <dfn>parse a CAR block header</dfn> are:
@@ -164,13 +164,13 @@
           A CAR stream must only feature DASL CIDs.
         </p>
         <p>
-          A CAR stream must have CIDs that match the block that follows
-          them. A CAR implementation should verify that CIDs match blocks, though
+          A CAR stream must have CIDs that match the data body that follows
+          them. A CAR implementation should verify that CIDs match block body data, though
           it may delegate verification to other components. (Keep in mind that not
           verifying at all negates the value of content addressing.)
         </p>
         <p>
-          A CAR stream's stated roots must match CIDs contained in the data.
+          A CAR stream's stated roots must match CIDs contained in the Body.
           However, implementations frequently operate in a streaming fashion such that
           they have no way of knowing whether a CAR stream conforms to this
           requirement before having processed the entire stream. Checking
