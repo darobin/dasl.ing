@@ -135,7 +135,10 @@
           There is no requirement in MASL that bundles have to be stored or dereferenced in any specific manner. The relevant CIDs
           may be loaded through whatever way the implementation knows about such as RASL ([[rasl]]) or may be
           provided in a CAR file ([[car]]).
-          Note that one value of this approach when compared to bundling resources for instance into Zip archives (or CAR files!) is that the resource map can contain an arbitrarily high number or volume of resources; an implementation may load an arbitrary subset of the resources, may parallelize loading, in an arbitrary order informed by types and HTTP headers, or load some resources on-demand.
+          Note that one value of this approach when compared to bundling resources for instance into Zip archives (or CAR files!)
+          is that the resource map can contain an arbitrarily high number or volume of resources; an implementation may load an
+          arbitrary subset of the resources, may parallelize loading, in an arbitrary order informed by types and HTTP headers,
+          or load some resources on-demand.
         </p>
         <div class="flag">
           Specify a scheme and fetch rules properly.
@@ -186,7 +189,8 @@
           are specified, the meaning of HTTP fields is undefined.
         </p>
         <p>
-          All HTTP headers, where specified, are lowercased.
+          All HTTP headers, where specified, are lowercased. Implementations MUST ignore headers
+          with a different casing.
         </p>
         <p>
           Supported headers:
