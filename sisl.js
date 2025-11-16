@@ -164,14 +164,14 @@ class SISL {
       // references
       const refs = {};
       main.innerHTML = main.innerHTML.replace(
-        /\[\[([\w-]+)\]\]/g,
-        (_, ref) => {
+        /\[\[([\w-]+)(?:\|([\w\s]+))?\]\]/g,
+        (_, ref, text) => {
           if (!bibliography[ref]) {
             this.err(`No "${ref}" entry in the bibliography.`);
             return `[[${ref}]]`;
           }
           refs[ref] = bibliography[ref];
-          return `[<a href="#ref-${ref}" class="ref">${ref}</a>]`;
+          return `[<a href="#ref-${ref}" class="ref">${text || ref}</a>]`;
         }
       );
       if (Object.keys(refs).length) {

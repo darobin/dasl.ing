@@ -19,7 +19,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RASL — Retrieval of Arbitrary Structures &amp; Links</title>
   <link rel="stylesheet" href="spec.css"><link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%220%22 y=%220%22 width=%22100%22 height=%22100%22 fill=%22%2300ff75%22></rect></svg>"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" property="og:title" content="DASL: RASL — Retrieval of Arbitrary Structures &amp; Links"><meta name="twitter:description" property="og:description" content="RASL is a URL scheme used to identify content-addressed DASL resources         along with a simple HTTP-based retrieval method."><meta name="twitter:image" property="og:image" content="https://dasl.ing/rasl.png"><meta name="twitter:image:alt" content="Very colourful stripes, so colourful it hurts"><meta name="twitter:url" property="og:url" content="https://dasl.ing/"><meta property="og:site_name" content="DASL"><meta property="og:locale" content="en"><meta name="theme-color" content="#00ff75"></head>
-  <body><div class="nav-back">A specification of the <a href="/">DASL Project</a>.</div><main><header><h1>RASL — Retrieval of Arbitrary Structures &amp; Links</h1><table><tbody><tr><th>date</th><td>2025-10-20</td></tr><tr><th>editors</th><td><a href="https://berjon.com/">Robin Berjon</a> &lt;<a href="mailto:robin@berjon.com">robin@berjon.com</a>&gt;<br><a href="https://bumblefudge.com/">Juan Caballero</a> &lt;<a href="mailto:bumblefudge@learningproof.xyz">bumblefudge@learningproof.xyz</a>&gt;</td></tr><tr><th>issues</th><td><a href="https://github.com/darobin/dasl.ing/issues">list</a>, <a href="https://github.com/darobin/dasl.ing/issues/new">new</a></td></tr><tr><th>abstract</th><td><div id="abstract">
+  <body><div class="nav-back">A specification of the <a href="/">DASL Project</a>.</div><main><header><h1>RASL — Retrieval of Arbitrary Structures &amp; Links</h1><table><tbody><tr><th>date</th><td>2025-11-16</td></tr><tr><th>editors</th><td><a href="https://berjon.com/">Robin Berjon</a> &lt;<a href="mailto:robin@berjon.com">robin@berjon.com</a>&gt;<br><a href="https://bumblefudge.com/">Juan Caballero</a> &lt;<a href="mailto:bumblefudge@learningproof.xyz">bumblefudge@learningproof.xyz</a>&gt;</td></tr><tr><th>issues</th><td><a href="https://github.com/darobin/dasl.ing/issues">list</a>, <a href="https://github.com/darobin/dasl.ing/issues/new">new</a></td></tr><tr><th>abstract</th><td><div id="abstract">
       <p>
         RASL is a URL scheme used to identify content-addressed DASL resources
         along with a simple HTTP-based retrieval method.
@@ -68,116 +68,125 @@
         mandate that RASL retrieval rely on it.
       </p>
       <section>
-        <h2>The <code>rasl</code> URL Scheme</h2>
+        <h3>Terminology</h3>
         <p>
-          RASL URLs look like this:
-          <code>rasl://bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4/?hint=berjon.com&amp;hint=bsky.app</code>.
-          This breaks down into the following components:
+          The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+          "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
+          document are to be interpreted as described in BCP 14 [<a href="#ref-rfc2119" class="ref">rfc2119</a>] [<a href="#ref-rfc8174" class="ref">rfc8174</a>]
+          when, and only when, they appear in all capitals, as shown here.
         </p>
-        <ul>
-          <li>
-            The <code>rasl</code> scheme. This is simply used as an entry point into RASL semantics.
-          </li>
-          <li>
-            An authority, which is simply a DASL CID ([<a href="#ref-cid" class="ref">cid</a>]), here <code>bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4</code>.
-          </li>
-          <li>
-            A path (here just <code>/</code>) that is empty or <code>/</code> and that is expected
-            to be ignored since RASL is only used for raw data retrieval.
-          </li>
-          <li>
-            A query string part, that is parsed according to CGI rules and that contains
-            zero or more <code>hint</code> entries, each of which is a host from which
-            that CID can be obtained.
-          </li>
-        </ul>
-        <p>
-          Use the following steps to <dfn id="dfn-parse-a-rasl-url">parse a RASL URL</dfn>:
-        </p>
-        <ol>
-          <li>Accept a string <var>url</var> and parse it according to the <a href="https://url.spec.whatwg.org/#url-parsing">URL Standard</a> ([<a href="#ref-url" class="ref">url</a>]).</li>
-          <li>If that's a failure, return the failure.</li>
-          <li>Read the <code>host</code> part of the parsed URL and store that in <var>cid</var>.</li>
-          <li>If <var>cid</var> is not a valid CID ([<a href="#ref-cid" class="ref">cid</a>]), return failure.</li>
-          <li>
-            Select all the tuples in the query object associated with the URL ([<a href="#ref-url" class="ref">url</a>]) whose name is
-            exaclty <code>hint</code>. Each value MUST match the syntax of a valid host for the
-            <code>https</code> scheme and values which do not match this syntax MUST be ignored
-            and removed from this list. Store the remaining values in <var>hints</var>. If there were none
-            then <var>hints</var> is an empty array.
-          </li>
-          <li>Return the URL's parts as well as <var>cid</var> and <var>hints</var>.</li>
-        </ol>
       </section>
-      <section>
-        <h2>Fetching RASL</h2>
-        <p>
-          A user agent may retrieve a CID in whichever way it prefers. This section
-          provides a simple standard for HTTP-based CID retrieval, to make it
-          easy for authors to publish content to their own sites and have it
-          retrieved, without having to worry about operating any infrastructure
-          beyond the web server they already have.
-        </p>
-        <p>
-          Use the following steps to <dfn id="dfn-fetch-a-rasl-url">fetch a RASL URL</dfn>:
-        </p>
-        <ol>
-          <li>Accept a string <var>url</var> and parse it according to the steps to <a href="#dfn-parse-a-rasl-url" class="dfn-ref">parse a RASL URL</a>.</li>
-          <li>
-            Construct a <var>request</var> using <var>cid</var> from the <var>url</var> as well as <var>hints</var> that may
-            be from the URL or from elsewhere (this is entirely up to you):
-            <ol>
-              <li>
-                For each hint, construct a request URL that is the concatenation of <code>https://</code>,
-                the hint as host, <code>/.well-known/rasl/</code>, and the <var>cid</var>.
-              </li>
-              <li>
-                Prepare the request such that it has a method of either <code>GET</code> or <code>HEAD</code>,
-                that it is stateless (no cookies, no credentials of any kind), and that it uses no content
-                negotiation.
-              </li>
-            </ol>
-          </li>
-          <li>
-            Fetch the <var>request</var>s. How these get prioritised is entirely up to the implementation. It
-            is common to run them all in parallel and abort them with the first success response.
-            Note that the <code>.well-known</code> path may redirect, so be ready to handle that.
-            This makes it possible to create sites that are published the usual way and to have a RASL that
-            is simply a redirect to the resource. So for instance, you may have an existing
-            <code>https://berjon.com/kitten.jpg</code> the CID for which is
-            <code>bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4</code>.
-            This can be published as this RASL URL:
-            <code>rasl://bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4/?hint=berjon.com</code>.
-            A client can retrieve it by constructing the a request to this URL:
-            <code>https://berjon.com/.well-known/rasl/bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4</code>.
-            In turn, the latter may simply return a 307 redirect back to <code>https://berjon.com/kitten.jpg</code>.
-            (Yes, this is HTTP with extra steps, but the extra steps get you self-certifying content.)
-          </li>
-          <li>
-            If the response is a redirect but not a 307, the client SHOULD treat it as if it
-            had been a 307 anyway.
-          </li>
-          <li>
-            If none of the responses are successful, return failure.
-          </li>
-          <li>
-            Set the response's media type to <code>application/octet-stream</code>. (The server should have
-            done that already, but may not have done so, notably if it relied on a redirect.) The purpose
-            of RASL is to retrieve data in ways that are independent of the server — any media type
-            processing must therefore take place at another layer. Without this, we lose the self-certifying
-            nature of the system. (Note that servers are encouraged to enforce that so as not to have their
-            RASL endpoints used for general-purpose web serving, which can be a security vector depending on
-            where the data being served came from.)
-          </li>
-          <li>
-            Produce a CID for the retrieved data. If that CID does not match the requested <var>cid</var>,
-            return failure.
-          </li>
-          <li>
-            Return the data.
-          </li>
-        </ol>
-      </section>
+    </section>
+    <section>
+      <h2>The <code>rasl</code> URL Scheme</h2>
+      <p>
+        RASL URLs look like this:
+        <code>rasl://bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4/?hint=berjon.com&amp;hint=bsky.app</code>.
+        This breaks down into the following components:
+      </p>
+      <ul>
+        <li>
+          The <code>rasl</code> scheme. This is simply used as an entry point into RASL semantics.
+        </li>
+        <li>
+          An authority, which is simply a DASL CID ([<a href="#ref-cid" class="ref">cid</a>]), here <code>bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4</code>.
+        </li>
+        <li>
+          A path (here just <code>/</code>) that is empty or <code>/</code> and that is expected
+          to be ignored since RASL is only used for raw data retrieval.
+        </li>
+        <li>
+          A query string part, that is parsed according to CGI rules and that contains
+          zero or more <code>hint</code> entries, each of which is a host from which
+          that CID can be obtained.
+        </li>
+      </ul>
+      <p>
+        Use the following steps to <dfn id="dfn-parse-a-rasl-url">parse a RASL URL</dfn>:
+      </p>
+      <ol>
+        <li>Accept a string <var>url</var> and parse it according to the <a href="https://url.spec.whatwg.org/#url-parsing">URL Standard</a> ([<a href="#ref-url" class="ref">url</a>]).</li>
+        <li>If that's a failure, return the failure.</li>
+        <li>Read the <code>host</code> part of the parsed URL and store that in <var>cid</var>.</li>
+        <li>If <var>cid</var> is not a valid CID ([<a href="#ref-cid" class="ref">cid</a>]), return failure.</li>
+        <li>
+          Select all the tuples in the query object associated with the URL ([<a href="#ref-url" class="ref">url</a>]) whose name is
+          exaclty <code>hint</code>. Each value MUST match the syntax of a valid host for the
+          <code>https</code> scheme and values which do not match this syntax MUST be ignored
+          and removed from this list. Store the remaining values in <var>hints</var>. If there were none
+          then <var>hints</var> is an empty array.
+        </li>
+        <li>Return the URL's parts as well as <var>cid</var> and <var>hints</var>.</li>
+      </ol>
+    </section>
+    <section>
+      <h2>Fetching RASL</h2>
+      <p>
+        A user agent may retrieve a CID in whichever way it prefers. This section
+        provides a simple standard for HTTP-based CID retrieval, to make it
+        easy for authors to publish content to their own sites and have it
+        retrieved, without having to worry about operating any infrastructure
+        beyond the web server they already have.
+      </p>
+      <p>
+        Use the following steps to <dfn id="dfn-fetch-a-rasl-url">fetch a RASL URL</dfn>:
+      </p>
+      <ol>
+        <li>Accept a string <var>url</var> and parse it according to the steps to <a href="#dfn-parse-a-rasl-url" class="dfn-ref">parse a RASL URL</a>.</li>
+        <li>
+          Construct a <var>request</var> using <var>cid</var> from the <var>url</var> as well as <var>hints</var> that may
+          be from the URL or from elsewhere (this is entirely up to you):
+          <ol>
+            <li>
+              For each hint, construct a request URL that is the concatenation of <code>https://</code>,
+              the hint as host, <code>/.well-known/rasl/</code>, and the <var>cid</var>.
+            </li>
+            <li>
+              Prepare the request such that it has a method of either <code>GET</code> or <code>HEAD</code>,
+              that it is stateless (no cookies, no credentials of any kind), and that it uses no content
+              negotiation.
+            </li>
+          </ol>
+        </li>
+        <li>
+          Fetch the <var>request</var>s. How these get prioritised is entirely up to the implementation. It
+          is common to run them all in parallel and abort them with the first success response.
+          Note that the <code>.well-known</code> path may redirect, so be ready to handle that.
+          This makes it possible to create sites that are published the usual way and to have a RASL that
+          is simply a redirect to the resource. So for instance, you may have an existing
+          <code>https://berjon.com/kitten.jpg</code> the CID for which is
+          <code>bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4</code>.
+          This can be published as this RASL URL:
+          <code>rasl://bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4/?hint=berjon.com</code>.
+          A client can retrieve it by constructing the a request to this URL:
+          <code>https://berjon.com/.well-known/rasl/bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4</code>.
+          In turn, the latter may simply return a 307 redirect back to <code>https://berjon.com/kitten.jpg</code>.
+          (Yes, this is HTTP with extra steps, but the extra steps get you self-certifying content.)
+        </li>
+        <li>
+          If the response is a redirect but not a 307, the client SHOULD treat it as if it
+          had been a 307 anyway.
+        </li>
+        <li>
+          If none of the responses are successful, return failure.
+        </li>
+        <li>
+          Set the response's media type to <code>application/octet-stream</code>. (The server should have
+          done that already, but may not have done so, notably if it relied on a redirect.) The purpose
+          of RASL is to retrieve data in ways that are independent of the server — any media type
+          processing must therefore take place at another layer. Without this, we lose the self-certifying
+          nature of the system. (Note that servers are encouraged to enforce that so as not to have their
+          RASL endpoints used for general-purpose web serving, which can be a security vector depending on
+          where the data being served came from.)
+        </li>
+        <li>
+          Produce a CID for the retrieved data. If that CID does not match the requested <var>cid</var>,
+          return failure.
+        </li>
+        <li>
+          Return the data.
+        </li>
+      </ol>
     </section>
     <section>
       <h2>RASL Pathing</h2>
@@ -188,4 +197,4 @@
     </section>
   
 
-<section><h2>References</h2><dl><dt id="ref-cid">[cid]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/cid.html"><cite>Content IDs (CIDs)</cite></a>. 2025-10-20. URL:&nbsp;<a href="https://dasl.ing/cid.html">https://dasl.ing/cid.html</a></dd><dt id="ref-ipfs-principles">[ipfs-principles]</dt><dd>Robin Berjon. <a href="https://specs.ipfs.tech/architecture/principles/"><cite>IPFS Principles</cite></a>. march 2023. URL:&nbsp;<a href="https://specs.ipfs.tech/architecture/principles/">https://specs.ipfs.tech/architecture/principles/</a></dd><dt id="ref-url">[url]</dt><dd>WHATWG. <a href="https://url.spec.whatwg.org/"><cite>URL</cite></a>. Living Standard. URL:&nbsp;<a href="https://url.spec.whatwg.org/">https://url.spec.whatwg.org/</a></dd></dl></section></main></body></html>
+<section><h2>References</h2><dl><dt id="ref-cid">[cid]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/cid.html"><cite>Content IDs (CIDs)</cite></a>. 2025-11-16. URL:&nbsp;<a href="https://dasl.ing/cid.html">https://dasl.ing/cid.html</a></dd><dt id="ref-ipfs-principles">[ipfs-principles]</dt><dd>Robin Berjon. <a href="https://specs.ipfs.tech/architecture/principles/"><cite>IPFS Principles</cite></a>. march 2023. URL:&nbsp;<a href="https://specs.ipfs.tech/architecture/principles/">https://specs.ipfs.tech/architecture/principles/</a></dd><dt id="ref-rfc2119">[rfc2119]</dt><dd>S. Bradner. <a href="https://www.rfc-editor.org/rfc/rfc2119"><cite>Key words for use in RFCs to Indicate Requirement Levels</cite></a>. March 1997. URL:&nbsp;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a></dd><dt id="ref-rfc8174">[rfc8174]</dt><dd>Leiba, B., <a href="https://www.rfc-editor.org/rfc/rfc8174"><cite>Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words</cite>&lt;.a&gt;. May 2017. URL:&nbsp;</a><a href="https://www.rfc-editor.org/info/rfc8174">https://www.rfc-editor.org/info/rfc8174</a></dd><dt id="ref-url">[url]</dt><dd>WHATWG. <a href="https://url.spec.whatwg.org/"><cite>URL</cite></a>. Living Standard. URL:&nbsp;<a href="https://url.spec.whatwg.org/">https://url.spec.whatwg.org/</a></dd></dl></section></main></body></html>

@@ -16,7 +16,7 @@
     <section>
       <h2>Introduction</h2>
       <p>
-        BDASL extends DASL CIDs by adding BLAKE3 support ([[blake3]). BLAKE3 is a powerful hashing
+        BDASL extends DASL CIDs by adding BLAKE3 support ([[blake3]]). BLAKE3 is a powerful hashing
         framework that works well for progressive verification of large streams. Unfortunately,
         it isn't available in browser (and neither is streaming hashing in general) which makes it
         inappriopriate for inclusion as the primary hash function in DASL CIDs.
@@ -26,6 +26,15 @@
         focus on using such CIDs in specific cases in which participants are likely to know how
         to handle them.
       </p>
+      <section>
+        <h3>Terminology</h3>
+        <p>
+          The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+          "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
+          document are to be interpreted as described in BCP 14 [[rfc2119]] [[rfc8174]]
+          when, and only when, they appear in all capitals, as shown here.
+        </p>
+      </section>
     </section>
     <section>
       <h2>Parsing BDASL CIDs</h2>
@@ -34,7 +43,7 @@
       </p>
       <p>
         In the steps to <a href="cid.html#decode-a-cid">decode a CID</a>, the <var>hash type</var>
-        may also be equal to <code>0x1e</code> (BLAKE3) ([[blake3]]).
+        MAY also be equal to <code>0x1e</code> (BLAKE3) ([[blake3]]).
       </p>
     </section>
   </body>

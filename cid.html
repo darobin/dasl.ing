@@ -19,7 +19,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Content IDs (CIDs)</title>
   <link rel="stylesheet" href="spec.css"><link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%220%22 y=%220%22 width=%22100%22 height=%22100%22 fill=%22%2300ff75%22></rect></svg>"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" property="og:title" content="DASL: Content IDs (CIDs)"><meta name="twitter:description" property="og:description" content="DASL CIDs are a simple structured identifier format for content addressing. They encapsulate a hash         with enough metadata to be extensible (to add new hash types in the future) and to indicate whether         they are pointing to raw bytes or to structured data."><meta name="twitter:image" property="og:image" content="https://dasl.ing/cid.png"><meta name="twitter:image:alt" content="Very colourful stripes, so colourful it hurts"><meta name="twitter:url" property="og:url" content="https://dasl.ing/"><meta property="og:site_name" content="DASL"><meta property="og:locale" content="en"><meta name="theme-color" content="#00ff75"></head>
-  <body><div class="nav-back">A specification of the <a href="/">DASL Project</a>.</div><main><header><h1>Content IDs (CIDs)</h1><table><tbody><tr><th>date</th><td>2025-10-20</td></tr><tr><th>editors</th><td><a href="https://berjon.com/">Robin Berjon</a> &lt;<a href="mailto:robin@berjon.com">robin@berjon.com</a>&gt;<br><a href="https://bumblefudge.com/">Juan Caballero</a> &lt;<a href="mailto:bumblefudge@learningproof.xyz">bumblefudge@learningproof.xyz</a>&gt;</td></tr><tr><th>issues</th><td><a href="https://github.com/darobin/dasl.ing/issues">list</a>, <a href="https://github.com/darobin/dasl.ing/issues/new">new</a></td></tr><tr><th>abstract</th><td><div id="abstract">
+  <body><div class="nav-back">A specification of the <a href="/">DASL Project</a>.</div><main><header><h1>Content IDs (CIDs)</h1><table><tbody><tr><th>date</th><td>2025-11-16</td></tr><tr><th>editors</th><td><a href="https://berjon.com/">Robin Berjon</a> &lt;<a href="mailto:robin@berjon.com">robin@berjon.com</a>&gt;<br><a href="https://bumblefudge.com/">Juan Caballero</a> &lt;<a href="mailto:bumblefudge@learningproof.xyz">bumblefudge@learningproof.xyz</a>&gt;</td></tr><tr><th>issues</th><td><a href="https://github.com/darobin/dasl.ing/issues">list</a>, <a href="https://github.com/darobin/dasl.ing/issues/new">new</a></td></tr><tr><th>abstract</th><td><div id="abstract">
       <p>
         DASL CIDs are a simple structured identifier format for content addressing. They encapsulate a hash
         with enough metadata to be extensible (to add new hash types in the future) and to indicate whether
@@ -61,6 +61,15 @@
           A digest, which is the hash of the content being identified.
         </li>
       </ol>
+      <section>
+        <h3>Terminology</h3>
+        <p>
+          The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+          "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
+          document are to be interpreted as described in BCP 14 [<a href="#ref-rfc2119" class="ref">rfc2119</a>] [<a href="#ref-rfc8174" class="ref">rfc8174</a>]
+          when, and only when, they appear in all capitals, as shown here.
+        </p>
+      </section>
     </section>
     <section>
       <h2>Parsing CIDs</h2>
@@ -137,7 +146,7 @@
         <li>Only SHA-256 (0x12) for the hash function .</li>
         <li>
           The CID isn't the boss of anyone, but the expectation is that, regardless of size, resources
-          <em>should not</em> be "chunked" into a DAG or Merkle tree (as historically done with UnixFS canonicalization
+          SHOULD NOT be "chunked" into a DAG or Merkle tree (as historically done with UnixFS canonicalization
           in IPFS systems) but rather hashed in their entirety and content-addressed directly. That being
           said, a DASL CID can point to a piece of [<a href="#ref-drisl" class="ref">drisl</a>] metadata that describes this kind of
           chunking, if needed. (A separate specification may be added for that.)
@@ -150,4 +159,4 @@
     </section>
   
 
-<section><h2>References</h2><dl><dt id="ref-drisl">[drisl]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/drisl.html"><cite>DRISL — Deterministic Representation for Interoperable Structures &amp; Links</cite></a>. 2025-10-20. URL:&nbsp;<a href="https://dasl.ing/drisl.html">https://dasl.ing/drisl.html</a></dd><dt id="ref-rfc4648">[rfc4648]</dt><dd>S. Josefsson. <a href="https://www.rfc-editor.org/rfc/rfc4648"><cite>The Base16, Base32, and Base64 Data Encodings</cite></a>. October 2006. URL:&nbsp;<a href="https://www.rfc-editor.org/rfc/rfc4648">https://www.rfc-editor.org/rfc/rfc4648</a></dd><dt id="ref-sha256">[sha256]</dt><dd>National Institute of Standards and Technology, <cite>Secure Hash Algorithm. NIST FIPS 180-2</cite>. August 2002.</dd></dl></section></main></body></html>
+<section><h2>References</h2><dl><dt id="ref-drisl">[drisl]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/drisl.html"><cite>DRISL — Deterministic Representation for Interoperable Structures &amp; Links</cite></a>. 2025-11-16. URL:&nbsp;<a href="https://dasl.ing/drisl.html">https://dasl.ing/drisl.html</a></dd><dt id="ref-rfc2119">[rfc2119]</dt><dd>S. Bradner. <a href="https://www.rfc-editor.org/rfc/rfc2119"><cite>Key words for use in RFCs to Indicate Requirement Levels</cite></a>. March 1997. URL:&nbsp;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a></dd><dt id="ref-rfc4648">[rfc4648]</dt><dd>S. Josefsson. <a href="https://www.rfc-editor.org/rfc/rfc4648"><cite>The Base16, Base32, and Base64 Data Encodings</cite></a>. October 2006. URL:&nbsp;<a href="https://www.rfc-editor.org/rfc/rfc4648">https://www.rfc-editor.org/rfc/rfc4648</a></dd><dt id="ref-rfc8174">[rfc8174]</dt><dd>Leiba, B., <a href="https://www.rfc-editor.org/rfc/rfc8174"><cite>Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words</cite>&lt;.a&gt;. May 2017. URL:&nbsp;</a><a href="https://www.rfc-editor.org/info/rfc8174">https://www.rfc-editor.org/info/rfc8174</a></dd><dt id="ref-sha256">[sha256]</dt><dd>National Institute of Standards and Technology, <cite>Secure Hash Algorithm. NIST FIPS 180-2</cite>. August 2002.</dd></dl></section></main></body></html>
