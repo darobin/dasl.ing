@@ -45,8 +45,8 @@
       <section>
         <h3>Terminology</h3>
         <p>
-          The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
-          "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
+          The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>",
+          "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>", "<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this
           document are to be interpreted as described in BCP 14 [<a href="#ref-rfc2119" class="ref">rfc2119</a>] [<a href="#ref-rfc8174" class="ref">rfc8174</a>]
           when, and only when, they appear in all capitals, as shown here.
         </p>
@@ -83,9 +83,9 @@
           blocks after the metadata header.
         </p>
         <p>
-          In order to be inserted directly as metadata object within CAR files, MASL documents need to contain a top-level <code>version</code> property whose value MUST
-          be set to integer <code>1</code> and a top-level <code>roots</code> array that MUST contain 0 or more tag 42 CIDs and nothing else.
-          Neither of these fields has any meaning in MASL, but they MUST be provided in the context of a CAR header for historical compatibility
+          In order to be inserted directly as metadata object within CAR files, MASL documents need to contain a top-level <code>version</code> property whose value <span class="bcp14">MUST</span>
+          be set to integer <code>1</code> and a top-level <code>roots</code> array that <span class="bcp14">MUST</span> contain 0 or more tag 42 CIDs and nothing else.
+          Neither of these fields has any meaning in MASL, but they <span class="bcp14">MUST</span> be provided in the context of a CAR header for historical compatibility
           reasons.
           Note that there is no requirements that all the CIDs in a <code>roots</code> array also appear in the <code>resources</code> mapping or vice versa.
         </p>
@@ -117,17 +117,17 @@
           </li>
           <li>
             <strong>Bundle Mode</strong> (using <code>resources</code>): the metadata is used to
-            describe a whole set of resources. These resources SHOULD be related to one another in some
+            describe a whole set of resources. These resources <span class="bcp14">SHOULD</span> be related to one another in some
             way (e.g. components that go into building an app or document). The keys of the <code>resources</code>
-            map are complete paths that MUST start with <code>/</code> and the values are metadata
-            objects that MUST have an <code>src</code> field pointing to the resource's CID and SHOULD have a
+            map are complete paths that <span class="bcp14">MUST</span> start with <code>/</code> and the values are metadata
+            objects that <span class="bcp14">MUST</span> have an <code>src</code> field pointing to the resource's CID and <span class="bcp14">SHOULD</span> have a
             <code>content-type</code> field giving its MIME type, along with other HTTP headers.
-            Any other properties present which do not map to HTTP headers MUST be ignored.
+            Any other properties present which do not map to HTTP headers <span class="bcp14">MUST</span> be ignored.
           </li>
         </ul>
         <p>
           Note that if both <code>src</code> and <code>resources</code> are specified, then
-          <code>src</code> MUST be ignored.
+          <code>src</code> <span class="bcp14">MUST</span> be ignored.
         </p>
         <p>
           The Bundle Mode has some specific processing rules:
@@ -135,8 +135,8 @@
         <ul>
           <li>
             Default: The entry with path <code>/</code> is the default path that is loaded if the bundle
-            itself gets rendered, e.g. in a browser or other user-agent. Implementations MUST only recognise this as the default
-            and MUST NOT automatically decide to pick a given entry (e.g. <code>/index.html</code>).
+            itself gets rendered, e.g. in a browser or other user-agent. Implementations <span class="bcp14">MUST</span> only recognise this as the default
+            and <span class="bcp14">MUST NOT</span> automatically decide to pick a given entry (e.g. <code>/index.html</code>).
           </li>
           <li>
             Relative: When loading a bundle into a web context, the root of the bundle is given an opaque origin,
@@ -149,8 +149,8 @@
             do <em>not</em> map to file systems.
           </li>
           <li>
-            Query strings: When resolving a URL inside of a bundle, implementation MUST only make use of the URL's pathname and
-            MUST ignore the query string. (Note that this departs from typical URL processing but makes it easier
+            Query strings: When resolving a URL inside of a bundle, implementation <span class="bcp14">MUST</span> only make use of the URL's pathname and
+            <span class="bcp14">MUST</span> ignore the query string. (Note that this departs from typical URL processing but makes it easier
             to pass parameters between resources internally.)
           </li>
         </ul>
@@ -197,20 +197,20 @@
         <p>
           MASL supports a subset of HTTP response headers that are meaningful in decentralised
           contexts. This doesn't preclude headers not listed here from being used, but implementations
-          that support using HTTP headers SHOULD NOT reflect the value of arbitrary HTTP headers
+          that support using HTTP headers <span class="bcp14">SHOULD NOT</span> reflect the value of arbitrary HTTP headers
           without considering the potential attack surface they create.
         </p>
         <p>
           When using HTTP headers as MASL metadata, there are two modes. If the MASL document
           contains a root <code>resources</code> field then it is a MASL document for multiple resources
           and the HTTP headers are only meaningful if they are set on values of the <code>resources</code>
-          map (and MUST be ignored if set on the root object). Conversely, if this MASL document
-          contains a <code>src</code> field (and no <code>resources</code>) then the HTTP headers MUST
+          map (and <span class="bcp14">MUST</span> be ignored if set on the root object). Conversely, if this MASL document
+          contains a <code>src</code> field (and no <code>resources</code>) then the HTTP headers <span class="bcp14">MUST</span>
           be set on the root and ignored otherwise. If neither <code>src</code> nor <code>resources</code>
           are specified, the meaning of HTTP fields is undefined.
         </p>
         <p>
-          All HTTP headers, where specified, are lowercased. Implementations MUST ignore headers
+          All HTTP headers, where specified, are lowercased. Implementations <span class="bcp14">MUST</span> ignore headers
           with a different casing.
         </p>
         <p>
@@ -231,7 +231,7 @@
           <li><code>service-worker-allowed</code></li>
           <li>
             <code>sourcemap</code>: this must point to another resource in the <code>resources</code> map.
-            Implementations SHOULD verify that this is the case as source maps could otherwise be used to
+            Implementations <span class="bcp14">SHOULD</span> verify that this is the case as source maps could otherwise be used to
             exfiltrate information.
           </li>
           <li>
@@ -297,13 +297,13 @@
           <code>screenshots</code>,
           <code>short_name</code>, and
           <code>theme_color</code>.
-          Note: other manifest fields MAY be used, but their behaviour is not guaranteed in the kind
+          Note: other manifest fields <span class="bcp14">MAY</span> be used, but their behaviour is not guaranteed in the kind
           of web and web-like contexts for which MASL is optimized.
         </p>
         <p>
-          For both <code>icons</code> and <code>screenshots</code>, the <code>src</code> field MUST
+          For both <code>icons</code> and <code>screenshots</code>, the <code>src</code> field <span class="bcp14">MUST</span>
           be a path that matches an entry in the <code>resources</code> map, and the <code>type</code>
-          field that is normally accepted in manifests there MUST NOT be used and MUST be ignored
+          field that is normally accepted in manifests there <span class="bcp14">MUST NOT</span> be used and <span class="bcp14">MUST</span> be ignored
           if specified. Media type information for that resource is specific on the resource entry
           that <code>src</code> maps to.
         </p>
@@ -353,7 +353,7 @@
         <h3>AT Compatibility</h3>
         <p>
           When used with the AT Protocol ([<a href="#ref-at" class="ref">at</a>]), it is common that objects will need to feature
-          a <code>$type</code> field. If present, it MUST be a string and SHOULD be set to the
+          a <code>$type</code> field. If present, it <span class="bcp14">MUST</span> be a string and <span class="bcp14">SHOULD</span> be set to the
           value <code>ing.dasl.masl</code>.
         </p>
       </section>
@@ -362,7 +362,7 @@
         <p>
           When manipulating DAGs, it can be useful to keep track of history by referencing
           earlier versions of the same data or metadata. This can be done using the <code>prev</code>
-          field, which if present MUST be a tag 42 CID pointing to a previous MASL document.
+          field, which if present <span class="bcp14">MUST</span> be a tag 42 CID pointing to a previous MASL document.
         </p>
         <p>
           Example:

@@ -64,8 +64,8 @@
       <section>
         <h3>Terminology</h3>
         <p>
-          The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
-          "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
+          The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>",
+          "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>", "<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this
           document are to be interpreted as described in BCP 14 [<a href="#ref-rfc2119" class="ref">rfc2119</a>] [<a href="#ref-rfc8174" class="ref">rfc8174</a>]
           when, and only when, they appear in all capitals, as shown here.
         </p>
@@ -146,7 +146,7 @@
         <li>Only SHA-256 (0x12) for the hash function .</li>
         <li>
           The CID isn't the boss of anyone, but the expectation is that, regardless of size, resources
-          SHOULD NOT be "chunked" into a DAG or Merkle tree (as historically done with UnixFS canonicalization
+          <span class="bcp14">SHOULD NOT</span> be "chunked" into a DAG or Merkle tree (as historically done with UnixFS canonicalization
           in IPFS systems) but rather hashed in their entirety and content-addressed directly. That being
           said, a DASL CID can point to a piece of [<a href="#ref-drisl" class="ref">drisl</a>] metadata that describes this kind of
           chunking, if needed. (A separate specification may be added for that.)

@@ -45,8 +45,8 @@
       <section>
         <h3>Terminology</h3>
         <p>
-          The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
-          "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
+          The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>",
+          "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>", "<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this
           document are to be interpreted as described in BCP 14 [<a href="#ref-rfc2119" class="ref">rfc2119</a>] [<a href="#ref-rfc8174" class="ref">rfc8174</a>]
           when, and only when, they appear in all capitals, as shown here.
         </p>
@@ -109,13 +109,13 @@
       </p>
       <ul>
         <li>
-          The object MUST contain a <code>version</code> map entry, the value of which
+          The object <span class="bcp14">MUST</span> contain a <code>version</code> map entry, the value of which
           is always integer-type <code>1</code>. Version numbers in data formats are
           an anti-pattern, and as a result this number is guaranteed never to change.
         </li>
         <li>
-          The object MUST contain a <code>roots</code> entry, which MUST be of type
-          array. It MAY be empty, but if it isn't then it MUST be an array of CIDs
+          The object <span class="bcp14">MUST</span> contain a <code>roots</code> entry, which <span class="bcp14">MUST</span> be of type
+          array. It <span class="bcp14">MAY</span> be empty, but if it isn't then it <span class="bcp14">MUST</span> be an array of CIDs
           encoded using tag 42 ([<a href="#ref-cid" class="ref">cid</a>]). A CAR can be used
           to contain one or more DAGs of [<a href="#ref-drisl" class="ref">drisl</a>] content and the purpose of the
           <code>roots</code> is to list one or more roots for those DAGs. The array
@@ -124,7 +124,7 @@
       </ul>
       <p>
         Some implementations will only return <var>version</var> and <var>roots</var>,
-        but it is RECOMMENDED that they make the entire <var>metadata</var> object
+        but it is <span class="bcp14">RECOMMENDED</span> that they make the entire <var>metadata</var> object
         available. A best practice for authors is to use the <var>metadata</var>
         to capture MASL content, which is able to provide metadata and a pathing
         mapping for the entire content of the CAR stream if needed ([<a href="#ref-masl" class="ref">masl</a>]).
@@ -184,16 +184,16 @@
       <section>
         <h3>Conformance</h3>
         <p>
-          A CAR stream MUST only feature DASL CIDs.
+          A CAR stream <span class="bcp14">MUST</span> only feature DASL CIDs.
         </p>
         <p>
-          A CAR stream MUST have CIDs that match the data body that follows
+          A CAR stream <span class="bcp14">MUST</span> have CIDs that match the data body that follows
           them. A CAR implementation should verify that CIDs match block body data, though
           it may delegate verification to other components. (Keep in mind that not
           verifying at all negates the value of content addressing.)
         </p>
         <p>
-          A CAR stream's stated roots MUST match CIDs contained in the Body.
+          A CAR stream's stated roots <span class="bcp14">MUST</span> match CIDs contained in the Body.
           However, implementations frequently operate in a streaming fashion such that
           they have no way of knowing whether a CAR stream conforms to this
           requirement before having processed the entire stream. Checking
@@ -221,11 +221,11 @@
           The <code>roots</code> specified by the Header of a CAR is expected to appear somewhere in its Body section,
           however there is no requirement that the roots define entire DAGs, nor that all blocks
           in a CAR must be part of DAGs described by the root CIDs in the Header. Therefore, the
-          <code>roots</code> MUST NOT be used alone to determine or differentiate the contents of a CAR.
+          <code>roots</code> <span class="bcp14">MUST NOT</span> be used alone to determine or differentiate the contents of a CAR.
         </p>
         <p>
           The CAR format contains no internal means, beyond the blocks and their CIDs, to verify
-          or differentiate contents. Where such a requirement exists, this MUST be performed
+          or differentiate contents. Where such a requirement exists, this <span class="bcp14">MUST</span> be performed
           externally, such as creating a digest of the entire CAR (and refer to it using a CID).
         </p>
       </section>

@@ -44,8 +44,8 @@
       <section>
         <h3>Terminology</h3>
         <p>
-          The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
-          "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
+          The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>",
+          "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>", "<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this
           document are to be interpreted as described in BCP 14 [<a href="#ref-rfc2119" class="ref">rfc2119</a>] [<a href="#ref-rfc8174" class="ref">rfc8174</a>]
           when, and only when, they appear in all capitals, as shown here.
         </p>
@@ -59,27 +59,27 @@
       </p>
       <ul>
         <li>
-          Implementations MUST support Tag 42 in the <a href="https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml">CBOR
+          Implementations <span class="bcp14">MUST</span> support Tag 42 in the <a href="https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml">CBOR
           Tag registry</a>; this tag compactly encodes CIDs as bytestrings, as specified below.
         </li>
         <li>
-          Implementations MUST reject all other tags, including any of the tags
+          Implementations <span class="bcp14">MUST</span> reject all other tags, including any of the tags
           listed in the <a href="https://tools.ietf.org/html/rfc8949#section-3.4">section
           3.4 of RFC 8949</a>.
         </li>
         <li>
-          Implementations MUST reject map keys that are not strings.
+          Implementations <span class="bcp14">MUST</span> reject map keys that are not strings.
         </li>
         <li>
-          Floating-point numbers MUST always be encoded as a 64-bit IEEE 754 binary floating-point, never as a "half-precision" (16-byte, major 7-25) or "single-precision (32-byte, major 7-26)" CBOR key.
-          <strong>NOTE</strong>: It is RECOMMENDED that users avoid encoding floating-point numbers as much as possible
+          Floating-point numbers <span class="bcp14">MUST</span> always be encoded as a 64-bit IEEE 754 binary floating-point, never as a "half-precision" (16-byte, major 7-25) or "single-precision (32-byte, major 7-26)" CBOR key.
+          <strong>NOTE</strong>: It is <span class="bcp14">RECOMMENDED</span> that users avoid encoding floating-point numbers as much as possible
           to minimize interoperability and tooling issues.
           <ul>
             <li>
-              Completely avoiding floating-point numbers is RECOMMENDED to minimize interoperability and tooling issues.
+              Completely avoiding floating-point numbers is <span class="bcp14">RECOMMENDED</span> to minimize interoperability and tooling issues.
             </li>
             <li>
-              Even where floating-point numbers are used, most of the IEEE 754 "special" floating points (infinity, negative infinity, minimal NaN, and NaN with payloads) MUST NOT be encoded.
+              Even where floating-point numbers are used, most of the IEEE 754 "special" floating points (infinity, negative infinity, minimal NaN, and NaN with payloads) <span class="bcp14">MUST NOT</span> be encoded.
               Negative zero is the only allowed special floating point.
             </li>
           </ul>
@@ -102,7 +102,7 @@
           </ul>
         </li>
         <li>
-          Encoders MUST NOT encode any simple values other than <code>true</code>, <code>false</code>, and <code>null</code> (20, 21, and 22 in section 3.3 of [<a href="#ref-rfc8949" class="ref">rfc8949</a>]).
+          Encoders <span class="bcp14">MUST NOT</span> encode any simple values other than <code>true</code>, <code>false</code>, and <code>null</code> (20, 21, and 22 in section 3.3 of [<a href="#ref-rfc8949" class="ref">rfc8949</a>]).
         </li>
       </ul>
       <p>

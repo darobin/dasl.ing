@@ -13,7 +13,8 @@ import { JSDOM } from 'jsdom';
 //  - Watches bibliography.json for references that specs can use.
 //  - Parses [[ref]] as a reference.
 //  - Manages metadata and styling for specs.
-//  - Creates anchors for definitions and the such
+//  - Creates anchors for definitions and the such.
+//  - Apply specific styles to BCP 14 terms.
 
 class SISL {
   constructor (dir) {
@@ -183,6 +184,11 @@ class SISL {
           dd.innerHTML = refs[r];
         });
       }
+      // BCP 14
+      main.innerHTML = main.innerHTML.replace(
+        /REQUIRED|(?:MUST|SHALL|SHOULD)(?: NOT)?|(?:NOT )?RECOMMENDED|MAY|OPTIONAL/g,
+        '<span class="bcp14">$&</span>'
+      );
       // save
       await writeFile(join(this.baseDir, `${shortname}.html`), dom.serialize());
     }

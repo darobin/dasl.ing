@@ -70,8 +70,8 @@
       <section>
         <h3>Terminology</h3>
         <p>
-          The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
-          "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
+          The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>",
+          "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>", "<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this
           document are to be interpreted as described in BCP 14 [<a href="#ref-rfc2119" class="ref">rfc2119</a>] [<a href="#ref-rfc8174" class="ref">rfc8174</a>]
           when, and only when, they appear in all capitals, as shown here.
         </p>
@@ -111,8 +111,8 @@
         <li>If <var>cid</var> is not a valid CID ([<a href="#ref-cid" class="ref">cid</a>]), return failure.</li>
         <li>
           Select all the tuples in the query object associated with the URL ([<a href="#ref-url" class="ref">url</a>]) whose name is
-          exaclty <code>hint</code>. Each value MUST match the syntax of a valid host for the
-          <code>https</code> scheme and values which do not match this syntax MUST be ignored
+          exaclty <code>hint</code>. Each value <span class="bcp14">MUST</span> match the syntax of a valid host for the
+          <code>https</code> scheme and values which do not match this syntax <span class="bcp14">MUST</span> be ignored
           and removed from this list. Store the remaining values in <var>hints</var>. If there were none
           then <var>hints</var> is an empty array.
         </li>
@@ -164,7 +164,7 @@
           (Yes, this is HTTP with extra steps, but the extra steps get you self-certifying content.)
         </li>
         <li>
-          If the response is a redirect but not a 307, the client SHOULD treat it as if it
+          If the response is a redirect but not a 307, the client <span class="bcp14">SHOULD</span> treat it as if it
           had been a 307 anyway.
         </li>
         <li>
@@ -191,7 +191,7 @@
     <section>
       <h2>RASL Pathing</h2>
       <p>
-        Implementations SHOULD ignore paths in RASL URLs. They may be used in a future
+        Implementations <span class="bcp14">SHOULD</span> ignore paths in RASL URLs. They may be used in a future
         iteration of this specification.
       </p>
     </section>
