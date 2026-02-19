@@ -156,57 +156,54 @@ x-dns-prefetch-control: off
         </dd>
         <dd>
           <u>Yes</u>. Reuse is good. Painful, but good.
-          <dl>
-            <dt>What networking security model do you want?</dt>
-            <dd>
-              <u>At least partly arbitrary network access</u>. This may be
-              somewhat restricted (SOP, CORS, etc.) but you can touch the network,
-              which means that you can exfiltrate sensitive information from
-              powerful APIs and generally violate privacy.
-              <dl>
-                <dt>Is installation gated to verify some degree of safety of the content?</dt>
-                <dd>
-                  <u>No</u>. This is basically the web as supported by today’s
-                  browsers. You can change some things about how it’s implemented,
-                  what the UX is, but in general you will need to limit access
-                  to many powerful features, you will need to be careful to
-                  limit the loading of content not initially triggered by user
-                  action, etc. Nothing new here.
-                </dd>
-                <dd>
-                  <u>Yes</u>. This is an app store. We know where it ends.
-                </dd>
-              </dl>
-            </dd>
-            <dd>
-              <u>No network access beyond pre-determined content</u>. This makes
-              it possible to expose much more powerful APIs and much more private
-              information, up to and including granting access for instance to a
-              full private chat. The lack of access to the network is limiting,
-              but it also renders the system composable and predictable.
-              <dl>
-                <dt>What kind of packaging tech do you use?</dt>
-                <dd>
-                  <u>Zip-like</u>. This is essentially WebXDC. It’s a fine approach
-                  and has seen variants implemented. The downside is that loading
-                  content becomes tied to loading the whole bundle or playing
-                  challenging games with built-in Zip manifests and range requests.
-                  It makes including large content (e.g. parquet, video) difficult
-                  and in the general case it will murder the latency of your first
-                  paint and interactivity.
-                </dd>
-                <dd>
-                  <u>Manifest-like</u>. The limits to content loading are not
-                  defined by a packaging format but by a manifest that will map
-                  the bundle’s internal paths to loading mechanisms, ideally content
-                  addressed. The full content can be bundled if desired (e.g. into
-                  a CAR) but it can also be loaded through content-addressing
-                  indirection mechanisms, for instance from a PDS over AT. This
-                  is web tiles.
-                </dd>
-              </dl>
-            </dd>
-          </dl>
+        </dd>
+        
+        <dt>What networking security model do you want?</dt>
+        <dd>
+          <u>At least partly arbitrary network access</u>. This may be
+          somewhat restricted (SOP, CORS, etc.) but you can touch the network,
+          which means that you can exfiltrate sensitive information from
+          powerful APIs and generally violate privacy.
+        </dd>
+        
+        <dt>Is installation gated to verify some degree of safety of the content?</dt>
+        <dd>
+          <u>No</u>. This is basically the web as supported by today’s
+          browsers. You can change some things about how it’s implemented,
+          what the UX is, but in general you will need to limit access
+          to many powerful features, you will need to be careful to
+          limit the loading of content not initially triggered by user
+          action, etc. Nothing new here.
+        </dd>
+        <dd>
+          <u>Yes</u>. This is an app store. We know where it ends.
+        </dd>
+        <dd>
+          <u>No network access beyond pre-determined content</u>. This makes
+          it possible to expose much more powerful APIs and much more private
+          information, up to and including granting access for instance to a
+          full private chat. The lack of access to the network is limiting,
+          but it also renders the system composable and predictable.
+        </dd>
+        
+        <dt>What kind of packaging tech do you use?</dt>
+        <dd>
+          <u>Zip-like</u>. This is essentially WebXDC. It’s a fine approach
+          and has seen variants implemented. The downside is that loading
+          content becomes tied to loading the whole bundle or playing
+          challenging games with built-in Zip manifests and range requests.
+          It makes including large content (e.g. parquet, video) difficult
+          and in the general case it will murder the latency of your first
+          paint and interactivity.
+        </dd>
+        <dd>
+          <u>Manifest-like</u>. The limits to content loading are not
+          defined by a packaging format but by a manifest that will map
+          the bundle’s internal paths to loading mechanisms, ideally content
+          addressed. The full content can be bundled if desired (e.g. into
+          a CAR) but it can also be loaded through content-addressing
+          indirection mechanisms, for instance from a PDS over AT. This
+          is web tiles.
         </dd>
       </dl>
     </section>
