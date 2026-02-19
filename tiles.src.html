@@ -26,13 +26,14 @@
       <p>
         Tiles change this by offering an environment in which arbitrary web content can be executed, while protecting
         against the egress of data by simply locking down the tile to whatever content is pre-listed in its manifest.
-        This makes it possible to embed tiles in social media, chats, LLM interactions, or to compose them with one
-        another.
+        The embedding app or context mediates all communication. This makes it possible to safely embed tiles in social
+        media, chats, LLM interactions, or to compose them with one another.
       </p>
       <p>
         While the lack of network interaction is limiting, tile execution contexts can then make tiles powerful all the
-        same. For instance, in a chat context all tiles may be able to post and listen on a data channel such that
-        each instance can sync with the others.
+        same. For instance, consider a poll tile in a group chat app: when one participant votes, their tile instance
+        posts the vote to a communication channel provided by the chat application. The chat app then broadcasts this
+        vote to all other participants' tile instances, keeping the poll results synchronized.
       </p>
     </section>
     <section>
@@ -43,7 +44,7 @@
         include a <code>/</code> entry for the root.
       </p>
       <p>
-        That's all that's needed. How the manifest is obtained depends on the context that the tile is loaded
+        That's all that's needed. The mechanism for obtaining the manifest depends on the context that the tile is loaded
         from, as detailed in the following sections.
       </p>
     </section>
@@ -133,24 +134,24 @@ x-dns-prefetch-control: off
         communicating with other instances of the same tile in a chat or
         invoking other tiles. And second — and most importantly — this
         restriction makes new applications possible. In many cases it's simply
-        inconceivable to run a full-fledge web frame simply because it could
+        inconceivable to run a full-fledged web frame simply because it could
         exfiltrate too much sensitive data too easily. But since tiles have very
         constrained exfiltration paths, they are safe for use in private
         environments.
       </p>
       <p>
         To better understand this, we've made a decision tree that maps the design
-        space for embedded apps and docs. It’s worth pointing out that one
-        decision that isn’t in the tree is about whether users should be prompted
-        for access to powerful capabilities as a load-bearing component of access
-        to anything dangerous, including exfiltration. It’s not there because a
-        world in which that works doesn’t exist.
+        space for embedded apps and docs. You'll notice the tree omits whether users
+        should be prompted for access to powerful capabilities as a load-bearing component of access
+        to anything dangerous, including exfiltration. This is intentional: relying on
+        users to correctly evaluate permission requests for powerful capabilities has
+        repeatedly failed in practice.
       </p>
       <dl>
         <dt>Do you want to build atop web technology?</dt>
         <dd>
           <u>No</u>. That’s respectable, good luck to you. You’ll probably
-          have to pick trade-off from the rest of the tree, but they’ll depend
+          have make similar trade-offs from the rest of the tree, but they’ll depend
           a lot on the architectural fundamentals that you select and so it’s
           hard to discuss that in meaningful detail. You exit the tree here.
         </dd>
