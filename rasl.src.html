@@ -87,7 +87,7 @@
           <li>If <var>cid</var> is not a valid CID ([[cid]]), return failure.</li>
           <li>
             Select all the tuples in the query object associated with the URL ([[url]]) whose name is
-            exaclty <code>hint</code>. Each value must match the syntax of a valid host for the
+            exactly <code>hint</code>. Each value must match the syntax of a valid host for the
             <code>https</code> scheme and values which do not match this syntax must be ignored
             and removed from this list. Store the remaining values in <var>hints</var>. If there were none
             then <var>hints</var> is an empty array.
@@ -134,7 +134,7 @@
             <code>bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4</code>.
             This can be published as this RASL URL:
             <code>rasl://bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4/?hint=berjon.com</code>.
-            A client can retrieve it by constructing the a request to this URL:
+            A client can retrieve it by constructing a request to this URL:
             <code>https://berjon.com/.well-known/rasl/bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4</code>.
             In turn, the latter may simply return a 307 redirect back to <code>https://berjon.com/kitten.jpg</code>.
             (Yes, this is HTTP with extra steps, but the extra steps get you self-certifying content.)
