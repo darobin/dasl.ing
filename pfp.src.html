@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="authors" content="makeworld" />
+    <title>Perceptual Fingerprint (PFP)</title>
+  </head>
+  <body>
+    <div id="abstract">
+      <p>
+        DASL PFPs are a simple structured identifier for referring to similar
+        media using perceptual hashing. They are extensible and
+        algorithm-agnostic, supporting image, video, or other kinds of content
+        fingerprinting.
+      </p>
+    </div>
+    <section>
+      <h2>Introduction</h2>
+      <p>
+        DASL PFPs are a simple structured identifier for referring to similar
+        media using perceptual hashing. They are extensible and
+        algorithm-agnostic, supporting image, video, or other kinds of content
+        fingerprinting.
+      </p>
+      <p>
+        Unlike a [[cid]], a PFP does not refer to any single file or sequence of
+        bits. It refers to a set of similar content files that have the same or
+        similar PFPs. You must be able to parse and understand the hash
+        algorithm referred to within the PFP to use it; simply comparing strings
+        is not enough.
+      </p>
+      <p>
+        A DASL PFP can be represented as a string or as an array of bytes. It
+        has the following structure:
+      </p>
+      <ol>
+        <li>
+          A <code>p</code> prefix (only in string form) to differentiate it from
+          CIDs.
+        </li>
+        <li>
+          An algorithm type, indicating which perceptual hashing algorithm was
+          used.
+        </li>
+        <li>A length for the rest of the identifier.</li>
+        <li>
+          The data, which is either the algorithm output hash or a CID of that
+          hash, depending on the algorithm type.
+        </li>
+      </ol>
+      <p>
+        The data can be a CID for cases where the algorithm's data is too long
+        to include directly. For example a video perceptual hash may be 256 KiB
+        in size. The CID allows the data to be retrieved from content-addressed
+        storage, wherever your application stores its data. You could use
+        [[rasl]] to retrieve it, for example.
+      </p>
+    </section>
+    <section>
+      <h2>Parsing PFPs</h2>
+      <p>
+        Use the following steps to <dfn>parse a string-encoded PFP</dfn>, i.e.
+        translate it to a bytestring:
+      </p>
+      <ol>
+        <li>Accept a string <var>PFP</var>.</li>
+        <li>
+          Remove the first character from <var>PFP</var> and store it in
+          <var>prefix</var>.
+        </li>
+        <li>
+          If <var>prefix</var> is not equal to <code>p</code>, throw an error.
+        </li>
+        <li>
+          Decode the rest of <var>PFP</var> using
+          <a href="https://datatracker.ietf.org/doc/html/rfc4648#section-6"
+            >the base32 algorithm from RFC4648</a
+          >
+          with a lowercase alphabet and store the result in
+          <var>PFP bytes</var> ([[rfc4648]]).
+        </li>
+        <li>
+          This results in <var>PFP bytes</var>, which can be used to
+          <a>decode a PFP</a>.
+        </li>
+      </ol>
+      <p>Use the following steps to <dfn>decode a PFP</dfn>:</p>
+      <ol>
+        <li>Accept an array of bytes <var>PFP bytes</var>.</li>
+        <li>
+          Read a [[varint]] from <var>PFP bytes</var> and store it in
+          <var>algorithm type</var>. For most use cases, you can assume it's a
+          single byte and reject unknown integers (unknown algorithm types).
+        </li>
+        <li>
+          Check <var>algorithm type</var> against the
+          <a href="#registry">algorithm registry</a>. If it is not a supported
+          algorithm, throw an error.
+        </li>
+        <li>
+          Read a varint from <var>PFP bytes</var> and store it in
+          <var>length</var>.
+        </li>
+        <li>
+          Verify that <var>length</var> matches the expected length for the
+          <var>algorithm type</var>
+          as specified in the registry. If it does not match, throw an error.
+        </li>
+        <li>
+          Read <var>length</var> bytes from <var>PFP bytes</var> and store them
+          in <var>data</var>. If there are fewer than <var>length</var> bytes
+          remaining, throw an error.
+        </li>
+        <li>
+          If the algorithm type specifies that <var>data</var> contains a
+          [[cid]], parse it according to that specification. Otherwise,
+          <var>data</var> contains the perceptual hash directly.
+        </li>
+        <li>
+          Return <var>algorithm type</var>, <var>length</var>, and
+          <var>data</var>.
+        </li>
+      </ol>
+    </section>
+    <section>
+      <h2>AT Protocol</h2>
+      <p>
+        When storing PFPs in an AT Protocol record, using a pseudo-type is
+        recommended to make them easier to identify by consumers who are not
+        familiar with your lexicon schema. The type for PFPs is
+        <code>{"__pfp": "p..."}</code>. This disambiguates PFPs from any other
+        string that starts with <code>p</code> in your record.
+      </p>
+      <p>An example:</p>
+      <pre>
+{
+  "$type": "baz.bar.myrecord",
+  "foo": "bar",
+  "my cid": {"$link": "bafkreiapgas3dluwwzthuv2fnc475ytvve3xd5acoproje3lr2446yno3q"},
+  "my pfp": {"__pfp": "paeqo5rgntyjx44a5dse6zygcmprz2ym7rxrbym6ogpzt44mgetbam3a"},
+}
+      </pre>
+      <p>Here is the lexicon for using that custom type:</p>
+      <pre>
+{
+  "lexicon": 1,
+  "id": "ing.dasl.pfpRef",
+  "defs": {
+    "main": {
+      "type": "object",
+      "description": "Reference to a perceptual fingerprint (PFP).",
+      "required": ["__pfp"],
+      "properties": {
+        "__pfp": {
+          "type": "string",
+          "description": "Perceptual fingerprint per DASL spec. Format: p&lt;base32-payload&gt;."
+        }
+      }
+    }
+  }
+}
+      </pre>
+    </section>
+    <section id="registry">
+      <h2>Registry</h2>
+      <p>
+        The following table lists the officially registered perceptual hashing
+        algorithms. Note number 0x00 is reserved and must be considered invalid
+        if parsed.
+      </p>
+      <p>
+        The length column refers to the length of the raw hash in the PFP, or
+        the length of the CID (fixed at 36 bytes). If a CID is used, the length
+        of the data the CID points to is not defined.
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Algorithm</th>
+            <th>Number</th>
+            <th>Content type</th>
+            <th>Hash or CID</th>
+            <th>Length</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <a href="https://github.com/facebook/ThreatExchange/tree/main/pdq"
+                >PDQ</a
+              >
+            </td>
+            <td>0x01</td>
+            <td>Image</td>
+            <td>Hash</td>
+            <td>32 bytes</td>
+          </tr>
+          <tr>
+            <td>
+              <a href="https://github.com/facebook/ThreatExchange/tree/main/tmk"
+                >TMK+PDQF</a
+              >
+            </td>
+            <td>0x02</td>
+            <td>Video</td>
+            <td>CID</td>
+            <td>36 bytes</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </body>
+</html>
