@@ -1,0 +1,1081 @@
+<!DOCTYPE html><html lang="en"><head>
+
+<!--
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!   GENERATED SPEC — DO NOT EDIT. Look for the .src.html instead   !!!!
+!!!!!                                                                  !!!!
+!!!!!   HEY YOU                                                        !!!!
+!!!!!   YES ***YOU****!                                                !!!!
+!!!!!                                                                  !!!!
+!!!!!   You're about to edit a generated document.                     !!!!
+!!!!!   Don't do that! Why would you do that.                          !!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+-->
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Media Uniform eXact Layout (MUXL)</title>
+  <link rel="stylesheet" href="spec.css"><link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%220%22 y=%220%22 width=%22100%22 height=%22100%22 fill=%22%2300ff75%22></rect></svg>"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" property="og:title" content="DASL: Media Uniform eXact Layout (MUXL)"><meta name="twitter:description" property="og:description" content="MUXL defines a deterministic layout for media data in the ISO Base Media         File Format (BMFF) for fMP4 files. Given the same encoded frames, any conformant MUXL         implementation produces identical bytes, enabling stable         content-addressed identifiers ([[cid]]) for video and audio content."><meta name="twitter:image" property="og:image" content="https://dasl.ing/muxl.png"><meta name="twitter:image:alt" content="Very colourful stripes, so colourful it hurts"><meta name="twitter:url" property="og:url" content="https://dasl.ing/"><meta property="og:site_name" content="DASL"><meta property="og:locale" content="en"><meta name="theme-color" content="#00ff75"></head>
+
+  <body><div class="nav-back">A specification of the <a href="/">DASL Project</a>.</div><main><header><h1>Media Uniform eXact Layout (MUXL)</h1><table><tbody><tr><th>date</th><td>2026-04-22</td></tr><tr><th>editors</th><td><a href="https://iame.li/">Eli Mallon</a> &lt;<a href="mailto:eli@stream.place">eli@stream.place</a>&gt;</td></tr><tr><th>issues</th><td><a href="https://github.com/darobin/dasl.ing/issues">list</a>, <a href="https://github.com/darobin/dasl.ing/issues/new">new</a></td></tr><tr><th>abstract</th><td><div id="abstract">
+      <p>
+        MUXL defines a deterministic layout for media data in the ISO Base Media
+        File Format (BMFF) for fMP4 files. Given the same encoded frames, any conformant MUXL
+        implementation produces identical bytes, enabling stable
+        content-addressed identifiers ([<a href="#ref-cid" class="ref">cid</a>]) for video and audio content.
+      </p>
+    </div></td></tr></tbody></table></header>
+    
+    <section>
+      <h2>Introduction</h2>
+      <p>
+        Video is the most important media format on the web, but
+        content-addressed systems don't know what to do with it. DASL gives us
+        DRISL for deterministic serialization of structured data ([<a href="#ref-drisl" class="ref">drisl</a>]) and
+        CIDs for content identifiers ([<a href="#ref-cid" class="ref">cid</a>]). But MP4 files — the dominant
+        container format for video — resist content-addressing. Run the
+        same video through ffmpeg twice with identical settings and you'll get
+        different bytes and no stable CID.
+      </p>
+      <p>
+        MUXL solves this by defining a single canonical container layout.
+        Unnecessary metadata is stripped, box orderings are fixed, and all
+        remaining fields are precisely specified. The result: given the same
+        encoded frames with the same timestamps, any MUXL implementation
+        produces the same bytes. Same bytes, same hash, same CID.
+      </p>
+      <p>
+        MUXL defines four representations of media data, each suited to a
+        different use case:
+      </p>
+      <ul>
+        <li>
+          <strong>MUXL fragments</strong>: the atomic unit — a single frame of
+          video or a single sample of audio in a minimal
+          <code>moof+mdat</code> pair. Suitable for low-latency streaming.
+        </li>
+        <li>
+          <strong>MUXL segments</strong>: one track's worth of fragments for one
+          Group of Pictures (GoP). The canonical byte sequence over which
+          content hashes and signatures are computed.
+        </li>
+        <li>
+          <strong>MUXL fMP4</strong>: a complete fMP4 file with an init
+          segment followed by per-track segments. Suitable for storage,
+          playback, and byte-range addressing.
+        </li>
+        <li>
+          <strong>MUXL flat MP4</strong>: a non-fragmented MP4 file with a
+          complete <code>moov</code> at the start (faststart) and a single
+          <code>mdat</code>. Suitable for editors, archival tools, and players
+          that do not consume fMP4.
+        </li>
+      </ul>
+      <p>
+        All four representations are deterministically interconvertible. Given
+        the same encoded samples, any MUXL implementation produces byte-identical
+        output for each representation. The content bytes — the encoded video
+        and audio samples — are unchanged at every stage; only the container
+        structure varies.
+      </p>
+    </section>
+    <section>
+      <h2>MUXL Fragments</h2>
+      <p>
+        A <dfn id="dfn-muxl-fragment">MUXL fragment</dfn> is the smallest unit of media data in MUXL.
+        Each fragment contains exactly one encoded sample (a single video frame
+        or a single audio packet) wrapped in a <code>moof+mdat</code> pair.
+      </p>
+      <p>
+        A MUXL fragment consists of two BMFF boxes in sequence:
+      </p>
+      <pre><code>[ moof ] [ mdat ]</code></pre>
+      <section>
+        <h3>moof Box</h3>
+        <p>
+          The <code>moof</code> box contains exactly one
+          <code>mfhd</code> and exactly one <code>traf</code>:
+        </p>
+        <ul>
+          <li>
+            <strong>mfhd</strong>:
+            <code>sequence_number</code> is 1-based, incrementing per
+            fragment within a track within a segment.
+          </li>
+          <li>
+            <strong>traf</strong> contains exactly three child boxes:
+            <ul>
+              <li>
+                <strong>tfhd</strong>:
+                <code>track_id</code> identifies the track. Flags must be
+                <code>0x020000</code>
+                (<code>default-base-is-moof</code>). No default sample values;
+                all sample metadata is explicit in the <code>trun</code>.
+              </li>
+              <li>
+                <strong>tfdt</strong>:
+                <code>base_media_decode_time</code> is the decode timestamp of
+                this sample in the track's media timescale.
+              </li>
+              <li>
+                <strong>trun</strong>: exactly one sample entry. Flags:
+                <code>data_offset</code>, <code>sample_duration</code>,
+                <code>sample_size</code>, <code>sample_flags</code>.
+                The <code>sample_composition_time_offset</code> flag must be
+                set if and only if the sample has a non-zero composition time
+                offset. <code>data_offset</code> is the byte offset from the
+                start of the <code>moof</code> to the start of the sample data
+                in <code>mdat</code>.
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </section>
+      <section>
+        <h3>trun Sample Flags</h3>
+        <p>
+          Sample flags follow the BMFF <code>sample_flags</code> layout:
+        </p>
+        <ul>
+          <li>
+            <strong>Sync sample</strong> (keyframe): <code>0x02000000</code>.
+            This sets <code>sample_depends_on = 2</code>, indicating the sample
+            does not depend on any other sample.
+          </li>
+          <li>
+            <strong>Non-sync sample</strong>: <code>0x01010000</code>. This sets
+            <code>sample_depends_on = 1</code> (depends on other samples) and
+            <code>sample_is_non_sync_sample = 1</code>.
+          </li>
+        </ul>
+      </section>
+      <section>
+        <h3>mdat Box</h3>
+        <p>
+          The <code>mdat</code> box contains exactly one sample's encoded
+          data. Size is 8 bytes (4-byte big-endian size + 4-byte FourCC) plus
+          the sample data length.
+        </p>
+      </section>
+    </section>
+    <section>
+      <h2>MUXL Segments</h2>
+      <p>
+        A <dfn id="dfn-muxl-segment">MUXL segment</dfn> is the canonical byte sequence over which
+        content hashes are computed. Each segment contains one track's MUXL
+        fragments for one GoP, concatenated in decode time order.
+      </p>
+      <pre><code>Segment (track T, GoP N):
+  moof(sample 1) + mdat(sample 1)
+  moof(sample 2) + mdat(sample 2)
+  ...
+  moof(sample K) + mdat(sample K)</code></pre>
+      <p>
+        Each GoP with <var>N</var> tracks produces <var>N</var> segments — one
+        per track. This per-track structure enables independent content hashing,
+        byte-range addressing, and blind concatenation of segments for the same
+        track.
+      </p>
+      <section>
+        <h3>Segmentation Rule</h3>
+        <p>
+          Segment boundaries are driven by video sync samples (keyframes). A new
+          segment begins at each video keyframe. Audio samples are grouped with
+          the video GoP they temporally overlap.
+        </p>
+        <p>
+          Given the same samples with the same timestamps, the segment
+          boundaries are always identical. This property is what makes
+          content-addressed hashing of segments stable.
+        </p>
+        <p>
+          For audio-only streams where there are no video keyframes,
+          segmentation rules are not yet defined by this specification.
+        </p>
+      </section>
+      <section>
+        <h3>Content Addressing</h3>
+        <p>
+          Because MUXL's output bytes are deterministic, they are suitable as
+          input to a content hash function. The same encoded frames always
+          produce the same bytes, which always produce the same CID ([<a href="#ref-cid" class="ref">cid</a>]).
+        </p>
+        <p>
+          Each track is hashed independently as a self-certifying segment (init
+          segment + fragment data for that track and GoP). This supports subset
+          verification (verify only the video track without needing the audio),
+          track independence (drop or replace a track without invalidating
+          others), and multi-track streams with multiple synced video and audio
+          tracks.
+        </p>
+        <p>
+          The hash algorithm and signing mechanism are not specified by MUXL.
+          MUXL defines what bytes are canonical; the signing layer (such as
+          S2PA) defines how to sign them.
+        </p>
+      </section>
+      <section>
+        <h3>Self-Certifying Format</h3>
+        <p>
+          A <dfn id="dfn-self-certifying-muxl-segment">self-certifying MUXL segment</dfn> is a MUXL segment prepended
+          with its corresponding init segment. This produces a standalone,
+          playable fMP4 file containing exactly one GoP's data for one track,
+          together with the track configuration needed to decode it.
+        </p>
+        <pre><code>Self-Certifying Segment (track T, GoP N):
+  ftyp + moov (init segment for track T)
+  moof(sample 1) + mdat(sample 1)
+  moof(sample 2) + mdat(sample 2)
+  ...
+  moof(sample K) + mdat(sample K)</code></pre>
+        <p>
+          The content hash for a self-certifying segment is computed over the
+          entire byte sequence — init segment and fragment data together.
+          Including the init segment in the hash input prevents an attacker from
+          substituting a different init segment (e.g., altered codec parameters,
+          modified SPS/PPS, changed timescale) that would cause the same encoded
+          samples to decode differently. Because the self-certifying format is a
+          logical construct used for verification rather than a format stored on
+          disk or transmitted over the wire, the small redundancy of hashing the
+          init bytes is negligible.
+        </p>
+        <p>A verifier with access to a self-certifying segment can:</p>
+        <ol>
+          <li>
+            Hash the complete self-certifying segment bytes (init segment +
+            fragment data) to obtain a CID.
+          </li>
+          <li>
+            Verify the CID against a signed manifest or other trust anchor.
+          </li>
+          <li>
+            Play back the content using the included init segment for codec
+            configuration.
+          </li>
+        </ol>
+        <p>
+          The init segment in the self-certifying format contains only the
+          single track that the segment belongs to, not all tracks in the
+          stream. This is a per-track init segment as described in the Init
+          Segment section, constructed with a single <code>trak</code> box.
+        </p>
+      </section>
+    </section>
+    <section>
+      <h2>MUXL fMP4</h2>
+      <p>
+        A <dfn id="dfn-muxl-fmp4">MUXL fMP4</dfn> is a valid fMP4 file consisting of an init
+        segment followed by per-track segments grouped by track:
+      </p>
+      <pre><code>ftyp
+moov (init — track config, empty sample tables)
+[track 1 segments: GoP 1, GoP 2, ...]
+[track 2 segments: GoP 1, GoP 2, ...]
+...</code></pre>
+      <p>
+        Each track's segments form a contiguous byte range within the file.
+        Tracks are ordered by <code>track_id</code> ascending. This layout
+        enables HLS byte-range playlists to reference individual tracks within a
+        single file.
+      </p>
+      <p>
+        A MUXL fMP4 is a standard fMP4 file playable by any fMP4-capable
+        player. The init segment at the start provides all codec configuration
+        needed for playback, and each track's contiguous segment range makes
+        HLS byte-range playlists straightforward.
+      </p>
+      <p>
+        fMP4 files are appendable: as new GoPs arrive (e.g., during a livestream),
+        their segments can be appended to each track's byte range. The init
+        segment is stable as long as the track configuration does not change.
+      </p>
+    </section>
+    <section>
+      <h2>MUXL Flat MP4</h2>
+      <p>
+        A <dfn id="dfn-muxl-flat-mp4">MUXL flat MP4</dfn> is a single file that serves two roles
+        simultaneously:
+      </p>
+      <ol>
+        <li>
+          To parsers that inspect top-level boxes, it is a
+          <em>flat (non-fragmented) MP4</em> with a faststart
+          <code>moov</code> and a single <code>mdat</code>. Video editors,
+          desktop players, and any tool that handles classic progressive MP4
+          treats it as an ordinary file.
+        </li>
+        <li>
+          To HLS byte-range CMAF consumers, the same bytes contain a sequence
+          of self-contained <code>moof+mdat</code> fragments addressable by
+          byte range. Those fragments are the MUXL fMP4's body bytes,
+          relocated verbatim.
+        </li>
+      </ol>
+      <p>
+        The trick: the <code>mdat</code> at the top level is an envelope. Its
+        payload is the concatenation of per-sample <code>moof+mdat</code>
+        pairs, grouped by track. A flat-MP4 parser sees only the outer
+        <code>mdat</code> and reads sample bytes via <code>co64</code> offsets
+        that point past the inner <code>moof</code> headers. An HLS player
+        fetching a byte range gets a self-contained CMAF fragment and never
+        knows the envelope exists. This envelope pattern is adapted from
+        OBS Studio's hybrid MP4 design ([<a href="#ref-obs-hybrid-mp4" class="ref">obs-hybrid-mp4</a>]).
+      </p>
+      <pre><code>ftyp
+moov (populated sample tables; no mvex; faststart)
+mdat (64-bit largesize envelope; payload =)
+  [track 1: moof+mdat, moof+mdat, ... ]    ← per-sample CMAF fragments
+  [track 2: moof+mdat, moof+mdat, ... ]
+  ...</code></pre>
+      <p>
+        Because the <code>moov</code> precedes the <code>mdat</code> and
+        carries absolute file offsets in <code>co64</code>, writing a MUXL
+        flat MP4 requires a metadata pre-pass: each inner <code>moof</code>'s
+        encoded size must be known before per-sample file offsets can be
+        computed. The moov's encoded size is invariant under
+        <code>co64</code> value changes (entries are fixed-size 64-bit
+        integers), so the encoded size converges after a single placeholder
+        encode.
+      </p>
+      <section>
+        <h3>Relationship to the MUXL fMP4</h3>
+        <p>
+          The inner <code>moof+mdat</code> sequence of a MUXL flat MP4 is
+          byte-identical to the body of a MUXL fMP4 produced from the
+          same samples. Converting an fMP4 into a flat MP4 is therefore a
+          metadata-only rewrite:
+        </p>
+        <ol>
+          <li>
+            Parse each fMP4 <code>moof</code> to recover per-sample
+            metadata (duration, size, sync flag, composition offset). No
+            sample-data reading is required.
+          </li>
+          <li>Build the populated flat-MP4 <code>moov</code>.</li>
+          <li>
+            Replace the fMP4's init <code>moov</code> with the flat
+            <code>moov</code>, prepend the 16-byte outer <code>mdat</code>
+            envelope header, and copy the fMP4's
+            <code>moof+mdat</code> body verbatim.
+          </li>
+        </ol>
+        <p>
+          The inverse (flat MP4 → fMP4) is similarly a wrapper swap: drop
+          the outer envelope header, replace the populated <code>moov</code>
+          with an init <code>moov</code>, and leave the inner fragments
+          untouched.
+        </p>
+      </section>
+      <section>
+        <h3>moov</h3>
+        <p>
+          Reuses the canonical <code>mvhd</code>, <code>trak</code>,
+          <code>tkhd</code>, <code>mdhd</code>, <code>hdlr</code>, and
+          <code>minf</code> rules from the Init Segment section, with:
+        </p>
+        <ul>
+          <li>
+            Populated <code>stbl</code> sample tables (see next section).
+          </li>
+          <li>
+            <em>No</em> <code>mvex</code>. The top-level view is
+            non-fragmented; HLS consumers use a separate init segment
+            delivered out of band.
+          </li>
+          <li>
+            <code>mvhd.duration</code>: maximum per-track duration, rescaled
+            to the movie timescale <code>1000</code>.
+          </li>
+          <li>
+            <code>tkhd.duration</code>: the track's total decode duration in
+            the movie timescale.
+          </li>
+          <li>
+            <code>mdhd.duration</code>: the track's total decode duration in
+            the media timescale.
+          </li>
+        </ul>
+      </section>
+      <section>
+        <h3>stbl</h3>
+        <p>
+          Each track's <code>stbl</code> carries populated sample tables.
+          <code>co64</code> entries point at sample bytes <em>inside the
+          inner mdats</em>, not at the start of each inner fragment.
+        </p>
+        <ul>
+          <li>
+            <strong>stsd</strong>: same as the Init Segment form.
+          </li>
+          <li>
+            <strong>stts</strong>: run-length encoded per-sample decode
+            durations in the media timescale.
+          </li>
+          <li>
+            <strong>ctts</strong>: present iff any sample has a non-zero
+            composition time offset; version 1 (signed 32-bit offsets);
+            run-length encoded.
+          </li>
+          <li>
+            <strong>stsz</strong>: uniform form when all samples are the
+            same size, otherwise per-sample list.
+          </li>
+          <li>
+            <strong>stsc</strong>: exactly one entry —
+            <code>first_chunk = 1</code>,
+            <code>samples_per_chunk = 1</code>,
+            <code>sample_description_index = 1</code>. Each sample sits in
+            its own chunk because each is preceded by its own inner
+            <code>moof+mdat</code> header bytes.
+          </li>
+          <li>
+            <strong>co64</strong>: one entry per sample. Entry
+            <var>i</var> is the absolute file offset of sample <var>i</var>'s
+            bytes within its inner <code>mdat</code>
+            (<code>inner_moof_start + inner_moof_size + 8</code>).
+            <code>co64</code> is always used, never <code>stco</code>, for
+            deterministic moov sizing.
+          </li>
+          <li>
+            <strong>stss</strong>: 1-based sync sample indices, for video
+            tracks only. Omitted for audio tracks and for any track in
+            which every sample is a sync sample.
+          </li>
+        </ul>
+        <p>
+          No other sample table boxes (<code>stsh</code>, <code>stps</code>,
+          <code>stdp</code>, <code>padb</code>, <code>sdtp</code>) are
+          emitted.
+        </p>
+      </section>
+      <section>
+        <h3>Outer mdat</h3>
+        <p>
+          The outer <code>mdat</code> header uses the 64-bit extended size
+          form (<code>size = 1</code>, followed by an 8-byte
+          <code>largesize</code>), always — regardless of total payload —
+          so that its header is always 16 bytes and the layout arithmetic
+          is independent of file size.
+        </p>
+        <p>
+          The outer <code>mdat</code> payload is the concatenation of
+          inner <code>moof+mdat</code> pairs, grouped by
+          <code>track_id</code> ascending, with samples within a track in
+          decode order.
+        </p>
+      </section>
+      <section>
+        <h3>Inner moof+mdat fragments</h3>
+        <p>
+          Each inner fragment is a canonical MUXL fragment as defined in
+          the MUXL Fragments section: a minimal single-sample
+          <code>moof+mdat</code> pair with
+          <code>default-base-is-moof</code> and <code>tfdt</code>. These
+          fragments are byte-identical whether they appear in a MUXL
+          fMP4 body or inside a MUXL flat MP4 envelope.
+        </p>
+        <p>
+          The <code>mfhd.sequence_number</code> increments globally across
+          all tracks, starting at <code>1</code> for the first fragment in
+          the file.
+        </p>
+      </section>
+    </section>
+    <section>
+      <h2>Init Segment</h2>
+      <p>
+        The <dfn id="dfn-muxl-init-segment">MUXL init segment</dfn> consists of an <code>ftyp</code> box
+        followed by a <code>moov</code> box. It contains track configuration
+        with empty sample tables, zero durations, and no sample data. The init
+        segment is used in MUXL fMP4 files (followed by per-track segments) and in
+        self-certifying segments (followed by a single track's segment data).
+        The flat MP4 representation reuses all of the init segment's box
+        structure rules except for the sample tables, which it populates
+        (§ MUXL Flat MP4 → stbl), and <code>mvex</code>, which it omits.
+      </p>
+      <section>
+        <h3>ftyp</h3>
+        <p>
+          The <code>ftyp</code> box is identical across all MUXL representations
+          that carry one (MUXL fMP4 and MUXL flat MP4):
+        </p>
+        <ul>
+          <li><strong>major_brand</strong>: <code>muxl</code></li>
+          <li><strong>minor_version</strong>: <code>0</code></li>
+          <li>
+            <strong>compatible_brands</strong>:
+            <code>[muxl, isom, iso2]</code>
+          </li>
+        </ul>
+        <p>
+          The <code>muxl</code> major brand signals that the file conforms to
+          this specification. The <code>isom</code> and <code>iso2</code>
+          compatible brands keep the file playable by generic ISOBMFF tools
+          that do not recognize <code>muxl</code>. The ftyp is codec-agnostic;
+          players detect the codec from <code>stsd</code> entries in the
+          <code>moov</code>.
+        </p>
+      </section>
+      <section>
+        <h3>moov</h3>
+        <p>
+          The <code>moov</code> box contains exactly: <code>mvhd</code>,
+          one or more <code>trak</code> boxes (sorted by
+          <code>track_id</code> ascending), and <code>mvex</code>.
+        </p>
+        <p>
+          The following boxes must <em>not</em> be present at the
+          <code>moov</code> level: <code>udta</code> (non-deterministic tool
+          tags), <code>meta</code>, <code>iods</code>, and
+          <code>free</code>/<code>skip</code>.
+        </p>
+        <section>
+          <h4>mvhd</h4>
+          <p>
+            Canonical <code>mvhd</code> values:
+          </p>
+          <ul>
+            <li><strong>version</strong>: <code>0</code></li>
+            <li><strong>flags</strong>: <code>0</code></li>
+            <li><strong>creation_time</strong>: <code>0</code></li>
+            <li><strong>modification_time</strong>: <code>0</code></li>
+            <li><strong>timescale</strong>: <code>1000</code></li>
+            <li><strong>duration</strong>: <code>0</code></li>
+            <li>
+              <strong>rate</strong>: <code>1.0</code> (<code>0x00010000</code>)
+            </li>
+            <li>
+              <strong>volume</strong>: <code>1.0</code> (<code>0x0100</code>)
+            </li>
+            <li><strong>matrix</strong>: identity matrix</li>
+            <li>
+              <strong>next_track_id</strong>: <code>max(track_ids) + 1</code>
+            </li>
+          </ul>
+        </section>
+        <section>
+          <h4>mvex</h4>
+          <p>
+            The <code>mvex</code> box signals that <code>moof+mdat</code>
+            pairs follow the <code>moov</code>. Required for fMP4 playback.
+            Contains one <code>trex</code> per track:
+          </p>
+          <ul>
+            <li>
+              <strong>track_id</strong>: matching the corresponding
+              <code>trak</code>
+            </li>
+            <li>
+              <strong>default_sample_description_index</strong>:
+              <code>1</code>
+            </li>
+            <li><strong>default_sample_duration</strong>: <code>0</code></li>
+            <li><strong>default_sample_size</strong>: <code>0</code></li>
+            <li><strong>default_sample_flags</strong>: <code>0</code></li>
+          </ul>
+          <p>
+            All sample metadata is explicit in each <code>trun</code> entry, so
+            <code>trex</code> defaults are all zero.
+          </p>
+        </section>
+        <section>
+          <h4>trak</h4>
+          <p>
+            One <code>trak</code> per track, sorted by
+            <code>track_id</code> ascending. Each contains
+            <code>tkhd</code> and <code>mdia</code>. No <code>udta</code>,
+            <code>meta</code>, or <code>free</code>/<code>skip</code>.
+          </p>
+          <p><strong>tkhd</strong>:</p>
+          <ul>
+            <li><strong>version</strong>: <code>0</code></li>
+            <li>
+              <strong>flags</strong>: <code>3</code> (<code>track_enabled | track_in_movie</code>)
+            </li>
+            <li><strong>creation_time</strong>: <code>0</code></li>
+            <li><strong>modification_time</strong>: <code>0</code></li>
+            <li><strong>track_id</strong>: the track's identifier</li>
+            <li><strong>duration</strong>: <code>0</code></li>
+            <li>
+              <strong>width, height</strong>: video dimensions for video tracks;
+              <code>0</code> for audio tracks
+            </li>
+            <li>
+              <strong>volume</strong>: <code>0</code> for video tracks,
+              <code>1.0</code> (<code>0x0100</code>) for audio tracks
+            </li>
+            <li><strong>matrix</strong>: from track configuration</li>
+            <li><strong>layer</strong>: <code>0</code></li>
+            <li><strong>alternate_group</strong>: <code>0</code></li>
+          </ul>
+          <p>
+            <strong>mdia</strong> contains <code>mdhd</code>,
+            <code>hdlr</code>, and <code>minf</code>:
+          </p>
+          <p><strong>mdhd</strong>:</p>
+          <ul>
+            <li><strong>version</strong>: <code>0</code></li>
+            <li><strong>flags</strong>: <code>0</code></li>
+            <li><strong>creation_time</strong>: <code>0</code></li>
+            <li><strong>modification_time</strong>: <code>0</code></li>
+            <li>
+              <strong>timescale</strong>: preserved from source (passthrough
+              to maintain timestamp precision)
+            </li>
+            <li><strong>duration</strong>: <code>0</code></li>
+            <li>
+              <strong>language</strong>: <code>"und"</code> (undetermined)
+            </li>
+          </ul>
+          <p><strong>hdlr</strong>:</p>
+          <ul>
+            <li><strong>version</strong>: <code>0</code></li>
+            <li><strong>flags</strong>: <code>0</code></li>
+            <li>
+              <strong>handler_type</strong>: <code>"vide"</code> for video,
+              <code>"soun"</code> for audio
+            </li>
+            <li>
+              <strong>name</strong>: empty string (cosmetic, varies across
+              muxers)
+            </li>
+          </ul>
+          <p><strong>minf</strong>:</p>
+          <ul>
+            <li>
+              <strong>vmhd</strong>: present for video tracks (default values).
+            </li>
+            <li>
+              <strong>smhd</strong>: present for audio tracks (default values).
+            </li>
+            <li>
+              <strong>dinf</strong>: contains <code>dref</code> with one
+              <code>url</code> entry (empty location,
+              <code>flags = 1</code> / <code>self_contained</code>).
+            </li>
+            <li>
+              <strong>stbl</strong>: <code>stsd</code> populated with the
+              track's codec configuration. All other tables
+              (<code>stts</code>, <code>stsc</code>, <code>stsz</code>,
+              <code>stco</code>) present but empty, since the init segment
+              contains no samples.
+            </li>
+            <li>
+              <strong>edts</strong> (optional): when present in the source
+              track, preserved byte-for-byte on output. Contains a single
+              <code>elst</code> whose entries use <code>segment_duration</code>
+              in the movie timescale (<code>1000</code>) and
+              <code>media_time</code> in the track's media timescale, with
+              <code>-1</code> denoting an empty edit. Edit lists are
+              track-level presentation metadata, not per-fragment metadata;
+              a fragments-only round-trip drops them, while a
+              fragments + catalog round-trip preserves them.
+            </li>
+          </ul>
+        </section>
+      </section>
+      <section>
+        <h3>Codec Configuration</h3>
+        <p>
+          Each track's <code>stsd</code> contains a codec-specific sample
+          entry. Currently supported:
+        </p>
+        <ul>
+          <li>
+            <strong>H.264/AVC</strong>: <code>avc1</code> + <code>avcC</code>
+            (SPS/PPS)
+          </li>
+          <li>
+            <strong>AV1</strong>: <code>av01</code> + <code>av1C</code>
+          </li>
+          <li>
+            <strong>Opus</strong>: <code>Opus</code> + <code>dOps</code>
+          </li>
+          <li>
+            <strong>AAC</strong>: <code>mp4a</code> + <code>esds</code>
+          </li>
+        </ul>
+        <p>
+          Codec configuration bytes are preserved from the source without
+          modification. MUXL does not normalize codec-level parameters.
+        </p>
+      </section>
+    </section>
+    <section>
+      <h2>Constructing MUXL from fMP4</h2>
+      <p>
+        The steps to <dfn id="dfn-construct-muxl-fragments-from-an-fmp4-stream">construct MUXL fragments from an fMP4 stream</dfn>
+        are:
+      </p>
+      <ol>
+        <li>
+          Accept a byte stream <var>input</var> containing a valid fMP4 file (an
+          init segment followed by <code>moof+mdat</code> pairs).
+        </li>
+        <li>
+          Read the <code>ftyp</code> and <code>moov</code> boxes from
+          <var>input</var> to obtain the track configuration. Store the track
+          configuration in <var>catalog</var>.
+        </li>
+        <li>
+          For each track, initialize a <var>decode_time</var> counter to
+          <code>0</code> and a <var>sequence_number</var> counter to
+          <code>0</code>.
+        </li>
+        <li>
+          For each <code>moof+mdat</code> pair in <var>input</var>:
+          <ol>
+            <li>
+              Parse the <code>moof</code> to obtain track ID, sample
+              durations, sizes, flags, and composition time offsets.
+              Resolve defaults via the BMFF cascade:
+              <code>trun</code> &gt; <code>tfhd</code> &gt;
+              <code>trex</code>.
+            </li>
+            <li>Read the corresponding <code>mdat</code> payload.</li>
+            <li>
+              For each sample in the <code>trun</code>:
+              <ol>
+                <li>
+                  Increment <var>sequence_number</var> for the sample's track.
+                </li>
+                <li>
+                  If the <code>moof</code> contains a <code>tfdt</code>, use its
+                  <code>base_media_decode_time</code> as
+                  <var>decode_time</var> for the first sample and advance by
+                  each sample's duration for subsequent samples. Otherwise,
+                  continue from the previous <var>decode_time</var>.
+                </li>
+                <li>
+                  Write a MUXL fragment: a new <code>moof</code> with a
+                  single-sample <code>trun</code> using canonical field values
+                  (as specified in the MUXL Fragments section), followed by an
+                  <code>mdat</code> containing the sample's encoded data.
+                </li>
+              </ol>
+            </li>
+          </ol>
+        </li>
+        <li>Return <var>catalog</var> and the sequence of MUXL fragments.</li>
+      </ol>
+      <p>
+        The steps to <dfn id="dfn-construct-muxl-segments-from-muxl-fragments">construct MUXL segments from MUXL fragments</dfn>
+        are:
+      </p>
+      <ol>
+        <li>
+          Accept a sequence of MUXL fragments and a <var>catalog</var>
+          describing the tracks.
+        </li>
+        <li>
+          Identify which track IDs are video tracks using
+          <var>catalog</var>.
+        </li>
+        <li>Maintain per-track buffers, keyed by track ID.</li>
+        <li>
+          For each fragment:
+          <ol>
+            <li>
+              If the fragment belongs to a video track and is a sync sample
+              (keyframe), and at least one keyframe has been seen before, then
+              the current GoP is complete. Emit a MUXL segment for each
+              non-empty per-track buffer and clear the buffers.
+            </li>
+            <li>Append the fragment's bytes to the buffer for its track ID.</li>
+          </ol>
+        </li>
+        <li>
+          After all fragments have been processed, emit a final MUXL segment for
+          each non-empty per-track buffer.
+        </li>
+      </ol>
+      <p>
+        The steps to <dfn id="dfn-construct-a-muxl-init-segment">construct a MUXL init segment</dfn> from a
+        <var>catalog</var> are:
+      </p>
+      <ol>
+        <li>
+          Accept a <var>catalog</var> containing video and audio track
+          configurations (codec, dimensions, sample rate, channels, track ID,
+          and timescale for each track).
+        </li>
+        <li>
+          Write an <code>ftyp</code> box with the canonical values specified in
+          the Init Segment section.
+        </li>
+        <li>
+          Collect all tracks from <var>catalog</var> and sort by
+          <code>track_id</code> ascending.
+        </li>
+        <li>
+          For each track, construct a <code>trak</code> box with the canonical
+          field values specified in the Init Segment section, using the track's
+          codec configuration for the <code>stsd</code> entry.
+        </li>
+        <li>
+          Construct a <code>moov</code> box containing <code>mvhd</code>,
+          <code>mvex</code> (with one <code>trex</code> per track), and the
+          sorted <code>trak</code> boxes.
+        </li>
+        <li>
+          Return the concatenation of the <code>ftyp</code> and
+          <code>moov</code> boxes.
+        </li>
+      </ol>
+      <p>The steps to <dfn id="dfn-construct-a-muxl-fmp4">construct a MUXL fMP4</dfn> are:</p>
+      <ol>
+        <li>
+          Accept a <var>catalog</var> and a sequence of MUXL segments, grouped
+          by GoP.
+        </li>
+        <li>Construct a MUXL init segment from <var>catalog</var>.</li>
+        <li>Collect all track IDs and sort ascending.</li>
+        <li>
+          For each track ID in sorted order, concatenate all of that track's
+          segments (GoP 1, GoP 2, ...) in order.
+        </li>
+        <li>
+          Return the init segment followed by the per-track concatenated
+          segments.
+        </li>
+      </ol>
+      <p>
+        The steps to <dfn id="dfn-construct-a-muxl-flat-mp4">construct a MUXL flat MP4</dfn> are:
+      </p>
+      <ol>
+        <li>
+          Accept a <var>catalog</var> and, for each track, the ordered sequence
+          of the track's samples with per-sample metadata
+          (<code>duration</code>, <code>size</code>, sync flag, composition
+          time offset) and a reference to each sample's encoded bytes.
+        </li>
+        <li>
+          Assign a global 1-based <code>mfhd.sequence_number</code> to each
+          sample in the order "all of track <var>k</var>'s samples before
+          track <var>k+1</var>'s, tracks in <code>track_id</code> ascending
+          order, samples within a track in decode order." For each sample,
+          build the inner <code>moof</code> as a canonical MUXL fragment
+          <code>moof</code> and measure its encoded size
+          <var>m<sub>i</sub></var>. Record the inner fragment size
+          <var>f<sub>i</sub> = m<sub>i</sub> + 8 +
+          size<sub>i</sub></var>.
+        </li>
+        <li>
+          Build each track's canonical <code>stbl</code>
+          (<code>stts</code>, <code>ctts</code> if needed, <code>stsz</code>,
+          <code>stsc</code>, <code>co64</code>, <code>stss</code> if needed)
+          with <code>co64</code> filled with the correct number of
+          placeholder entries (one per sample).
+        </li>
+        <li>
+          Construct the <code>moov</code> using the canonical
+          <code>mvhd</code>, <code>trak</code>, and <code>mdia</code> rules,
+          with track and movie durations filled in. Do not include
+          <code>mvex</code>.
+        </li>
+        <li>
+          Construct the <code>ftyp</code> with canonical values. Measure the
+          sizes <var>F</var> of the encoded <code>ftyp</code> and <var>M</var>
+          of the placeholder <code>moov</code>.
+        </li>
+        <li>
+          Compute the outer <code>mdat</code> payload start offset
+          <var>P = F + M + 16</var> (the outer mdat header is an 8-byte
+          size/type field plus an 8-byte <code>largesize</code>).
+        </li>
+        <li>
+          For each sample <var>i</var> in the same global order as step 2,
+          compute its absolute file offset: <var>P</var> plus the sum of all
+          preceding inner fragment sizes <var>f</var>, plus
+          <var>m<sub>i</sub> + 8</var> (past this sample's inner
+          <code>moof</code> and inner <code>mdat</code> header). Install the
+          result in the sample's <code>co64</code> entry.
+        </li>
+        <li>
+          Re-encode the <code>moov</code> with the finalized
+          <code>co64</code> values. Its byte length is unchanged from the
+          placeholder encode, because <code>co64</code> entry count is the
+          same and each entry is a fixed-size 64-bit integer.
+        </li>
+        <li>
+          Write the <code>ftyp</code>, the re-encoded <code>moov</code>, and
+          the outer <code>mdat</code> header (size field
+          <code>0x00000001</code>, type <code>mdat</code>,
+          <code>largesize = 16 + Σ f<sub>i</sub></code>).
+        </li>
+        <li>
+          For each sample <var>i</var> in the same global order, write the
+          canonical <code>moof</code> (with
+          <code>trun.data_offset = m<sub>i</sub> + 8</code>) followed by the
+          inner <code>mdat</code> containing the sample's encoded bytes.
+        </li>
+      </ol>
+      <p>
+        The steps to <dfn id="dfn-convert-a-muxl-fmp4-to-a-muxl-flat-mp4">convert a MUXL fMP4 to a MUXL flat MP4</dfn>
+        are:
+      </p>
+      <ol>
+        <li>
+          Parse the fMP4's <code>moof</code> boxes to recover per-sample
+          metadata. No sample-data reading is required.
+        </li>
+        <li>
+          Construct a new flat-MP4 <code>moov</code> from that metadata,
+          sized as above.
+        </li>
+        <li>
+          Write the fMP4's <code>ftyp</code> unchanged, then the new
+          <code>moov</code>, then the 16-byte outer <code>mdat</code>
+          envelope header, then stream the fMP4's
+          <code>moof+mdat</code> body verbatim.
+        </li>
+      </ol>
+    </section>
+    <section>
+      <h2>Determinism</h2>
+      <p>
+        MUXL's value proposition depends on determinism: the same input must
+        always produce the same output. The following properties are guaranteed:
+      </p>
+      <ul>
+        <li>
+          <strong>Init segment determinism</strong>: given the same track
+          configuration (codecs, dimensions, sample rates, timescales, track
+          IDs), any MUXL implementation produces byte-identical init segments.
+        </li>
+        <li>
+          <strong>Fragment determinism</strong>: given the same encoded sample
+          data, track ID, decode timestamp, duration, sync flag, and composition
+          time offset, any MUXL implementation produces byte-identical
+          fragments.
+        </li>
+        <li>
+          <strong>Segment determinism</strong>: given the same sequence of
+          encoded samples with the same timestamps and sync flags, any MUXL
+          implementation produces byte-identical segments with identical segment
+          boundaries.
+        </li>
+        <li>
+          <strong>Flat MP4 determinism</strong>: given the same track
+          configuration and the same ordered per-track sequence of encoded
+          samples (with their durations, sync flags, and composition time
+          offsets), any MUXL implementation produces a byte-identical flat
+          MP4. The inner <code>moof+mdat</code> body is byte-identical to
+          the corresponding MUXL fMP4 body. The <code>co64</code> offsets
+          are deterministic because the <code>moov</code>'s encoded size is
+          a pure function of sample metadata, not sample offsets.
+        </li>
+      </ul>
+      <p>
+        The following are <em>not</em> currently normalized by MUXL and
+        therefore represent sources of non-determinism across different source
+        encoders:
+      </p>
+      <ul>
+        <li>
+          <strong>Media timescale</strong>: the <code>mdhd</code> timescale is
+          passed through from the source. Different encoders may use different
+          timescales (e.g., 16000 vs. 60000 for 60fps video), producing
+          different duration values in <code>trun</code> entries.
+        </li>
+        <li>
+          <strong>Audio priming samples</strong>: muxers disagree on how to
+          handle encoder delay for Opus and AAC. Some keep priming samples in
+          the media data with an edit list offset; others strip them.
+        </li>
+      </ul>
+      <p>
+        These sources of non-determinism are acceptable for the primary use case
+        of livestream ingest from a single source encoder. Future revisions of
+        this specification may address cross-encoder canonicalization.
+      </p>
+    </section>
+    <section>
+      <h2>Additional Considerations</h2>
+      <section>
+        <h3>Relationship to CMAF</h3>
+        <p>
+          The MUXL fMP4 is a constrained profile of CMAF. It uses
+          single-sample fragments (one frame per <code>moof+mdat</code> pair),
+          the most granular CMAF chunking mode. Any CMAF-compatible player
+          can play a MUXL fMP4.
+        </p>
+        <p>
+          The MUXL flat MP4 is <em>not</em> a CMAF file at the top level —
+          its top-level boxes are <code>ftyp+moov+mdat</code> with no
+          <code>mvex</code>. But its outer <code>mdat</code> payload is a
+          concatenation of CMAF fragments, so HLS byte-range playlists can
+          reference those fragments directly. An HLS player never parses the
+          outer container; it only receives CMAF-compliant byte ranges.
+        </p>
+      </section>
+      <section>
+        <h3>Relationship to Hang / Media over QUIC</h3>
+        <p>
+          MUXL fragments are directly compatible with Hang CMAF ([<a href="#ref-hang" class="ref">hang</a>]),
+          the container format used in Media over QUIC. Hang transmits
+          per-frame <code>moof+mdat</code> pairs over QUIC with codec config
+          out-of-band. MUXL can consume Hang frames directly and
+          canonicalize them into segments.
+        </p>
+      </section>
+      <section>
+        <h3>Security &amp; Verifiability</h3>
+        <p>
+          MUXL provides byte-level determinism for content addressing but
+          does not define a signing or verification mechanism. For provenance
+          verification, use a signing layer such as S2PA that computes
+          per-track hashes over self-certifying segments and publishes signed
+          manifests.
+        </p>
+        <p>
+          The self-certifying format (init segment + one track's segment data)
+          provides a minimal verifiable unit: it can be independently played
+          back, hashed, and checked against a signed manifest without access to
+          the full fMP4 or stream.
+        </p>
+      </section>
+      <section>
+        <h3>Conformance</h3>
+        <p>
+          A conformant MUXL implementation must produce byte-identical
+          output for the same input:
+        </p>
+        <ul>
+          <li>All box orderings must follow this specification exactly.</li>
+          <li>
+            All canonical field values (timestamps, flags, metadata) must match
+            this specification exactly.
+          </li>
+          <li>
+            Stripped boxes (<code>udta</code>, <code>meta</code>,
+            <code>free</code>, <code>skip</code>, <code>iods</code>) must not be
+            present.
+          </li>
+          <li>
+            Segment boundaries must occur at the same positions (video keyframe
+            boundaries) for the same input.
+          </li>
+        </ul>
+      </section>
+    </section>
+    <section>
+      <h2>Appendix: Media Type</h2>
+      <p>
+        MUXL fMP4 files and MUXL flat MP4s are valid MP4 files. The appropriate
+        media type is <code>video/mp4</code> (or <code>audio/mp4</code> for
+        audio-only files). The conventional file extension is
+        <code>.mp4</code>.
+      </p>
+      <p>
+        MUXL segments (without an init segment) use the extension
+        <code>.m4s</code>, following the CMAF convention for media segments.
+      </p>
+    </section>
+  
+
+<section><h2>References</h2><dl><dt id="ref-cid">[cid]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/cid.html"><cite>Content IDs (CIDs)</cite></a>. 2026-04-22. URL:&nbsp;<a href="https://dasl.ing/cid.html">https://dasl.ing/cid.html</a></dd><dt id="ref-drisl">[drisl]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/drisl.html"><cite>DRISL — Deterministic Representation for Interoperable Structures &amp; Links</cite></a>. 2026-04-22. URL:&nbsp;<a href="https://dasl.ing/drisl.html">https://dasl.ing/drisl.html</a></dd><dt id="ref-hang">[hang]</dt><dd>L. Curley. <a href="https://doc.moq.dev/concept/layer/hang"><cite>Hang: a simple, WebCodecs-based media format utilizing MoQ</cite></a>. URL:&nbsp;<a href="https://doc.moq.dev/concept/layer/hang">https://doc.moq.dev/concept/layer/hang</a></dd><dt id="ref-obs-hybrid-mp4">[obs-hybrid-mp4]</dt><dd>Rodney. <a href="https://obsproject.com/blog/obs-studio-hybrid-mp4"><cite>Writing an MP4 Muxer for Fun and Profit</cite></a>. OBS Project, July 2024. URL:&nbsp;<a href="https://obsproject.com/blog/obs-studio-hybrid-mp4">https://obsproject.com/blog/obs-studio-hybrid-mp4</a></dd></dl></section></main></body></html>
