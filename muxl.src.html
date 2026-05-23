@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="authors" content="iameli" />
+        <title>MUXL — Media Uniform eXact Layout</title>
+    </head>
+
+    <body>
+        <div id="abstract">
+            <p>
+                MUXL is a deterministic and highly-restrictive subset of
+                ISO-BMFF, enabling stable content-addressed identifiers for
+                video and audio. It's like DRISL for MP4 files!
+            </p>
+        </div>
+        <section>
+            <p>
+                Video is the most important media format on the web, but
+                content-addressed systems don't know what to do with it. DASL
+                gives us DRISL for deterministic serialization of structured
+                data ([[drisl]]) and CIDs for content identifiers ([[cid]]). But
+                MP4 files — the dominant container format for video — resist
+                content-addressing. Run the same video through ffmpeg twice with
+                identical settings and you'll get different bytes and no stable
+                CID. MUXL solves this problem by introducing a deterministic,
+                highly-restrictive subset of ISO-BMFF.
+            </p>
+            <p>
+                This format attempts to fulfill three design goals: our format
+                should be
+                <em>concatenatable</em>, <em>self-contained</em>, and
+                <em>maximally-compatible</em>. Achieving all three of these
+                goals is impossible for a single MP4 format due to restrictions
+                in the spec. To resolve this, MUXL introduces two presentation
+                formats, which bridge the gap between our base format and media
+                playback software. These presentation formats are prepended onto
+                the canonical MUXL segments themselves, providing maximal
+                compatibility while leaving the underlying format intact.
+            </p>
+        </section>
+        <section>
+            <h2>Design goals</h2>
+            <ul>
+                <li>
+                    <strong>Concatenatable:</strong> it's really nice if our
+                    segments can be naively combined by adding new bytes to the
+                    end. It lets us use BLAKE-3 hashing ([[blake3]]) and BDASL
+                    CIDs ([[bdasl]]) for verifiable transfer of subsets of the
+                    input.
+                </li>
+                <li>
+                    <strong>Self-contained:</strong> Every piece of media needs
+                    to be self-contained, independently playable and
+                    interpretable without other external data. (HLS spells this
+                    property <code>EXT-X-INDEPENDENT-SEGMENTS</code>.) This is
+                    important to make our segments self-certifying and prevent
+                    bad actors from distorting the data.
+                </li>
+                <li>
+                    <strong>Maximally-compatible:</strong> We don't want to
+                    invent a new bespoke media format. A long video should
+                    present to users as one big MP4 file.
+                </li>
+            </ul>
+        </section>
+        <section>
+            <h2>Base Format: MUXL fragments</h2>
+            <p>
+                The foundational format of MUXL is the
+                <dfn>MUXL fragment</dfn>. Incoming frames are stripped of all
+                metadata and wrapped in a CMAF format inspired by moq-lite's
+                Hang CMAF format ([[hang]]). The MP4 atoms are:
+            </p>
+            <pre><code>[moof][mdat]</code></pre>
+            <p>
+                Once incoming data is wrapped like this, it's
+                <em>minted</em> and may never change. All derived formats work
+                with these; this is the "minting" process for MUXL. Each
+                fragment has exactly two pieces of metadata: a decoding
+                timestamp and a sequence number.
+            </p>
+            <details class="technical" open>
+                <summary>Technical details</summary>
+                <p>
+                    A fragment is one <code>moof</code> followed by one
+                    <code>mdat</code>, carrying exactly one sample.
+                </p>
+                <ul>
+                    <li>
+                        <code>moof</code> contains exactly one
+                        <code>mfhd</code> and one <code>traf</code>.
+                    </li>
+                    <li>
+                        <code>mfhd.sequence_number</code>: per-track, 1-based,
+                        +1 per fragment within the track.
+                    </li>
+                    <li>
+                        <code>traf</code> contains exactly <code>tfhd</code>,
+                        <code>tfdt</code>, and <code>trun</code>:
+                        <ul>
+                            <li>
+                                <code>tfhd</code>: <code>track_id</code>;
+                                <code>flags = 0x020000</code>
+                                (<code>default-base-is-moof</code>); no default
+                                sample values.
+                            </li>
+                            <li>
+                                <code>tfdt.base_media_decode_time</code>:
+                                absolute decode time of the sample, in the
+                                track's media timescale.
+                            </li>
+                            <li>
+                                <code>trun</code>: one sample. Flags
+                                <code
+                                    >data_offset | sample_duration | sample_size
+                                    | sample_flags</code
+                                >, plus
+                                <code>sample_composition_time_offset</code> iff
+                                the composition offset is non-zero.
+                                <code>data_offset</code> is measured from the
+                                start of <code>moof</code> to the sample bytes
+                                in <code>mdat</code>.
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <code>sample_flags</code>: sync sample (keyframe) =
+                        <code>0x02000000</code>; non-sync =
+                        <code>0x01010000</code>.
+                    </li>
+                    <li>
+                        <code>mdat</code>: one sample's encoded bytes; 8-byte
+                        header (size + <code>mdat</code>) then payload.
+                    </li>
+                </ul>
+            </details>
+        </section>
+        <section>
+            <h2>Segmentation Format: MUXL segments</h2>
+            <p>
+                Unfortunately, MUXL fragments can't be played without some
+                additional metadata. The raw video data is present, but the
+                media data, such as the resolution, orientation, and pixel
+                format is absent. We borrow another term from Hang ([[hang]])
+                and call this the "catalog data".
+            </p>
+            <p>
+                Traditionally in MP4 and CMAF, this would be provided from "init
+                segment" data: basically an MP4 file header containing a
+                <code>moov</code> atom that identifies the media type. Usually,
+                this init segment is provided out-of-band in an HLS playlist.
+                That doesn't work for us because it means our segments are no
+                longer self-contained. And doing it in-band doesn't work either:
+                an MP4 file cannot contain multiple <code>ftyp</code> and
+                <code>moov</code> atoms, so we'd be breaking concatenatability.
+            </p>
+            <p>
+                We've instead opted to include the catalog data as CBOR and
+                prepend it to every segment using BMFF's path for generic
+                extensibility: the <code>uuid</code> atom. This makes a small
+                size tradeoff; each MUXL segment for a stream now contains
+                redundant catalog data, but this is necessary to make the
+                segments self-contained. As a bonus, we can use the presence of
+                the <code>uuid</code> atom as a segmentation heuristic; when you
+                encounter a <code>uuid</code> atom in a MUXL stream you know
+                you've encountered a new self-contained set of fragments.
+            </p>
+            <p>
+                When minting new segments that contain video, it is encouraged
+                to cut all tracks based on video keyframe boundaries to
+                facilitate efficient playback. Video segments should not be
+                minted without keyframe data. Audio-only segments without a
+                reference video track should segment at 1-second intervals.
+            </p>
+            <p>
+                So, this gives us the definition of a
+                <dfn>MUXL segment</dfn>: a <code>uuid</code> atom containing the
+                catalog data followed by some MUXL fragments for one track of
+                the input stream. To make this as minimal and deterministic as
+                possible, we encode it with DRISL CBOR ([[drisl]]). So, a MUXL
+                segment becomes:
+            </p>
+            <pre><code>[uuid-muxl][moof][mdat][moof][mdat][moof][mdat]....</code></pre>
+            <p>
+                This segment is now a self-contained <code>.m4s</code> file,
+                suitable as a signing target and also freely concatenatable with
+                other MUXL segments. Multiple tracks may be combined in a single
+                blob by interleaving segments by timestamp.
+            </p>
+            <details class="technical" open>
+                <summary>Technical details</summary>
+                <p>
+                    <code>uuid</code> identifier:
+                    <code>e6404ea2-8f01-4305-98da-7bec3c2a9173</code>. The box
+                    body is a DRISL-encoded catalog and nothing else.
+                </p>
+                <p>
+                    A canonical segment's catalog is single-track: exactly one
+                    entry under <code>video.renditions</code> <em>or</em> one
+                    under <code>audio.renditions</code>, never both.
+                </p>
+                <pre><code>Catalog {
+  video?: { renditions: { &lt;name&gt;: VideoConfig }, display?, rotation?, flip? }
+  audio?: { renditions: { &lt;name&gt;: AudioConfig } }
+}</code></pre>
+                <ul>
+                    <li>
+                        <strong>VideoConfig</strong>:
+                        <code>codec</code> (WebCodecs string),
+                        <code>container</code>,
+                        <code>description?</code>
+                        (<code>avcC</code>/<code>av1C</code> bytes — CBOR byte
+                        string, hex in JSON), <code>codedWidth</code>,
+                        <code>codedHeight</code>,
+                        <code>displayAspectWidth?</code
+                        >/<code>displayAspectHeight?</code>, and playback hints
+                        (<code>framerate?</code>, <code>bitrate?</code>, …).
+                    </li>
+                    <li>
+                        <strong>AudioConfig</strong>: <code>codec</code>,
+                        <code>container</code>, <code>description?</code>
+                        (<code>dOps</code>/<code>esds</code>),
+                        <code>sampleRate</code>, <code>numberOfChannels</code>,
+                        and playback hints.
+                    </li>
+                    <li>
+                        <strong>container</strong>:
+                        <code
+                            >{ kind: "cmaf", timescale: u32, trackId: u32
+                            }</code
+                        >
+                        — currently the only framing MUXL defines; others may be
+                        added later.
+                    </li>
+                </ul>
+                <p>
+                    Boundaries: a new segment begins at every video sync sample;
+                    audio samples join the GoP they overlap; audio-only streams
+                    cut at 1-second spans.
+                </p>
+            </details>
+        </section>
+        <section>
+            <h2>Self-certifying Format: S2PA</h2>
+            <p>
+                The full methodology for signing is part of the C2PA and S2PA
+                ([[s2pa]]) specs and exceeds this documentation; all we need to
+                know is that they're going to include another
+                <code>uuid</code> atom containing the signing and provenance
+                data. So, our format is now:
+            </p>
+            <pre><code>[uuid-c2pa][uuid-muxl][moof][mdat][moof][mdat]....</code></pre>
+            <p>
+                This constitutes the only optionality in the MUXL spec: segments
+                may be prepended with additional <code>uuid</code> atoms as
+                required by the use case. This allows the MUXL spec itself to
+                stay minimal while providing the necessary extension points.
+            </p>
+            <details class="technical" open>
+                <summary>Technical details</summary>
+                <p>
+                    Prepended <code>uuid</code> boxes sit ahead of the MUXL
+                    <code>uuid</code>; the segment's <code>moof+mdat</code>
+                    bytes are unchanged, and the manifest's BMFF hash assertion
+                    covers them. Signature construction is specified by
+                    [[s2pa]].
+                </p>
+            </details>
+        </section>
+        <section>
+            <h2>Presentation Formats: MP4 and fMP4</h2>
+            <p>
+                What we have now are <code>.m4s</code> files: CMAF fragment data
+                alongside the catalog data necessary to play them. But we just
+                invented this format so no video players are actually capable of
+                playing it yet. To facilitate actual playback, we introduce two
+                presentation formats: fMP4 and Flat MP4. Both presentation
+                formats work by reading the catalog data from the segments and
+                synthesizing an MP4 header that is prepended to the MUXL
+                segments. The bytes of the segments themselves remain unaltered
+                and are easily recoverable by stripping all of the generated
+                metadata through to the first <code>uuid</code> atom. Because
+                neither format actually modifies the canonical MUXL segments,
+                any hash or signature over that segment stays valid as soon as
+                you discard the presentation header.
+            </p>
+            <section>
+                <h3>fMP4</h3>
+                <p>
+                    This is the most "MP4-native" way to present MUXL data, and
+                    fits perfectly with our MUXL segments. An "empty"
+                    <code>moov</code> atom is synthesized that provides the
+                    track codec data. This makes the <code>[moof][mdat]</code>
+                    fragments intelligible to software as a regular CMAF stream.
+                    This is a useful format as it's fully-streamable: an fMP4
+                    header may be followed by an arbitrary and increasing number
+                    of MUXL segments and is primarily useful in livestreaming
+                    use cases. There's no finalization step, either: the file is
+                    a valid, playable MP4 at every moment, even mid-broadcast —
+                    so a 24-hour stream, or one cut short by a crash, is always
+                    a complete file right up to its last whole segment.
+                </p>
+                <p>
+                    The downside of fMP4 is that it's a much newer format, less
+                    compatible with media software. And even when software does
+                    support them, they're not very nice to work with; seeking
+                    around a large fMP4 file is very slow because there's no
+                    index of segments. Wouldn't it be nice if we could just have
+                    a regular MP4 file?
+                </p>
+                <details class="technical" open>
+                    <summary>Technical details</summary>
+                    <p>
+                        Init segment = <code>ftyp</code> + <code>moov</code>
+                        with empty sample tables.
+                    </p>
+                    <ul>
+                        <li>
+                            <code>ftyp</code>: <code>major_brand = muxl</code>,
+                            <code>minor_version = 0</code>,
+                            <code>compatible_brands = [muxl, isom, iso2]</code>.
+                        </li>
+                        <li>
+                            <code>moov</code> = <code>mvhd</code> + one
+                            <code>trak</code> per track (sorted by
+                            <code>track_id</code>) + <code>mvex</code>. No
+                            <code>udta</code>, <code>meta</code>,
+                            <code>iods</code>,
+                            <code>free</code>/<code>skip</code>.
+                        </li>
+                        <li>
+                            <code>mvhd</code>: <code>version 0</code>, zero
+                            timestamps, <code>timescale = 1000</code>,
+                            <code>duration = 0</code>, identity matrix,
+                            <code>next_track_id = max(track_id) + 1</code>.
+                        </li>
+                        <li>
+                            <code>mvex</code>: one <code>trex</code> per track,
+                            <code>default_sample_description_index = 1</code>,
+                            all other defaults <code>0</code> (every sample
+                            value is explicit in <code>trun</code>).
+                        </li>
+                        <li>
+                            <code>trak</code> = <code>tkhd</code> (<code
+                                >flags = 3</code
+                            >; <code>width</code>/<code>height</code> for video,
+                            <code>0</code> for audio) + <code>mdia</code>.
+                        </li>
+                        <li>
+                            <code>mdia</code> = <code>mdhd</code> (<code
+                                >timescale</code
+                            >
+                            passed through from source,
+                            <code>language = "und"</code>) + <code>hdlr</code>
+                            (<code>vide</code>/<code>soun</code>, empty name) +
+                            <code>minf</code>.
+                        </li>
+                        <li>
+                            <code>minf</code> = <code>vmhd</code> (video) or
+                            <code>smhd</code> (audio),
+                            <code>dinf</code>&gt;<code>dref</code>&gt;<code
+                                >url</code
+                            >
+                            (self-contained), and <code>stbl</code> with
+                            <code>stsd</code> populated and all other tables
+                            empty.
+                        </li>
+                    </ul>
+                    <p>
+                        No <code>edts</code>: a track's presentation offset
+                        rides on its first fragment's <code>tfdt</code>.
+                    </p>
+                </details>
+            </section>
+            <section>
+                <h3>Flat MP4</h3>
+                <p>
+                    (Also known as "just a regular MP4 file.") MUXL MP4s build
+                    off a format developed for OBS called "Hybrid MP4"
+                    ([[obs-hybrid-mp4]]). This type of synthesized MP4 header
+                    performs a full scan of the file and builds a sample index:
+                    a table of the precise byte offset of every frame, letting
+                    playback software seek smoothly around the file. All the
+                    less-compatible fMP4 apparatus (the
+                    <code>[moof][mdat]</code> pairs) are stepped right over by
+                    that index, resulting in an extremely compatible media
+                    format without any alteration of the actual MUXL byte
+                    stream.
+                </p>
+                <details class="technical" open>
+                    <summary>Technical details</summary>
+                    <p>
+                        Same <code>ftyp</code> as the fMP4. The
+                        <code>moov</code> reuses the init-segment boxes but with
+                        populated sample tables, real durations, and <em>no</em>
+                        <code>mvex</code>, followed by one outer
+                        <code>mdat</code> envelope.
+                    </p>
+                    <ul>
+                        <li>
+                            <code>stbl</code> per track: <code>stsd</code> (as
+                            init); <code>stts</code> (run-length durations);
+                            <code>ctts</code> (only if any composition offset ≠
+                            0; version 1, signed); <code>stsz</code> (uniform or
+                            per-sample); <code>stsc</code> (single entry, one
+                            sample per chunk); <code>co64</code> (one offset per
+                            sample, always 64-bit); <code>stss</code> (sync
+                            indices, video only, omitted when every sample is a
+                            sync sample).
+                        </li>
+                        <li>
+                            <code>co64</code> offsets point <em>inside</em> the
+                            envelope — past each segment's leading
+                            <code>uuid</code> and each fragment's
+                            <code>moof</code> — straight at the sample bytes.
+                        </li>
+                        <li>
+                            Outer <code>mdat</code>: always the 64-bit
+                            <code>largesize</code> form (16-byte header).
+                            Payload is the canonical-segment stream, verbatim.
+                        </li>
+                        <li>
+                            <code>elst</code>: synthesized only for a track with
+                            a non-zero presentation offset — two entries (empty
+                            edit <code>media_time = -1</code>, then normal play
+                            <code>media_time = 0</code>); otherwise no
+                            <code>edts</code>.
+                        </li>
+                    </ul>
+                    <p>
+                        Interleaving: for each GoP, all tracks' segments
+                        contiguously (ordered by <code>track_id</code>), then
+                        the next GoP.
+                    </p>
+                </details>
+            </section>
+        </section>
+    </body>
+</html>
