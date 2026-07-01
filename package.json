@@ -35,5 +35,8 @@
     "eslint": "^8.26.0",
     "http-server": "^14.1.1",
     "jsdom": "^25.0.1"
+  },
+  "dependencies": {
+    "turndown": "^7.2.4"
   }
 }

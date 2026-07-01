@@ -5,6 +5,7 @@ import { rm, readFile, writeFile, readdir } from 'node:fs/promises';
 import chokidar from 'chokidar';
 import chalk from 'chalk';
 import { JSDOM } from 'jsdom';
+import Turndown from 'turndown';
 
 // SISL — Simple Implementation of a Specification Language
 // This is just a basic spec generator. Here's what it does:
@@ -18,6 +19,20 @@ import { JSDOM } from 'jsdom';
 class SISL {
   constructor (dir) {
     this.baseDir = dir;
+    this.turnDown = new Turndown({
+      bulletListMarker: '-',
+      codeBlockStyle: 'fenced',
+      headingStyle: 'atx',
+    });
+    this.turnDown.addRule('meta-abstract', {
+      filter: (n) => n.localName === 'table' && n.parentElement?.localName === 'header',
+      replacement: (_, n) => n.querySelector('#abstract')?.textContent,
+    });
+    this.turnDown.keep(['var', 'dfn']);
+    this.turnDown.addRule('references', {
+      filter: (n) => n.localName === 'dt' && /^ref-/.test(n.id),
+      replacement: (cnt, n) => `<dfn id="${n.id}">${cnt}</dfn>`,
+    });
   }
   async watch () {
     // For reasons that baffle me, chokidar's ignored option doesn't work correctly. So
@@ -89,6 +104,7 @@ class SISL {
       head.prepend(doc.createTextNode('\n\n'), cmt, doc.createTextNode('\n\n'));
       el('link', { rel: 'stylesheet', href: 'spec.css' }, [], head);
       el('link', { rel: 'icon', href: 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%220%22 y=%220%22 width=%22100%22 height=%22100%22 fill=%22%2300ff75%22></rect></svg>' }, [], head);
+      el('link', { rel: 'alternate', type: 'text/markdown', href: `https://dasl.ing/${shortname}.md` }, [], head);
       el('meta', { name: 'twitter:card', content: 'summary_large_image' }, [], head);
       el('meta', { name: 'twitter:title', property: 'og:title', content: `DASL: ${doc.title}` }, [], head);
       if (abstract) el('meta', { name: 'twitter:description', property: 'og:description', content: norm(abstract.textContent) }, [], head);
@@ -185,6 +201,8 @@ class SISL {
       }
       // save
       await writeFile(join(this.baseDir, `${shortname}.html`), dom.serialize());
+      // make some MD
+      await writeFile(join(this.baseDir, `${shortname}.md`), this.turnDown.turndown(doc.body.querySelector('main')));
     }
   }
   async removeSpec (absPath) {
