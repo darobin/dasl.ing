@@ -129,7 +129,7 @@ Interleaving: for each GoP, all tracks' segments contiguously (ordered by `track
 
 <dfn id="ref-bdasl">\[bdasl\]</dfn>
 
-Robin Berjon, Brendan O'Brien, & Juan Caballero. [Big DASL (BDASL)](https://dasl.ing/bdasl.html). 2026-07-01. URL: [https://dasl.ing/bdasl.html](https://dasl.ing/bdasl.html)
+Robin Berjon, Brendan O'Brien, & Juan Caballero. [Big DASL (BDASL)](https://dasl.ing/bdasl.html). 2026-07-10. URL: [https://dasl.ing/bdasl.html](https://dasl.ing/bdasl.html)
 
 <dfn id="ref-blake3">\[blake3\]</dfn>
 
@@ -137,11 +137,11 @@ J-P. Aumasson, S. Neves, J. O'Connor, Z. Wilcox. [The BLAKE3 Hashing Framework](
 
 <dfn id="ref-cid">\[cid\]</dfn>
 
-Robin Berjon & Juan Caballero. [Content IDs (CIDs)](https://dasl.ing/cid.html). 2026-07-01. URL: [https://dasl.ing/cid.html](https://dasl.ing/cid.html)
+Robin Berjon & Juan Caballero. [Content IDs (CIDs)](https://dasl.ing/cid.html). 2026-07-10. URL: [https://dasl.ing/cid.html](https://dasl.ing/cid.html)
 
 <dfn id="ref-drisl">\[drisl\]</dfn>
 
-Robin Berjon & Juan Caballero. [DRISL — Deterministic Representation for Interoperable Structures & Links](https://dasl.ing/drisl.html). 2026-07-01. URL: [https://dasl.ing/drisl.html](https://dasl.ing/drisl.html)
+Robin Berjon & Juan Caballero. [DRISL — Deterministic Representation for Interoperable Structures & Links](https://dasl.ing/drisl.html). 2026-07-10. URL: [https://dasl.ing/drisl.html](https://dasl.ing/drisl.html)
 
 <dfn id="ref-hang">\[hang\]</dfn>
 
@@ -153,4 +153,4 @@ Rodney. [Writing an MP4 Muxer for Fun and Profit](https://obsproject.com/blog/ob
 
 <dfn id="ref-s2pa">\[s2pa\]</dfn>
 
-Eli Mallon. [S2PA — Simple Standard for Provenance and Authenticity](https://dasl.ing/s2pa.html). 2026-07-01. URL: [https://dasl.ing/s2pa.html](https://dasl.ing/s2pa.html)
+Eli Mallon. [S2PA — Simple Standard for Provenance and Authenticity](https://dasl.ing/s2pa.html). 2026-07-10. URL: [https://dasl.ing/s2pa.html](https://dasl.ing/s2pa.html)

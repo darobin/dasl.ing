@@ -78,7 +78,7 @@ J-P. Aumasson, S. Neves, J. O'Connor, Z. Wilcox. [The BLAKE3 Hashing Framework](
 
 <dfn id="ref-cid">\[cid\]</dfn>
 
-Robin Berjon & Juan Caballero. [Content IDs (CIDs)](https://dasl.ing/cid.html). 2026-07-01. URL: [https://dasl.ing/cid.html](https://dasl.ing/cid.html)
+Robin Berjon & Juan Caballero. [Content IDs (CIDs)](https://dasl.ing/cid.html). 2026-07-10. URL: [https://dasl.ing/cid.html](https://dasl.ing/cid.html)
 
 <dfn id="ref-ipfs-principles">\[ipfs-principles\]</dfn>
 
