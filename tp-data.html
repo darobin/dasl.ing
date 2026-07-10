@@ -19,24 +19,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <title>Tiles Protocol: Data Loading</title>
-  <link rel="stylesheet" href="spec.css"><link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%220%22 y=%220%22 width=%22100%22 height=%22100%22 fill=%22%2300ff75%22></rect></svg>"><link rel="alternate" type="text/markdown" href="https://dasl.ing/tp-data.md"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" property="og:title" content="DASL: Tiles Protocol: Data Loading"><meta name="twitter:description" property="og:description" content="XXX something about tiles protocols and how data is important"><meta name="twitter:image" property="og:image" content="https://dasl.ing/tp-data.png"><meta name="twitter:image:alt" content="Very colourful stripes, so colourful it hurts"><meta name="twitter:url" property="og:url" content="https://dasl.ing/"><meta property="og:site_name" content="DASL"><meta property="og:locale" content="en"><meta name="theme-color" content="#00ff75"></head>
+  <link rel="stylesheet" href="spec.css"><link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%220%22 y=%220%22 width=%22100%22 height=%22100%22 fill=%22%2300ff75%22></rect></svg>"><link rel="alternate" type="text/markdown" href="https://dasl.ing/tp-data.md"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" property="og:title" content="DASL: Tiles Protocol: Data Loading"><meta name="twitter:description" property="og:description" content="Passsing data to and from tiles is key to integrating tiles in arbitrary         environments. This protocol specifies precisely that."><meta name="twitter:image" property="og:image" content="https://dasl.ing/tp-data.png"><meta name="twitter:image:alt" content="Very colourful stripes, so colourful it hurts"><meta name="twitter:url" property="og:url" content="https://dasl.ing/"><meta property="og:site_name" content="DASL"><meta property="og:locale" content="en"><meta name="theme-color" content="#00ff75"></head>
   <body><div class="nav-back">A specification of the <a href="/">DASL Project</a>.</div><main><header><h1>Tiles Protocol: Data Loading</h1><table><tbody><tr><th>date</th><td>2026-07-10</td></tr><tr><th>editors</th><td><a href="https://berjon.com/">Robin Berjon</a> &lt;<a href="mailto:robin@berjon.com">robin@berjon.com</a>&gt;</td></tr><tr><th>issues</th><td><a href="https://github.com/darobin/dasl.ing/issues">list</a>, <a href="https://github.com/darobin/dasl.ing/issues/new">new</a></td></tr><tr><th>abstract</th><td><div id="abstract">
       <p>
-        XXX something about tiles protocols and how data is important
+        Passsing data to and from tiles is key to integrating tiles in arbitrary
+        environments. This protocol specifies precisely that.
       </p>
     </div></td></tr></tbody></table></header>
     
     <section>
       <h2>Introduction</h2>
       <p>
-        XXX some stuff with examples about how this works
+        Since tiles are cut off from the network, they cannot load data for
+        themselves or post it to servers. This protocol enables a tile and its
+        hots environment to exchange data so that the tile may process or render
+        it and so that it can hand results back to its host.
       </p>
     </section>
     <section>
       <h2>Data Loading Protocol</h2>
       <p>
-        XXX readiness communication and await, then just cloning
+        The data protocol is loaded from <code>/.well-known/web-tiles/data.js</code>.
+        The interface exported from that has the following functions:
       </p>
+      <ul>
+        <li>
+          <code>addDataHandler(handler)</code>: sets function <code>handler</code>
+          up to receive data sent by the host. The data is provided to the function
+          as an object that is the structured clone of whatever the host sent.
+        </li>
+        <li>
+          <code>removeDataHandler(handler)</code>: removes function <code>handler</code>
+          from the list of functions that can receive data payloads from the host.
+        </li>
+        <li>
+          <code>listen()</code>: tells the host that the tile is all set up and
+          ready to start receiving data. This is necessary in some environments
+          in which the host may not easily know that a tile has loaded. Always
+          call it when ready.
+        </li>
+        <li>
+          <code>sendData(payload)</code>: sends data back to the host, with
+          <code>payload</code> being structured-cloned on the way there.
+        </li>
+      </ul>
+      <p>
+        A simple example:
+      </p>
+      <pre>try {
+  const { listen, addDataHandler, sendData } = await import('/.well-known/web-tiles/data.js');
+  addDataHandler((payload) =&gt; {
+    alert(`Hello ${payload.name}!`);
+    sendData({ response: 'How do you do?' });
+  });
+  listen();
+}
+catch (err) {
+  alert("Sorry, this tile can't receive data.");
+}
+      </pre>
     </section>
   
 
