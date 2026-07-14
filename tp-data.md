@@ -17,6 +17,7 @@ The data protocol is loaded from `/.well-known/web-tiles/data.js`. The interface
 
 A simple example:
 
+```
 try {
   const { listen, addDataHandler, sendData } = await import('/.well-known/web-tiles/data.js');
   addDataHandler((payload) => {
@@ -28,3 +29,4 @@ try {
 catch (err) {
   alert("Sorry, this tile can't receive data.");
 }
+```

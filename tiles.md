@@ -32,6 +32,7 @@ As a convention, the tile carball may be named with a `.tile` extension. No part
 
 In order to guarantee that tiles run in as safe and private a manner as possible, the web context into which they are loaded must meet restrictions that correspond to the following headers:
 
+```
 content-security-policy:
     default-src 'self' blob: data:;
     script-src 'self' blob: data: 'unsafe-inline' 'wasm-unsafe-eval';
@@ -55,7 +56,7 @@ permissions-policy: interest-cohort=(), browsing-topics=()
 referrer-policy: no-referrer
 x-content-type-options: nosniff
 x-dns-prefetch-control: off
-      
+```
 
 In the current state of browser technology, loading tiles in a web context requires setting up an origin that is unique to the tile (currently it is random, though it may become derived from its CID), which in turn requires touching the network. It is recommended to use a server that is trusted by the user for this purpose (i.e. one that cannot learn more than what the embedding context already knows).
 
@@ -99,6 +100,7 @@ Note that lexica are not flexible enough to be able to describe the `resources` 
 
 This has important implications with how MASL needs to be used over AT in order to work correctly with deployed PDSs. An example `resources` entry for a root HTML document looks as follows:
 
+```
 {
   …
   "resources": {
@@ -116,7 +118,7 @@ This has important implications with how MASL needs to be used over AT in order 
     …
   }
 }
-      
+```
 
 A few things are worth noting in the above:
 
@@ -127,6 +129,7 @@ A few things are worth noting in the above:
 
 The full lexicon is:
 
+```
 {
   "id": "ing.dasl.masl",
   "description": "Lexicon for DASL (https://dasl.ing/) types used on AT, notably for Web Tiles.",
@@ -257,7 +260,7 @@ The full lexicon is:
     }
   }
 }
-      
+```
 
 ## References
 
@@ -267,12 +270,12 @@ The full lexicon is:
 
 <dfn id="ref-car">\[car\]</dfn>
 
-Robin Berjon & Juan Caballero. [Content-Addressable aRchives (CAR)](https://dasl.ing/car.html). 2026-07-10. URL: [https://dasl.ing/car.html](https://dasl.ing/car.html)
+Robin Berjon & Juan Caballero. [Content-Addressable aRchives (CAR)](https://dasl.ing/car.html). 2026-07-14. URL: [https://dasl.ing/car.html](https://dasl.ing/car.html)
 
 <dfn id="ref-cid">\[cid\]</dfn>
 
-Robin Berjon & Juan Caballero. [Content IDs (CIDs)](https://dasl.ing/cid.html). 2026-07-10. URL: [https://dasl.ing/cid.html](https://dasl.ing/cid.html)
+Robin Berjon & Juan Caballero. [Content IDs (CIDs)](https://dasl.ing/cid.html). 2026-07-14. URL: [https://dasl.ing/cid.html](https://dasl.ing/cid.html)
 
 <dfn id="ref-masl">\[masl\]</dfn>
 
-Robin Berjon & Juan Caballero. [MASL — Metadata for Arbitrary Structures & Links](https://dasl.ing/masl.html). 2026-07-10. URL: [https://dasl.ing/masl.html](https://dasl.ing/masl.html)
+Robin Berjon & Juan Caballero. [MASL — Metadata for Arbitrary Structures & Links](https://dasl.ing/masl.html). 2026-07-14. URL: [https://dasl.ing/masl.html](https://dasl.ing/masl.html)

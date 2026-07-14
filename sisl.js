@@ -33,6 +33,10 @@ class SISL {
       filter: (n) => n.localName === 'dt' && /^ref-/.test(n.id),
       replacement: (cnt, n) => `<dfn id="${n.id}">${cnt}</dfn>`,
     });
+    this.turnDown.addRule('code', {
+      filter: ['pre'],
+      replacement: (cnt) => `\`\`\`\n${cnt.replace(/\n\s+\n?$/s, '')}\n\`\`\``,
+    });
   }
   async watch () {
     // For reasons that baffle me, chokidar's ignored option doesn't work correctly. So

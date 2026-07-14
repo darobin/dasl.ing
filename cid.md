@@ -55,7 +55,7 @@ DASL CIDs are a strict subset of [IPFS CIDs](https://docs.ipfs.tech/concepts/con
 
 <dfn id="ref-drisl">\[drisl\]</dfn>
 
-Robin Berjon & Juan Caballero. [DRISL — Deterministic Representation for Interoperable Structures & Links](https://dasl.ing/drisl.html). 2026-07-10. URL: [https://dasl.ing/drisl.html](https://dasl.ing/drisl.html)
+Robin Berjon & Juan Caballero. [DRISL — Deterministic Representation for Interoperable Structures & Links](https://dasl.ing/drisl.html). 2026-07-14. URL: [https://dasl.ing/drisl.html](https://dasl.ing/drisl.html)
 
 <dfn id="ref-rfc4648">\[rfc4648\]</dfn>
 
