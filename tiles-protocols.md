@@ -65,6 +65,14 @@ Data passing to and from tiles.
 
 Self-editing tiles, the protocol can read and write from the tile's store.
 
+## Usage Notes
+
+Tiles can be hosted in a great variety of environments, and each of these environments may have different technical ways of establishing communication between host and tile. That is why it is important for tiles to create this communication by loading from the `/.well-known/web-tiles/some-protocol.js` resource rather than include a specific protocol implementation because they may be getting different implementations in different environments.
+
+It's worth noting however that in most cases the communication will go through `postMessage` across the tile boundary, and in all cases the expectation is that the data passed over the boundary should transfer according to the behaviour of [structured clones](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm).
+
+In web contexts, the communication will therefore be `postMessage` content. By convention, the data passed via `postMessage` will have an `action` field prefixed with `tiles-protocol-up-` if it's going from the tile to the host and with `tiles-protocol-down-` if it's going from the host to the tile. It will be accompanied by a `payload` field that contains the data being passed.
+
 ## References
 
 <dfn id="ref-tiles">\[tiles\]</dfn>
