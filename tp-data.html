@@ -79,6 +79,36 @@
 }
       </code></pre>
     </section>
+    <section>
+      <h2>Web Runtime Context Notes</h2>
+      <p>
+        Tiles may be embedded in all kinds of contexts, and those may determine
+        the exact way in which the <code>/.well-known/web-tiles/data.js</code>
+        resource is implemented. This section only gives guidance for web runtimes
+        as they are likely to mostly work in similar ways.
+      </p>
+      <p>
+        In web runtime contexts, the integration works in the following way:
+      </p>
+      <ul>
+        <li>
+          The tile signals that it's ready to engage with data (<code>listen()</code>) by
+          sending a message with <code>action</code> set to <code>tiles-protocol-up-data-ready</code>
+          and no <code>payload</code>.
+        </li>
+        <li>
+          The tile receives data (handlers are called) by receiving a message with
+          <code>action</code> set to <code>tiles-protocol-down-data-payload</code>
+          and <code>payload</code> set to the content that the handler receives.
+        </li>
+        <li>
+          The tile sends data (<code>sendData()</code>) by sending a message with
+          <code>action</code> set to <code>tiles-protocol-up-data-payload</code>
+          and <code>payload</code> set to the content being sent.
+        </li>
+      </ul>
+      <code>action</code>
+    </section>
   
 
 </main></body></html>
