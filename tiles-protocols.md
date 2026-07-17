@@ -81,7 +81,7 @@ Robin Berjon. [Web Tiles](https://dasl.ing/tiles.html). 2026-07-17. URL: [https
 
 <dfn id="ref-tp-data">\[tp-data\]</dfn>
 
-Robin Berjon. [Tiles Protocol: Data Loading](https://dasl.ing/tp-data.html). 2026-07-17. URL: [https://dasl.ing/tp-data.html](https://dasl.ing/tp-data.html)
+Robin Berjon. [Tiles Protocol: Data Passing](https://dasl.ing/tp-data.html). 2026-07-17. URL: [https://dasl.ing/tp-data.html](https://dasl.ing/tp-data.html)
 
 <dfn id="ref-tp-editable">\[tp-editable\]</dfn>
 

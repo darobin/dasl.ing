@@ -1,4 +1,4 @@
-# Tiles Protocol: Data Loading
+# Tiles Protocol: Data Passing
 
 Passsing data to and from tiles is key to integrating tiles in arbitrary environments. This protocol specifies precisely that.
 
