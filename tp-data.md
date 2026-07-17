@@ -40,5 +40,3 @@ In web runtime contexts, the integration works in the following way:
 -   The tile signals that it's ready to engage with data (`listen()`) by sending a message with `action` set to `tiles-protocol-up-data-ready` and no `payload`.
 -   The tile receives data (handlers are called) by receiving a message with `action` set to `tiles-protocol-down-data-payload` and `payload` set to the content that the handler receives.
 -   The tile sends data (`sendData()`) by sending a message with `action` set to `tiles-protocol-up-data-payload` and `payload` set to the content being sent.
-
-`action`
