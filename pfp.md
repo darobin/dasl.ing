@@ -44,16 +44,18 @@ When storing PFPs in an AT Protocol record, using a pseudo-type is recommended t
 
 An example:
 
+```
 {
   "$type": "baz.bar.myrecord",
   "foo": "bar",
   "my cid": {"$link": "bafkreiapgas3dluwwzthuv2fnc475ytvve3xd5acoproje3lr2446yno3q"},
-  "my pfp": {"\_\_pfp": "paeqo5rgntyjx44a5dse6zygcmprz2ym7rxrbym6ogpzt44mgetbam3a"},
+  "my pfp": {"__pfp": "paeqo5rgntyjx44a5dse6zygcmprz2ym7rxrbym6ogpzt44mgetbam3a"},
 }
-      
+```
 
 Here is the lexicon for using that custom type:
 
+```
 {
   "lexicon": 1,
   "id": "ing.dasl.pfpRef",
@@ -61,9 +63,9 @@ Here is the lexicon for using that custom type:
     "main": {
       "type": "object",
       "description": "Reference to a perceptual fingerprint (PFP).",
-      "required": \["\_\_pfp"\],
+      "required": ["__pfp"],
       "properties": {
-        "\_\_pfp": {
+        "__pfp": {
           "type": "string",
           "description": "Perceptual fingerprint per DASL spec. Format: p<base32-payload>."
         }
@@ -71,7 +73,7 @@ Here is the lexicon for using that custom type:
     }
   }
 }
-      
+```
 
 ## Registry
 
@@ -113,11 +115,11 @@ CID
 
 <dfn id="ref-cid">\[cid\]</dfn>
 
-Robin Berjon & Juan Caballero. [Content IDs (CIDs)](https://dasl.ing/cid.html). 2026-07-01. URL: [https://dasl.ing/cid.html](https://dasl.ing/cid.html)
+Robin Berjon & Juan Caballero. [Content IDs (CIDs)](https://dasl.ing/cid.html). 2026-07-17. URL: [https://dasl.ing/cid.html](https://dasl.ing/cid.html)
 
 <dfn id="ref-rasl">\[rasl\]</dfn>
 
-Robin Berjon & Juan Caballero. [RASL — Retrieval of Arbitrary Structures & Links](https://dasl.ing/rasl.html). 2026-07-01. URL: [https://dasl.ing/rasl.html](https://dasl.ing/rasl.html)
+Robin Berjon & Juan Caballero. [RASL — Retrieval of Arbitrary Structures & Links](https://dasl.ing/rasl.html). 2026-07-17. URL: [https://dasl.ing/rasl.html](https://dasl.ing/rasl.html)
 
 <dfn id="ref-rfc4648">\[rfc4648\]</dfn>
 

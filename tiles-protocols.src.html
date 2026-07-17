@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="authors" content="robin">
+    <title>Tiles Protocols</title>
+  </head>
+  <body>
+    <div id="abstract">
+      <p>
+        Tiles ([[tiles]]) are intended for use in a diversity of environements.
+        Depending on the environment that they find themselves embedded in, they
+        will have access to different capabilities that expose various features
+        and communicate with the host environment. Tiles Protocols are the
+        mechanisms through which these integrations are made available.
+      </p>
+    </div>
+    <section>
+      <h2>Introduction</h2>
+      <p>
+        Tiles are intended to be embedded in many different contexts, but also
+        to be strongly sandboxed to keep them from exfiltrating data. This means
+        that features like passing data to and from a tile need specific handling.
+        That's what Tiles Protocols are for.
+      </p>
+      <p>
+        Because a tile does not necessarily know what environment it's embedded in,
+        it's up to the embedding environment to provide the implementation for
+        a given protocol. The tile simply loads it according to a shared convention
+        and then uses the documented interface to use the protocol implementation it
+        has loaded as a black box.
+      </p>
+    </section>
+    <section>
+      <h2>Protocol Loading</h2>
+      <p>
+        All protocols are loaded from resources under <code>/.well-known/web-tiles/</code>.
+        Note that this path is reserved and that trying to include content under
+        it in a tile will almost certainly fail. An imaginary Cat tiles protocol
+        could be loaded for instance from <code>/.well-known/web-tiles/cats.js</code>.
+        If the embeddeding environment supports cats, that resource will resolve,
+        if it doesn't the load will error.
+      </p>
+      <p>
+        The JavaScript loading pattern for a protocol is always the same:
+      </p>
+      <pre>
+try {
+  const protocolApi = await import('/.well-known/web-tiles/some-protocol.js');
+  // Use protocolApi like the JS object it is.
+}
+catch (err) {
+  // Handle whatever the tile does when this protocol isn't available.
+  // If it's essential, at least show the user a message.
+}
+      </pre>
+    </section>
+    <section>
+      <h2>Registered Protocols</h2>
+      <p>
+        This table lists all the currently registered resource name under
+        <code>/.well-known/web-tiles/</code>. Note that some cannot be usefully
+        loaded as protocols and just act as reserved paths that may be present
+        in some environments.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>name</th>
+            <th>source</th>
+            <th>notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>index.html</code></td>
+            <td>reserved</td>
+            <td>Loader in web contexts.</td>
+          </tr>
+          <tr>
+            <td><code>shuttle.js</code></td>
+            <td>reserved</td>
+            <td>Code for loader in web contexts.</td>
+          </tr>
+          <tr>
+            <td><code>worker.js</code></td>
+            <td>reserved</td>
+            <td>Service Worker in web contexts.</td>
+          </tr>
+          <tr>
+            <td><code>data.js</code></td>
+            <td>[[tp-data]]</td>
+            <td>Data passing to and from tiles.</td>
+          </tr>
+          <tr>
+            <td><code>store.js</code></td>
+            <td>[[tp-editable]]</td>
+            <td>Self-editing tiles, the protocol can read and write from the tile's store.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+    <section>
+      <h2>Usage Notes</h2>
+      <p>
+        Tiles can be hosted in a great variety of environments, and each of these
+        environments may have different technical ways of establishing communication
+        between host and tile. That is why it is important for tiles to create this
+        communication by loading from the <code>/.well-known/web-tiles/some-protocol.js</code>
+        resource rather than include a specific protocol implementation because they
+        may be getting different implementations in different environments.
+      </p>
+      <p>
+        It's worth noting however that in most cases the communication will go
+        through <code>postMessage</code> across the tile boundary, and in all
+        cases the expectation is that the data passed over the boundary should
+        transfer according to the behaviour of
+        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm">structured clones</a>.
+      </p>
+      <p>
+        In web contexts, the communication will therefore be <code>postMessage</code>
+        content. By convention, the data passed via <code>postMessage</code> will
+        have an <code>action</code> field prefixed with <code>tiles-protocol-up-</code>
+        if it's going from the tile to the host and with <code>tiles-protocol-down-</code>
+        if it's going from the host to the tile. It will be accompanied by a
+        <code>payload</code> field that contains the data being passed.
+      </p>
+    </section>
+  </body>
+</html>

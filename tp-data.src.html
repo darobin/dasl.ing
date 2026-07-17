@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="authors" content="robin">
+    <title>Tiles Protocol: Data Passing</title>
+  </head>
+  <body>
+    <div id="abstract">
+      <p>
+        Passsing data to and from tiles is key to integrating tiles in arbitrary
+        environments. This protocol specifies precisely that.
+      </p>
+    </div>
+    <section>
+      <h2>Introduction</h2>
+      <p>
+        Since tiles are cut off from the network, they cannot load data for
+        themselves or post it to servers. This protocol enables a tile and its
+        hots environment to exchange data so that the tile may process or render
+        it and so that it can hand results back to its host.
+      </p>
+    </section>
+    <section>
+      <h2>Data Loading Protocol</h2>
+      <p>
+        The data protocol is loaded from <code>/.well-known/web-tiles/data.js</code>.
+        The interface exported from that has the following functions:
+      </p>
+      <ul>
+        <li>
+          <code>addDataHandler(handler)</code>: sets function <code>handler</code>
+          up to receive data sent by the host. The data is provided to the function
+          as an object that is the structured clone of whatever the host sent.
+        </li>
+        <li>
+          <code>removeDataHandler(handler)</code>: removes function <code>handler</code>
+          from the list of functions that can receive data payloads from the host.
+        </li>
+        <li>
+          <code>listen()</code>: tells the host that the tile is all set up and
+          ready to start receiving data. This is necessary in some environments
+          in which the host may not easily know that a tile has loaded. Always
+          call it when ready.
+        </li>
+        <li>
+          <code>sendData(payload)</code>: sends data back to the host, with
+          <code>payload</code> being structured-cloned on the way there.
+        </li>
+      </ul>
+      <p>
+        A simple example:
+      </p>
+      <pre>
+try {
+  const { listen, addDataHandler, sendData } = await import('/.well-known/web-tiles/data.js');
+  addDataHandler((payload) => {
+    alert(`Hello ${payload.name}!`);
+    sendData({ response: 'How do you do?' });
+  });
+  listen();
+}
+catch (err) {
+  alert("Sorry, this tile can't receive data.");
+}
+      </pre>
+    </section>
+    <section>
+      <h2>Web Runtime Context Notes</h2>
+      <p>
+        Tiles may be embedded in all kinds of contexts, and those may determine
+        the exact way in which the <code>/.well-known/web-tiles/data.js</code>
+        resource is implemented. This section only gives guidance for web runtimes
+        as they are likely to mostly work in similar ways.
+      </p>
+      <p>
+        In web runtime contexts, the integration works in the following way:
+      </p>
+      <ul>
+        <li>
+          The tile signals that it's ready to engage with data (<code>listen()</code>) by
+          sending a message with <code>action</code> set to <code>tiles-protocol-up-data-ready</code>
+          and no <code>payload</code>.
+        </li>
+        <li>
+          The tile receives data (handlers are called) by receiving a message with
+          <code>action</code> set to <code>tiles-protocol-down-data-payload</code>
+          and <code>payload</code> set to the content that the handler receives.
+        </li>
+        <li>
+          The tile sends data (<code>sendData()</code>) by sending a message with
+          <code>action</code> set to <code>tiles-protocol-up-data-payload</code>
+          and <code>payload</code> set to the content being sent.
+        </li>
+      </ul>
+    </section>
+  </body>
+</html>

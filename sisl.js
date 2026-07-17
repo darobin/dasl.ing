@@ -6,6 +6,11 @@ import chokidar from 'chokidar';
 import chalk from 'chalk';
 import { JSDOM } from 'jsdom';
 import Turndown from 'turndown';
+import hljs from 'highlight.js/lib/core';
+import javascript from 'highlight.js/lib/languages/javascript';
+import json from 'highlight.js/lib/languages/json';
+hljs.registerLanguage('javascript', javascript);
+hljs.registerLanguage('json', json);
 
 // SISL — Simple Implementation of a Specification Language
 // This is just a basic spec generator. Here's what it does:
@@ -32,6 +37,10 @@ class SISL {
     this.turnDown.addRule('references', {
       filter: (n) => n.localName === 'dt' && /^ref-/.test(n.id),
       replacement: (cnt, n) => `<dfn id="${n.id}">${cnt}</dfn>`,
+    });
+    this.turnDown.addRule('code', {
+      filter: ['pre'],
+      replacement: (cnt) => `\`\`\`\n${cnt.replace(/\n\s+\n?$/s, '')}\n\`\`\``,
     });
   }
   async watch () {
@@ -199,6 +208,18 @@ class SISL {
           dd.innerHTML = refs[r];
         });
       }
+      [...doc.querySelectorAll('pre')].forEach(pre => {
+        // make them all be wrapped in code
+        if (!(pre.firstElementChild?.localName === 'code')) {
+          const c = doc.createElement('code');
+          c.append(...pre.childNodes);
+          pre.append(c);
+          hljs.highlightElement(c);
+        }
+        else {
+          hljs.highlightElement(pre.querySelector('code'));
+        }
+      });
       // save
       await writeFile(join(this.baseDir, `${shortname}.html`), dom.serialize());
       // make some MD

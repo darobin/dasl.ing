@@ -39,12 +39,13 @@ JSON lacks a native way to encode tag 42 for CIDs (\[[cbor-tag42](#ref-cbor-tag4
 
 The AT Protocol uses an object with a `$link` key pointing to the stringified DASL CID:
 
+```
 {
   "someSrc": {
     "$link": "bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4"
   }
 }
-      
+```
 
 This specification recommends that implementations default to the AT Protocol `$link` convention, but may offer the option to support DAG-JSON or other conventions as well.
 
@@ -72,7 +73,7 @@ C. Bormann. [CBOR Common Deterministic Encoding (CDE)](https://datatracker.ietf.
 
 <dfn id="ref-cid">\[cid\]</dfn>
 
-Robin Berjon & Juan Caballero. [Content IDs (CIDs)](https://dasl.ing/cid.html). 2026-07-01. URL: [https://dasl.ing/cid.html](https://dasl.ing/cid.html)
+Robin Berjon & Juan Caballero. [Content IDs (CIDs)](https://dasl.ing/cid.html). 2026-07-17. URL: [https://dasl.ing/cid.html](https://dasl.ing/cid.html)
 
 <dfn id="ref-dcbor">\[dcbor\]</dfn>
 
@@ -80,7 +81,7 @@ W. McNally, C. Allen, C. Bormann, & L. Lundblade. [dCBOR: A Deterministic CBOR A
 
 <dfn id="ref-drisl">\[drisl\]</dfn>
 
-Robin Berjon & Juan Caballero. [DRISL — Deterministic Representation for Interoperable Structures & Links](https://dasl.ing/drisl.html). 2026-07-01. URL: [https://dasl.ing/drisl.html](https://dasl.ing/drisl.html)
+Robin Berjon & Juan Caballero. [DRISL — Deterministic Representation for Interoperable Structures & Links](https://dasl.ing/drisl.html). 2026-07-17. URL: [https://dasl.ing/drisl.html](https://dasl.ing/drisl.html)
 
 <dfn id="ref-rfc8949">\[rfc8949\]</dfn>
 

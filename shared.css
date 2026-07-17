@@ -90,6 +90,9 @@ var {
 code, pre {
   font-size: 1rem;
 }
+pre {
+  overflow: auto;
+}
 .early {
   display: inline-block;
   color: orangered;

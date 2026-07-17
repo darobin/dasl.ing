@@ -50,14 +50,16 @@ Specify a scheme and fetch rules properly.
 
 Example with `src`:
 
+```
 {
   "src": { "$link": "bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4" },
   "content-type": "application/pdf",
 }
-        
+```
 
 Example with `resources`:
 
+```
 {
   "name": "A Simple Page With Pic",
   "resources": {
@@ -71,7 +73,7 @@ Example with `resources`:
     }
   }
 }
-        
+```
 
 ### HTTP Headers
 
@@ -99,16 +101,18 @@ Supported headers:
 
 Example with `src`:
 
+```
 {
   "src": { "$link": "bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4" },
   "content-type": "text/html",
   "content-language": "en",
   "service-worker-allowed": "/"
 }
-        
+```
 
 Example with `resources`:
 
+```
 {
   "name": "My Doc",
   "resources": {
@@ -133,7 +137,7 @@ Example with `resources`:
     }
   }
 }
-        
+```
 
 ### App Manifest
 
@@ -145,12 +149,13 @@ For both `icons` and `screenshots`, the `src` field must be a path that matches 
 
 Example:
 
+```
 {
   "name": "Unicorn Editor",
-  "short\_name": "Unicorn",
+  "short_name": "Unicorn",
   "description": "This is simply the best app to edit unicorns with.",
-  "background\_color": "#00ff75",
-  "icons": \[{ "src": "/unicorn.svg" }\],
+  "background_color": "#00ff75",
+  "icons": [{ "src": "/unicorn.svg" }],
   "resources": {
     "/": {
       "src": { "$link": "bafk…" },
@@ -162,7 +167,7 @@ Example:
     }
   }
 }
-        
+```
 
 ### CAR Compatibility
 
@@ -170,12 +175,13 @@ As indicated in the CAR specification (\[[car](#ref-car)\]), the metadata object
 
 Example:
 
+```
 {
   "name": "Get in the CAR if you want to live",
   "version": 1,
-  "roots": \[\]
+  "roots": []
 }
-        
+```
 
 ### AT Compatibility
 
@@ -187,16 +193,18 @@ When manipulating DAGs, it can be useful to keep track of history by referencing
 
 Example:
 
+```
 {
   "name": "Unicorn Editor",
   "prev": { "$link": "bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4" }
 }
-        
+```
 
 ## Lexicon
 
 Making a precise lexicon (\[[lexicon](#ref-lexicon)\]) for MASL is impossible because lexicons lack a way of constraining objects with arbitrary keys. However, the following may still prove useful when MASL is integrated with the AT Protocol (\[[at](#ref-at)\]).
 
+```
 {
   "lexicon": 1,
   "id": "ing.dasl.masl",
@@ -223,7 +231,7 @@ Making a precise lexicon (\[[lexicon](#ref-lexicon)\]) for MASL is impossible be
         "supports-loading-mode": { "type": "string" },
         "x-content-type-options": { "type": "string" },
         // Manifest
-        "background\_color": {
+        "background_color": {
           "type": "string"
         },
         "categories": {
@@ -239,7 +247,7 @@ Making a precise lexicon (\[[lexicon](#ref-lexicon)\]) for MASL is impossible be
           "type": "array",
           "items": {
             "type": "object",
-            "required": \["src"\],
+            "required": ["src"],
             "properties":{
               "src": { "type": "string" },
               "sizes": { "type": "string" },
@@ -254,26 +262,26 @@ Making a precise lexicon (\[[lexicon](#ref-lexicon)\]) for MASL is impossible be
           "type": "array",
           "items": {
             "type": "object",
-            "required": \["src"\],
+            "required": ["src"],
             "properties":{
               "src": { "type": "string" },
               "sizes": { "type": "string" },
               "label": { "type": "string" },
-              "form\_factor": {
+              "form_factor": {
                 "type": "string",
-                "knownValues": \["narrow", "wide"\]
+                "knownValues": ["narrow", "wide"]
               },
               "platform": {
                 "type": "string",
-                "knownValues": \["android", "chromeos", "ios", "ipados", "kaios", "macos", "windows", "xbox", "chrome\_web\_store", "itunes", "microsoft", "microsoft", "play"\]
+                "knownValues": ["android", "chromeos", "ios", "ipados", "kaios", "macos", "windows", "xbox", "chrome_web_store", "itunes", "microsoft", "microsoft", "play"]
               }
             }
           }
         },
-        "short\_name": {
+        "short_name": {
           "type": "string"
         },
-        "theme\_color": {
+        "theme_color": {
           "type": "string"
         },
         // CAR compatibility
@@ -291,7 +299,7 @@ Making a precise lexicon (\[[lexicon](#ref-lexicon)\]) for MASL is impossible be
     }
   }
 }
-      
+```
 
 ## References
 
@@ -301,11 +309,11 @@ Making a precise lexicon (\[[lexicon](#ref-lexicon)\]) for MASL is impossible be
 
 <dfn id="ref-car">\[car\]</dfn>
 
-Robin Berjon & Juan Caballero. [Content-Addressable aRchives (CAR)](https://dasl.ing/car.html). 2026-07-01. URL: [https://dasl.ing/car.html](https://dasl.ing/car.html)
+Robin Berjon & Juan Caballero. [Content-Addressable aRchives (CAR)](https://dasl.ing/car.html). 2026-07-17. URL: [https://dasl.ing/car.html](https://dasl.ing/car.html)
 
 <dfn id="ref-drisl">\[drisl\]</dfn>
 
-Robin Berjon & Juan Caballero. [DRISL — Deterministic Representation for Interoperable Structures & Links](https://dasl.ing/drisl.html). 2026-07-01. URL: [https://dasl.ing/drisl.html](https://dasl.ing/drisl.html)
+Robin Berjon & Juan Caballero. [DRISL — Deterministic Representation for Interoperable Structures & Links](https://dasl.ing/drisl.html). 2026-07-17. URL: [https://dasl.ing/drisl.html](https://dasl.ing/drisl.html)
 
 <dfn id="ref-lexicon">\[lexicon\]</dfn>
 
@@ -317,4 +325,4 @@ M. Cáceres, K. Rohde Christiansen, D. González, D. Murphy, C. Liebel. [Web App
 
 <dfn id="ref-rasl">\[rasl\]</dfn>
 
-Robin Berjon & Juan Caballero. [RASL — Retrieval of Arbitrary Structures & Links](https://dasl.ing/rasl.html). 2026-07-01. URL: [https://dasl.ing/rasl.html](https://dasl.ing/rasl.html)
+Robin Berjon & Juan Caballero. [RASL — Retrieval of Arbitrary Structures & Links](https://dasl.ing/rasl.html). 2026-07-17. URL: [https://dasl.ing/rasl.html](https://dasl.ing/rasl.html)
