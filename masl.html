@@ -19,7 +19,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MASL — Metadata for Arbitrary Structures &amp; Links</title>
   <link rel="stylesheet" href="spec.css"><link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%220%22 y=%220%22 width=%22100%22 height=%22100%22 fill=%22%2300ff75%22></rect></svg>"><link rel="alternate" type="text/markdown" href="https://dasl.ing/masl.md"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" property="og:title" content="DASL: MASL — Metadata for Arbitrary Structures &amp; Links"><meta name="twitter:description" property="og:description" content="MASL is a CBOR-based metadata system that is designed to work well with content-addressed         and decentralised systems, to enable fully self-contained, self-certified content         distribution."><meta name="twitter:image" property="og:image" content="https://dasl.ing/masl.png"><meta name="twitter:image:alt" content="Very colourful stripes, so colourful it hurts"><meta name="twitter:url" property="og:url" content="https://dasl.ing/"><meta property="og:site_name" content="DASL"><meta property="og:locale" content="en"><meta name="theme-color" content="#00ff75"></head>
-  <body><div class="nav-back">A specification of the <a href="/">DASL Project</a>.</div><main><header><h1>MASL — Metadata for Arbitrary Structures &amp; Links</h1><table><tbody><tr><th>date</th><td>2026-07-14</td></tr><tr><th>editors</th><td><a href="https://berjon.com/">Robin Berjon</a> &lt;<a href="mailto:robin@berjon.com">robin@berjon.com</a>&gt;<br><a href="https://bumblefudge.com/">Juan Caballero</a> &lt;<a href="mailto:bumblefudge@learningproof.xyz">bumblefudge@learningproof.xyz</a>&gt;</td></tr><tr><th>issues</th><td><a href="https://github.com/darobin/dasl.ing/issues">list</a>, <a href="https://github.com/darobin/dasl.ing/issues/new">new</a></td></tr><tr><th>abstract</th><td><div id="abstract">
+  <body><div class="nav-back">A specification of the <a href="/">DASL Project</a>.</div><main><header><h1>MASL — Metadata for Arbitrary Structures &amp; Links</h1><table><tbody><tr><th>date</th><td>2026-07-17</td></tr><tr><th>editors</th><td><a href="https://berjon.com/">Robin Berjon</a> &lt;<a href="mailto:robin@berjon.com">robin@berjon.com</a>&gt;<br><a href="https://bumblefudge.com/">Juan Caballero</a> &lt;<a href="mailto:bumblefudge@learningproof.xyz">bumblefudge@learningproof.xyz</a>&gt;</td></tr><tr><th>issues</th><td><a href="https://github.com/darobin/dasl.ing/issues">list</a>, <a href="https://github.com/darobin/dasl.ing/issues/new">new</a></td></tr><tr><th>abstract</th><td><div id="abstract">
       <p>
         MASL is a CBOR-based metadata system that is designed to work well with content-addressed
         and decentralised systems, to enable fully self-contained, self-certified content
@@ -160,28 +160,28 @@
         <p>
           Example with <code>src</code>:
         </p>
-        <pre>{
-  "src": { "$link": "bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4" },
-  "content-type": "application/pdf",
-}
-        </pre>
+        <pre><code data-highlighted="yes" class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"src"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"$link"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"content-type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"application/pdf"</span><span class="hljs-punctuation">,</span>
+<span class="hljs-punctuation">}</span>
+        </code></pre>
         <p>
           Example with <code>resources</code>:
         </p>
-        <pre>{
-  "name": "A Simple Page With Pic",
-  "resources": {
-    "/": {
-      "src": { "$link": "bafk…" },
-      "content-type": "text/html"
-    },
-    "/picture.jpg": {
-      "src": { "$link": "bafk…" },
-      "content-type": "image/jpeg"
-    }
-  }
-}
-        </pre>
+        <pre><code data-highlighted="yes" class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"A Simple Page With Pic"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"resources"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"/"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">"src"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"$link"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"bafk…"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"content-type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"text/html"</span>
+    <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"/picture.jpg"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">"src"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"$link"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"bafk…"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"content-type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"image/jpeg"</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+        </code></pre>
       </section>
       <section>
         <h3>HTTP Headers</h3>
@@ -234,41 +234,41 @@
         <p>
           Example with <code>src</code>:
         </p>
-        <pre>{
-  "src": { "$link": "bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4" },
-  "content-type": "text/html",
-  "content-language": "en",
-  "service-worker-allowed": "/"
-}
-        </pre>
+        <pre><code data-highlighted="yes" class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"src"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"$link"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"content-type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"text/html"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"content-language"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"en"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"service-worker-allowed"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/"</span>
+<span class="hljs-punctuation">}</span>
+        </code></pre>
         <p>
           Example with <code>resources</code>:
         </p>
-        <pre>{
-  "name": "My Doc",
-  "resources": {
-    "/": {
-      "src": { "$link": "bafk…" },
-      "content-type": "text/html",
-      "content-encoding": "gzip",
-      "content-language": "fr"
-    },
-    "/interactive.js": {
-      "src": { "$link": "bafk…" },
-      "content-type": "application/javascript",
-      "sourcemap": "/interactive.js.map"
-    },
-    "/interactive.js.map": {
-      "src": { "$link": "bafk…" },
-      "content-type": "application/json"
-    },
-    "/picture.jpg": {
-      "src": { "$link": "bafk…" },
-      "content-type": "image/jpeg"
-    }
-  }
-}
-        </pre>
+        <pre><code data-highlighted="yes" class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"My Doc"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"resources"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"/"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">"src"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"$link"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"bafk…"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"content-type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"text/html"</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"content-encoding"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"gzip"</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"content-language"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"fr"</span>
+    <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"/interactive.js"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">"src"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"$link"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"bafk…"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"content-type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"application/javascript"</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"sourcemap"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/interactive.js.map"</span>
+    <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"/interactive.js.map"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">"src"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"$link"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"bafk…"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"content-type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"application/json"</span>
+    <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"/picture.jpg"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">"src"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"$link"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"bafk…"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"content-type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"image/jpeg"</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+        </code></pre>
       </section>
       <section>
         <h3>App Manifest</h3>
@@ -301,24 +301,24 @@
         <p>
           Example:
         </p>
-        <pre>{
-  "name": "Unicorn Editor",
-  "short_name": "Unicorn",
-  "description": "This is simply the best app to edit unicorns with.",
-  "background_color": "#00ff75",
-  "icons": [{ "src": "/unicorn.svg" }],
-  "resources": {
-    "/": {
-      "src": { "$link": "bafk…" },
-      "content-type": "text/html"
-    },
-    "/unicorn.svg": {
-      "src": { "$link": "bafk…" },
-      "content-type": "image/svg"
-    }
-  }
-}
-        </pre>
+        <pre><code data-highlighted="yes" class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Unicorn Editor"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"short_name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Unicorn"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"description"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"This is simply the best app to edit unicorns with."</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"background_color"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"#00ff75"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"icons"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-punctuation">{</span> <span class="hljs-attr">"src"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/unicorn.svg"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"resources"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"/"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">"src"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"$link"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"bafk…"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"content-type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"text/html"</span>
+    <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"/unicorn.svg"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">"src"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"$link"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"bafk…"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"content-type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"image/svg"</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+        </code></pre>
       </section>
       <section>
         <h3>CAR Compatibility</h3>
@@ -333,12 +333,12 @@
         <p>
           Example:
         </p>
-        <pre>{
-  "name": "Get in the CAR if you want to live",
-  "version": 1,
-  "roots": []
-}
-        </pre>
+        <pre><code data-highlighted="yes" class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Get in the CAR if you want to live"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"version"</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"roots"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">}</span>
+        </code></pre>
       </section>
       <section>
         <h3>AT Compatibility</h3>
@@ -358,11 +358,11 @@
         <p>
           Example:
         </p>
-        <pre>{
-  "name": "Unicorn Editor",
-  "prev": { "$link": "bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4" }
-}
-        </pre>
+        <pre><code data-highlighted="yes" class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Unicorn Editor"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"prev"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"$link"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"bafkreifn5yxi7nkftsn46b6x26grda57ict7md2xuvfbsgkiahe2e7vnq4"</span> <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+        </code></pre>
       </section>
     </section>
     <section>
@@ -372,102 +372,102 @@
         constraining objects with arbitrary keys. However, the following may still prove useful when
         MASL is integrated with the AT Protocol ([<a href="#ref-at" class="ref">at</a>]).
       </p>
-      <pre>{
-  "lexicon": 1,
-  "id": "ing.dasl.masl",
-  "defs": {
-    "main": {
-      "type": "object",
-      "properties": {
-        "src": { "type": "cid-link" },
-        "resources": {
-          "type": "unknown"
-        },
-        // HTTP
-        "content-type": { "type": "string" },
-        "content-disposition": { "type": "string" },
-        "content-encoding": { "type": "string" },
-        "content-language": { "type": "string" },
-        "content-security-policy": { "type": "string" },
-        "link": { "type": "string" },
-        "permissions-policy": { "type": "string" },
-        "referrer-policy": { "type": "string" },
-        "service-worker-allowed": { "type": "string" },
-        "sourcemap": { "type": "string" },
-        "speculation-rules": { "type": "string" },
-        "supports-loading-mode": { "type": "string" },
-        "x-content-type-options": { "type": "string" },
-        // Manifest
-        "background_color": {
-          "type": "string"
-        },
-        "categories": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "description": {
-          "type": "string"
-        },
-        "icons": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "required": ["src"],
-            "properties":{
-              "src": { "type": "string" },
-              "sizes": { "type": "string" },
-              "purpose": { "type": "string" }
-            }
-          }
-        },
-        "name": {
-          "type": "string"
-        },
-        "screenshots": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "required": ["src"],
-            "properties":{
-              "src": { "type": "string" },
-              "sizes": { "type": "string" },
-              "label": { "type": "string" },
-              "form_factor": {
-                "type": "string",
-                "knownValues": ["narrow", "wide"]
-              },
-              "platform": {
-                "type": "string",
-                "knownValues": ["android", "chromeos", "ios", "ipados", "kaios", "macos", "windows", "xbox", "chrome_web_store", "itunes", "microsoft", "microsoft", "play"]
-              }
-            }
-          }
-        },
-        "short_name": {
-          "type": "string"
-        },
-        "theme_color": {
-          "type": "string"
-        },
-        // CAR compatibility
-        "version": {
-          "type": "integer",
-          "const": 1
-        },
-        "roots": {
-          "type": "array",
-          "items": { "type": "cid-link" }
-        },
-        // versioning
-        "prev": { "type": "cid-link" }
-      }
-    }
-  }
-}
-      </pre>
+      <pre><code data-highlighted="yes" class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"lexicon"</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"ing.dasl.masl"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"defs"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"main"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"object"</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"properties"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+        <span class="hljs-attr">"src"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"cid-link"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"resources"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+          <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"unknown"</span>
+        <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-comment">// HTTP</span>
+        <span class="hljs-attr">"content-type"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"string"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"content-disposition"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"string"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"content-encoding"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"string"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"content-language"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"string"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"content-security-policy"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"string"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"link"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"string"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"permissions-policy"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"string"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"referrer-policy"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"string"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"service-worker-allowed"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"string"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"sourcemap"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"string"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"speculation-rules"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"string"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"supports-loading-mode"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"string"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"x-content-type-options"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"string"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-comment">// Manifest</span>
+        <span class="hljs-attr">"background_color"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+          <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"string"</span>
+        <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"categories"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+          <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"array"</span><span class="hljs-punctuation">,</span>
+          <span class="hljs-attr">"items"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+            <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"string"</span>
+          <span class="hljs-punctuation">}</span>
+        <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"description"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+          <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"string"</span>
+        <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"icons"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+          <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"array"</span><span class="hljs-punctuation">,</span>
+          <span class="hljs-attr">"items"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+            <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"object"</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-attr">"required"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">"src"</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-attr">"properties"</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span>
+              <span class="hljs-attr">"src"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"string"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+              <span class="hljs-attr">"sizes"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"string"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+              <span class="hljs-attr">"purpose"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"string"</span> <span class="hljs-punctuation">}</span>
+            <span class="hljs-punctuation">}</span>
+          <span class="hljs-punctuation">}</span>
+        <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"name"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+          <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"string"</span>
+        <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"screenshots"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+          <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"array"</span><span class="hljs-punctuation">,</span>
+          <span class="hljs-attr">"items"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+            <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"object"</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-attr">"required"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">"src"</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-attr">"properties"</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span>
+              <span class="hljs-attr">"src"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"string"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+              <span class="hljs-attr">"sizes"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"string"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+              <span class="hljs-attr">"label"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"string"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+              <span class="hljs-attr">"form_factor"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+                <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"string"</span><span class="hljs-punctuation">,</span>
+                <span class="hljs-attr">"knownValues"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">"narrow"</span><span class="hljs-punctuation">,</span> <span class="hljs-string">"wide"</span><span class="hljs-punctuation">]</span>
+              <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+              <span class="hljs-attr">"platform"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+                <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"string"</span><span class="hljs-punctuation">,</span>
+                <span class="hljs-attr">"knownValues"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">"android"</span><span class="hljs-punctuation">,</span> <span class="hljs-string">"chromeos"</span><span class="hljs-punctuation">,</span> <span class="hljs-string">"ios"</span><span class="hljs-punctuation">,</span> <span class="hljs-string">"ipados"</span><span class="hljs-punctuation">,</span> <span class="hljs-string">"kaios"</span><span class="hljs-punctuation">,</span> <span class="hljs-string">"macos"</span><span class="hljs-punctuation">,</span> <span class="hljs-string">"windows"</span><span class="hljs-punctuation">,</span> <span class="hljs-string">"xbox"</span><span class="hljs-punctuation">,</span> <span class="hljs-string">"chrome_web_store"</span><span class="hljs-punctuation">,</span> <span class="hljs-string">"itunes"</span><span class="hljs-punctuation">,</span> <span class="hljs-string">"microsoft"</span><span class="hljs-punctuation">,</span> <span class="hljs-string">"microsoft"</span><span class="hljs-punctuation">,</span> <span class="hljs-string">"play"</span><span class="hljs-punctuation">]</span>
+              <span class="hljs-punctuation">}</span>
+            <span class="hljs-punctuation">}</span>
+          <span class="hljs-punctuation">}</span>
+        <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"short_name"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+          <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"string"</span>
+        <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"theme_color"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+          <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"string"</span>
+        <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-comment">// CAR compatibility</span>
+        <span class="hljs-attr">"version"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+          <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"integer"</span><span class="hljs-punctuation">,</span>
+          <span class="hljs-attr">"const"</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span>
+        <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"roots"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+          <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"array"</span><span class="hljs-punctuation">,</span>
+          <span class="hljs-attr">"items"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"cid-link"</span> <span class="hljs-punctuation">}</span>
+        <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-comment">// versioning</span>
+        <span class="hljs-attr">"prev"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"cid-link"</span> <span class="hljs-punctuation">}</span>
+      <span class="hljs-punctuation">}</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+      </code></pre>
     </section>
   
 
-<section><h2>References</h2><dl><dt id="ref-at">[at]</dt><dd><a href="https://atproto.com/specs/atp"><cite>AT Protocol</cite></a>. URL:&nbsp;<a href="https://atproto.com/">https://atproto.com/</a></dd><dt id="ref-car">[car]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/car.html"><cite>Content-Addressable aRchives (CAR)</cite></a>. 2026-07-14. URL:&nbsp;<a href="https://dasl.ing/car.html">https://dasl.ing/car.html</a></dd><dt id="ref-drisl">[drisl]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/drisl.html"><cite>DRISL — Deterministic Representation for Interoperable Structures &amp; Links</cite></a>. 2026-07-14. URL:&nbsp;<a href="https://dasl.ing/drisl.html">https://dasl.ing/drisl.html</a></dd><dt id="ref-lexicon">[lexicon]</dt><dd><a href="https://atproto.com/specs/lexicon"><cite>AT Protocol: Lexicon</cite></a>.</dd><dt id="ref-manifest">[manifest]</dt><dd>M. Cáceres, K. Rohde Christiansen, D. González, D. Murphy, C. Liebel. <a href="https://www.w3.org/TR/appmanifest/"><cite>Web Application Manifest</cite></a>. March 2025. URL:&nbsp;<a href="https://www.w3.org/TR/appmanifest/">https://www.w3.org/TR/appmanifest/</a></dd><dt id="ref-rasl">[rasl]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/rasl.html"><cite>RASL — Retrieval of Arbitrary Structures &amp; Links</cite></a>. 2026-07-14. URL:&nbsp;<a href="https://dasl.ing/rasl.html">https://dasl.ing/rasl.html</a></dd></dl></section></main></body></html>
+<section><h2>References</h2><dl><dt id="ref-at">[at]</dt><dd><a href="https://atproto.com/specs/atp"><cite>AT Protocol</cite></a>. URL:&nbsp;<a href="https://atproto.com/">https://atproto.com/</a></dd><dt id="ref-car">[car]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/car.html"><cite>Content-Addressable aRchives (CAR)</cite></a>. 2026-07-17. URL:&nbsp;<a href="https://dasl.ing/car.html">https://dasl.ing/car.html</a></dd><dt id="ref-drisl">[drisl]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/drisl.html"><cite>DRISL — Deterministic Representation for Interoperable Structures &amp; Links</cite></a>. 2026-07-17. URL:&nbsp;<a href="https://dasl.ing/drisl.html">https://dasl.ing/drisl.html</a></dd><dt id="ref-lexicon">[lexicon]</dt><dd><a href="https://atproto.com/specs/lexicon"><cite>AT Protocol: Lexicon</cite></a>.</dd><dt id="ref-manifest">[manifest]</dt><dd>M. Cáceres, K. Rohde Christiansen, D. González, D. Murphy, C. Liebel. <a href="https://www.w3.org/TR/appmanifest/"><cite>Web Application Manifest</cite></a>. March 2025. URL:&nbsp;<a href="https://www.w3.org/TR/appmanifest/">https://www.w3.org/TR/appmanifest/</a></dd><dt id="ref-rasl">[rasl]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/rasl.html"><cite>RASL — Retrieval of Arbitrary Structures &amp; Links</cite></a>. 2026-07-17. URL:&nbsp;<a href="https://dasl.ing/rasl.html">https://dasl.ing/rasl.html</a></dd></dl></section></main></body></html>

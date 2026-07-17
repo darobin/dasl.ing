@@ -21,7 +21,7 @@ A simple example:
 try {
   const { listen, addDataHandler, sendData } = await import('/.well-known/web-tiles/data.js');
   addDataHandler((payload) => {
-    alert(\`Hello ${payload.name}!\`);
+    alert(`Hello ${payload.name}!`);
     sendData({ response: 'How do you do?' });
   });
   listen();

@@ -69,12 +69,12 @@ Self-editing tiles, the protocol can read and write from the tile's store.
 
 <dfn id="ref-tiles">\[tiles\]</dfn>
 
-Robin Berjon. [Web Tiles](https://dasl.ing/tiles.html). 2026-07-14. URL: [https://dasl.ing/tiles.html](https://dasl.ing/tiles.html)
+Robin Berjon. [Web Tiles](https://dasl.ing/tiles.html). 2026-07-17. URL: [https://dasl.ing/tiles.html](https://dasl.ing/tiles.html)
 
 <dfn id="ref-tp-data">\[tp-data\]</dfn>
 
-Robin Berjon. [Tiles Protocol: Data Loading](https://dasl.ing/tp-data.html). 2026-07-14. URL: [https://dasl.ing/tp-data.html](https://dasl.ing/tp-data.html)
+Robin Berjon. [Tiles Protocol: Data Loading](https://dasl.ing/tp-data.html). 2026-07-17. URL: [https://dasl.ing/tp-data.html](https://dasl.ing/tp-data.html)
 
 <dfn id="ref-tp-editable">\[tp-editable\]</dfn>
 
-Robin Berjon. [Tiles Protocol: Self-Editing Tiles](https://dasl.ing/tp-editable.html). 2026-07-14. URL: [https://dasl.ing/tp-editable.html](https://dasl.ing/tp-editable.html)
+Robin Berjon. [Tiles Protocol: Self-Editing Tiles](https://dasl.ing/tp-editable.html). 2026-07-17. URL: [https://dasl.ing/tp-editable.html](https://dasl.ing/tp-editable.html)

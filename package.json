@@ -37,6 +37,7 @@
     "jsdom": "^25.0.1"
   },
   "dependencies": {
+    "highlight.js": "^11.11.1",
     "turndown": "^7.2.4"
   }
 }

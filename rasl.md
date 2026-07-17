@@ -54,7 +54,7 @@ Implementations should ignore paths in RASL URLs. They may be used in a future i
 
 <dfn id="ref-cid">\[cid\]</dfn>
 
-Robin Berjon & Juan Caballero. [Content IDs (CIDs)](https://dasl.ing/cid.html). 2026-07-14. URL: [https://dasl.ing/cid.html](https://dasl.ing/cid.html)
+Robin Berjon & Juan Caballero. [Content IDs (CIDs)](https://dasl.ing/cid.html). 2026-07-17. URL: [https://dasl.ing/cid.html](https://dasl.ing/cid.html)
 
 <dfn id="ref-ipfs-principles">\[ipfs-principles\]</dfn>
 

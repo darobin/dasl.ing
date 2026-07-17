@@ -157,7 +157,7 @@ The full lexicon is:
             "type": "string"
           }
         },
-        "background\_color": {
+        "background_color": {
           "type": "string",
           "description": "A colour for the background of the tile"
         },
@@ -166,7 +166,7 @@ The full lexicon is:
           "description": "Icons for the tile",
           "items": {
             "type": "object",
-            "required": \["src"\],
+            "required": ["src"],
             "properties": {
               "src": { type: "string" }, // has to be in resources
               "sizes": { type: "string" },
@@ -179,7 +179,7 @@ The full lexicon is:
           "description": "Screenshots, can be used for banner or card images",
           "items": {
             "type": "object",
-            "required": \["src"\],
+            "required": ["src"],
             "properties": {
               "src": { "type": "string" },
               "sizes": { "type": "string" },
@@ -200,17 +200,17 @@ The full lexicon is:
               "mininum": 1
             }
           },
-          "required": \["width", "height"\]
+          "required": ["width", "height"]
         },
         "resources": {
           "type": "unknown",
           "description": "A mapping of path to object with a CID src and HTTP headers"
         },
-        "short\_name": {
+        "short_name": {
           "type": "string",
           "description": "A name, in case the basic name cannot fit"
         },
-        "theme\_color": {
+        "theme_color": {
           "type": "string",
           "description": "Theme colour"
         },
@@ -230,7 +230,7 @@ The full lexicon is:
           "items": { "type": "cid-link" }
         },
       },
-      "required": \["name", "resources"\]
+      "required": ["name", "resources"]
     },
     "main": {
       "type": "record",
@@ -238,7 +238,7 @@ The full lexicon is:
       "key": "tid",
       "record": {
         "type": "object",
-        "required": \["cid", "tile", "createdAt"\],
+        "required": ["cid", "tile", "createdAt"],
         "properties": {
           "cid": {
             "type": "string",
@@ -270,12 +270,12 @@ The full lexicon is:
 
 <dfn id="ref-car">\[car\]</dfn>
 
-Robin Berjon & Juan Caballero. [Content-Addressable aRchives (CAR)](https://dasl.ing/car.html). 2026-07-14. URL: [https://dasl.ing/car.html](https://dasl.ing/car.html)
+Robin Berjon & Juan Caballero. [Content-Addressable aRchives (CAR)](https://dasl.ing/car.html). 2026-07-17. URL: [https://dasl.ing/car.html](https://dasl.ing/car.html)
 
 <dfn id="ref-cid">\[cid\]</dfn>
 
-Robin Berjon & Juan Caballero. [Content IDs (CIDs)](https://dasl.ing/cid.html). 2026-07-14. URL: [https://dasl.ing/cid.html](https://dasl.ing/cid.html)
+Robin Berjon & Juan Caballero. [Content IDs (CIDs)](https://dasl.ing/cid.html). 2026-07-17. URL: [https://dasl.ing/cid.html](https://dasl.ing/cid.html)
 
 <dfn id="ref-masl">\[masl\]</dfn>
 
-Robin Berjon & Juan Caballero. [MASL — Metadata for Arbitrary Structures & Links](https://dasl.ing/masl.html). 2026-07-14. URL: [https://dasl.ing/masl.html](https://dasl.ing/masl.html)
+Robin Berjon & Juan Caballero. [MASL — Metadata for Arbitrary Structures & Links](https://dasl.ing/masl.html). 2026-07-17. URL: [https://dasl.ing/masl.html](https://dasl.ing/masl.html)

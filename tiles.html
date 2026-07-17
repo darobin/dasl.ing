@@ -20,7 +20,7 @@
     
     <title>Web Tiles</title>
   <link rel="stylesheet" href="spec.css"><link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%220%22 y=%220%22 width=%22100%22 height=%22100%22 fill=%22%2300ff75%22></rect></svg>"><link rel="alternate" type="text/markdown" href="https://dasl.ing/tiles.md"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" property="og:title" content="DASL: Web Tiles"><meta name="twitter:description" property="og:description" content="Tiles are composable web docs and apps that can safely be used in arbitrary contexts and assembled from multiple         sources to carry out complex user interface tasks. Their composability, security, and privacy properties         make them ideal for use in social media, chat, agents, and malleable software."><meta name="twitter:image" property="og:image" content="https://dasl.ing/tiles.png"><meta name="twitter:image:alt" content="Very colourful stripes, so colourful it hurts"><meta name="twitter:url" property="og:url" content="https://dasl.ing/"><meta property="og:site_name" content="DASL"><meta property="og:locale" content="en"><meta name="theme-color" content="#00ff75"></head>
-  <body><div class="nav-back">A specification of the <a href="/">DASL Project</a>.</div><main><header><h1>Web Tiles</h1><table><tbody><tr><th>date</th><td>2026-07-14</td></tr><tr><th>editors</th><td><a href="https://berjon.com/">Robin Berjon</a> &lt;<a href="mailto:robin@berjon.com">robin@berjon.com</a>&gt;</td></tr><tr><th>issues</th><td><a href="https://github.com/darobin/dasl.ing/issues">list</a>, <a href="https://github.com/darobin/dasl.ing/issues/new">new</a></td></tr><tr><th>abstract</th><td><div id="abstract">
+  <body><div class="nav-back">A specification of the <a href="/">DASL Project</a>.</div><main><header><h1>Web Tiles</h1><table><tbody><tr><th>date</th><td>2026-07-17</td></tr><tr><th>editors</th><td><a href="https://berjon.com/">Robin Berjon</a> &lt;<a href="mailto:robin@berjon.com">robin@berjon.com</a>&gt;</td></tr><tr><th>issues</th><td><a href="https://github.com/darobin/dasl.ing/issues">list</a>, <a href="https://github.com/darobin/dasl.ing/issues/new">new</a></td></tr><tr><th>abstract</th><td><div id="abstract">
       <p>
         Tiles are composable web docs and apps that can safely be used in arbitrary contexts and assembled from multiple
         sources to carry out complex user interface tasks. Their composability, security, and privacy properties
@@ -94,30 +94,30 @@
         In order to guarantee that tiles run in as safe and private a manner as possible, the web context into
         which they are loaded must meet restrictions that correspond to the following headers:
       </p>
-      <pre>content-security-policy:
-    default-src 'self' blob: data:;
-    script-src 'self' blob: data: 'unsafe-inline' 'wasm-unsafe-eval';
-    script-src-attr 'none';
-    style-src 'self' blob: data: 'unsafe-inline';
-    form-src 'self';
-    manifest-src 'none';
-    object-src 'none';
-    base-uri 'none';
+      <pre><code data-highlighted="yes" class="hljs language-javascript">content-security-<span class="hljs-attr">policy</span>:
+    <span class="hljs-keyword">default</span>-src <span class="hljs-string">'self'</span> <span class="hljs-attr">blob</span>: <span class="hljs-attr">data</span>:;
+    script-src <span class="hljs-string">'self'</span> <span class="hljs-attr">blob</span>: <span class="hljs-attr">data</span>: <span class="hljs-string">'unsafe-inline'</span> <span class="hljs-string">'wasm-unsafe-eval'</span>;
+    script-src-attr <span class="hljs-string">'none'</span>;
+    style-src <span class="hljs-string">'self'</span> <span class="hljs-attr">blob</span>: <span class="hljs-attr">data</span>: <span class="hljs-string">'unsafe-inline'</span>;
+    form-src <span class="hljs-string">'self'</span>;
+    manifest-src <span class="hljs-string">'none'</span>;
+    object-src <span class="hljs-string">'none'</span>;
+    base-uri <span class="hljs-string">'none'</span>;
     sandbox allow-downloads
             allow-forms
             allow-modals
             allow-popups
-            allow-popups-to-escape-sandbox
+            allow-popups-to-<span class="hljs-built_in">escape</span>-sandbox
             allow-same-origin
             allow-scripts
-cross-origin-opener-policy: same-origin
-cross-origin-resource-policy: cross-origin
-origin-agent-cluster: ?1
-permissions-policy: interest-cohort=(), browsing-topics=()
-referrer-policy: no-referrer
-x-content-type-options: nosniff
-x-dns-prefetch-control: off
-      </pre>
+cross-origin-opener-<span class="hljs-attr">policy</span>: same-origin
+cross-origin-resource-<span class="hljs-attr">policy</span>: cross-origin
+origin-agent-<span class="hljs-attr">cluster</span>: ?<span class="hljs-number">1</span>
+permissions-<span class="hljs-attr">policy</span>: interest-cohort=(), browsing-topics=()
+referrer-<span class="hljs-attr">policy</span>: no-referrer
+x-content-type-<span class="hljs-attr">options</span>: nosniff
+x-dns-prefetch-<span class="hljs-attr">control</span>: off
+      </code></pre>
       <p>
         In the current state of browser technology, loading tiles in a web context requires setting up
         an origin that is unique to the tile (currently it is random, though it may become derived from
@@ -238,24 +238,24 @@ x-dns-prefetch-control: off
         with deployed PDSs. An example <code>resources</code> entry for a root HTML document looks as
         follows:
       </p>
-      <pre>{
+      <pre><code data-highlighted="yes" class="hljs language-javascript">{
   …
-  "resources": {
-    "/": {
-      "src": {
-        "$type": "blob",
-        "ref": {
-         "$link":"bafkreicknles2uzv7sruakcbjtn5pnoc4rqmgkvnavuq4raxexjvcn7osq"
+  <span class="hljs-string">"resources"</span>: {
+    <span class="hljs-string">"/"</span>: {
+      <span class="hljs-string">"src"</span>: {
+        <span class="hljs-string">"$type"</span>: <span class="hljs-string">"blob"</span>,
+        <span class="hljs-string">"ref"</span>: {
+         <span class="hljs-string">"$link"</span>:<span class="hljs-string">"bafkreicknles2uzv7sruakcbjtn5pnoc4rqmgkvnavuq4raxexjvcn7osq"</span>
         },
-        "size": 20,
-        "mimeType": "application/octet-stream"
+        <span class="hljs-string">"size"</span>: <span class="hljs-number">20</span>,
+        <span class="hljs-string">"mimeType"</span>: <span class="hljs-string">"application/octet-stream"</span>
       },
-      "content-type": "text/html"
+      <span class="hljs-string">"content-type"</span>: <span class="hljs-string">"text/html"</span>
     },
     …
   }
 }
-      </pre>
+      </code></pre>
       <p>
         A few things are worth noting in the above:
       </p>
@@ -273,138 +273,138 @@ x-dns-prefetch-control: off
       <p>
         The full lexicon is:
       </p>
-      <pre>{
-  "id": "ing.dasl.masl",
-  "description": "Lexicon for DASL (https://dasl.ing/) types used on AT, notably for Web Tiles.",
-  "defs": {
-    "masl": {
-      "type": "object",
-      "description": "MASL metadata as defined in https://dasl.ing/masl.html",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name for the tile, can be a title or app name",
-          "maxLength": 1000,
-          "maxGraphemes": 100
+      <pre><code data-highlighted="yes" class="hljs language-javascript">{
+  <span class="hljs-string">"id"</span>: <span class="hljs-string">"ing.dasl.masl"</span>,
+  <span class="hljs-string">"description"</span>: <span class="hljs-string">"Lexicon for DASL (https://dasl.ing/) types used on AT, notably for Web Tiles."</span>,
+  <span class="hljs-string">"defs"</span>: {
+    <span class="hljs-string">"masl"</span>: {
+      <span class="hljs-string">"type"</span>: <span class="hljs-string">"object"</span>,
+      <span class="hljs-string">"description"</span>: <span class="hljs-string">"MASL metadata as defined in https://dasl.ing/masl.html"</span>,
+      <span class="hljs-string">"properties"</span>: {
+        <span class="hljs-string">"name"</span>: {
+          <span class="hljs-string">"type"</span>: <span class="hljs-string">"string"</span>,
+          <span class="hljs-string">"description"</span>: <span class="hljs-string">"The name for the tile, can be a title or app name"</span>,
+          <span class="hljs-string">"maxLength"</span>: <span class="hljs-number">1000</span>,
+          <span class="hljs-string">"maxGraphemes"</span>: <span class="hljs-number">100</span>
         },
-        "description": {
-          "type": "string",
-          "description": "Short overview of the content",
-          "maxLength": 3000,
-          "maxGraphemes": 300
+        <span class="hljs-string">"description"</span>: {
+          <span class="hljs-string">"type"</span>: <span class="hljs-string">"string"</span>,
+          <span class="hljs-string">"description"</span>: <span class="hljs-string">"Short overview of the content"</span>,
+          <span class="hljs-string">"maxLength"</span>: <span class="hljs-number">3000</span>,
+          <span class="hljs-string">"maxGraphemes"</span>: <span class="hljs-number">300</span>
         },
-        "categories": {
-          "type": "array",
-          "description": "Tags categorising the tile",
-          "items": {
-            "type": "string"
+        <span class="hljs-string">"categories"</span>: {
+          <span class="hljs-string">"type"</span>: <span class="hljs-string">"array"</span>,
+          <span class="hljs-string">"description"</span>: <span class="hljs-string">"Tags categorising the tile"</span>,
+          <span class="hljs-string">"items"</span>: {
+            <span class="hljs-string">"type"</span>: <span class="hljs-string">"string"</span>
           }
         },
-        "background_color": {
-          "type": "string",
-          "description": "A colour for the background of the tile"
+        <span class="hljs-string">"background_color"</span>: {
+          <span class="hljs-string">"type"</span>: <span class="hljs-string">"string"</span>,
+          <span class="hljs-string">"description"</span>: <span class="hljs-string">"A colour for the background of the tile"</span>
         },
-        "icons": {
-          "type": "array",
-          "description": "Icons for the tile",
-          "items": {
-            "type": "object",
-            "required": ["src"],
-            "properties": {
-              "src": { type: "string" }, // has to be in resources
-              "sizes": { type: "string" },
-              "purpose": { "type": "string" }
+        <span class="hljs-string">"icons"</span>: {
+          <span class="hljs-string">"type"</span>: <span class="hljs-string">"array"</span>,
+          <span class="hljs-string">"description"</span>: <span class="hljs-string">"Icons for the tile"</span>,
+          <span class="hljs-string">"items"</span>: {
+            <span class="hljs-string">"type"</span>: <span class="hljs-string">"object"</span>,
+            <span class="hljs-string">"required"</span>: [<span class="hljs-string">"src"</span>],
+            <span class="hljs-string">"properties"</span>: {
+              <span class="hljs-string">"src"</span>: { <span class="hljs-attr">type</span>: <span class="hljs-string">"string"</span> }, <span class="hljs-comment">// has to be in resources</span>
+              <span class="hljs-string">"sizes"</span>: { <span class="hljs-attr">type</span>: <span class="hljs-string">"string"</span> },
+              <span class="hljs-string">"purpose"</span>: { <span class="hljs-string">"type"</span>: <span class="hljs-string">"string"</span> }
             }
           }
         },
-        "screenshots": {
-          "type": "array",
-          "description": "Screenshots, can be used for banner or card images",
-          "items": {
-            "type": "object",
-            "required": ["src"],
-            "properties": {
-              "src": { "type": "string" },
-              "sizes": { "type": "string" },
-              "label": { "type": "string" }
+        <span class="hljs-string">"screenshots"</span>: {
+          <span class="hljs-string">"type"</span>: <span class="hljs-string">"array"</span>,
+          <span class="hljs-string">"description"</span>: <span class="hljs-string">"Screenshots, can be used for banner or card images"</span>,
+          <span class="hljs-string">"items"</span>: {
+            <span class="hljs-string">"type"</span>: <span class="hljs-string">"object"</span>,
+            <span class="hljs-string">"required"</span>: [<span class="hljs-string">"src"</span>],
+            <span class="hljs-string">"properties"</span>: {
+              <span class="hljs-string">"src"</span>: { <span class="hljs-string">"type"</span>: <span class="hljs-string">"string"</span> },
+              <span class="hljs-string">"sizes"</span>: { <span class="hljs-string">"type"</span>: <span class="hljs-string">"string"</span> },
+              <span class="hljs-string">"label"</span>: { <span class="hljs-string">"type"</span>: <span class="hljs-string">"string"</span> }
             }
           }
         },
-        "sizing": {
-          "type": "object",
-          "description": "Requesting sizing properties for the content",
-          "properties": {
-            "width": {
-              "type": "integer",
-              "mininum": 1
+        <span class="hljs-string">"sizing"</span>: {
+          <span class="hljs-string">"type"</span>: <span class="hljs-string">"object"</span>,
+          <span class="hljs-string">"description"</span>: <span class="hljs-string">"Requesting sizing properties for the content"</span>,
+          <span class="hljs-string">"properties"</span>: {
+            <span class="hljs-string">"width"</span>: {
+              <span class="hljs-string">"type"</span>: <span class="hljs-string">"integer"</span>,
+              <span class="hljs-string">"mininum"</span>: <span class="hljs-number">1</span>
             },
-            "height": {
-              "type": "integer",
-              "mininum": 1
+            <span class="hljs-string">"height"</span>: {
+              <span class="hljs-string">"type"</span>: <span class="hljs-string">"integer"</span>,
+              <span class="hljs-string">"mininum"</span>: <span class="hljs-number">1</span>
             }
           },
-          "required": ["width", "height"]
+          <span class="hljs-string">"required"</span>: [<span class="hljs-string">"width"</span>, <span class="hljs-string">"height"</span>]
         },
-        "resources": {
-          "type": "unknown",
-          "description": "A mapping of path to object with a CID src and HTTP headers"
+        <span class="hljs-string">"resources"</span>: {
+          <span class="hljs-string">"type"</span>: <span class="hljs-string">"unknown"</span>,
+          <span class="hljs-string">"description"</span>: <span class="hljs-string">"A mapping of path to object with a CID src and HTTP headers"</span>
         },
-        "short_name": {
-          "type": "string",
-          "description": "A name, in case the basic name cannot fit"
+        <span class="hljs-string">"short_name"</span>: {
+          <span class="hljs-string">"type"</span>: <span class="hljs-string">"string"</span>,
+          <span class="hljs-string">"description"</span>: <span class="hljs-string">"A name, in case the basic name cannot fit"</span>
         },
-        "theme_color": {
-          "type": "string",
-          "description": "Theme colour"
+        <span class="hljs-string">"theme_color"</span>: {
+          <span class="hljs-string">"type"</span>: <span class="hljs-string">"string"</span>,
+          <span class="hljs-string">"description"</span>: <span class="hljs-string">"Theme colour"</span>
         },
-        "prev": {
-          "type": "cid-link",
-          "description": "In case there are multiple versions of this tile, this is the CID of the previous one"
+        <span class="hljs-string">"prev"</span>: {
+          <span class="hljs-string">"type"</span>: <span class="hljs-string">"cid-link"</span>,
+          <span class="hljs-string">"description"</span>: <span class="hljs-string">"In case there are multiple versions of this tile, this is the CID of the previous one"</span>
         },
-        // CAR compatibility
-        "version": {
-          "type": "integer",
-          "description": "The CAR version — avoid using this",
-          "const": 1
+        <span class="hljs-comment">// CAR compatibility</span>
+        <span class="hljs-string">"version"</span>: {
+          <span class="hljs-string">"type"</span>: <span class="hljs-string">"integer"</span>,
+          <span class="hljs-string">"description"</span>: <span class="hljs-string">"The CAR version — avoid using this"</span>,
+          <span class="hljs-string">"const"</span>: <span class="hljs-number">1</span>
         },
-        "roots": {
-          "type": "array",
-          "description": "The CAR roots — avoid using this",
-          "items": { "type": "cid-link" }
+        <span class="hljs-string">"roots"</span>: {
+          <span class="hljs-string">"type"</span>: <span class="hljs-string">"array"</span>,
+          <span class="hljs-string">"description"</span>: <span class="hljs-string">"The CAR roots — avoid using this"</span>,
+          <span class="hljs-string">"items"</span>: { <span class="hljs-string">"type"</span>: <span class="hljs-string">"cid-link"</span> }
         },
       },
-      "required": ["name", "resources"]
+      <span class="hljs-string">"required"</span>: [<span class="hljs-string">"name"</span>, <span class="hljs-string">"resources"</span>]
     },
-    "main": {
-      "type": "record",
-      "description": "A tile, instantiating MASL metadata into a record",
-      "key": "tid",
-      "record": {
-        "type": "object",
-        "required": ["cid", "tile", "createdAt"],
-        "properties": {
-          "cid": {
-            "type": "string",
-            "description": "The DRISL CID of the MASL for the tile",
-            "format": "cid"
+    <span class="hljs-string">"main"</span>: {
+      <span class="hljs-string">"type"</span>: <span class="hljs-string">"record"</span>,
+      <span class="hljs-string">"description"</span>: <span class="hljs-string">"A tile, instantiating MASL metadata into a record"</span>,
+      <span class="hljs-string">"key"</span>: <span class="hljs-string">"tid"</span>,
+      <span class="hljs-string">"record"</span>: {
+        <span class="hljs-string">"type"</span>: <span class="hljs-string">"object"</span>,
+        <span class="hljs-string">"required"</span>: [<span class="hljs-string">"cid"</span>, <span class="hljs-string">"tile"</span>, <span class="hljs-string">"createdAt"</span>],
+        <span class="hljs-string">"properties"</span>: {
+          <span class="hljs-string">"cid"</span>: {
+            <span class="hljs-string">"type"</span>: <span class="hljs-string">"string"</span>,
+            <span class="hljs-string">"description"</span>: <span class="hljs-string">"The DRISL CID of the MASL for the tile"</span>,
+            <span class="hljs-string">"format"</span>: <span class="hljs-string">"cid"</span>
           },
-          "tile": {
-            "type": "ref",
-            "description": "The MASL content",
-            "ref": "ing.dasl.masl#masl"
+          <span class="hljs-string">"tile"</span>: {
+            <span class="hljs-string">"type"</span>: <span class="hljs-string">"ref"</span>,
+            <span class="hljs-string">"description"</span>: <span class="hljs-string">"The MASL content"</span>,
+            <span class="hljs-string">"ref"</span>: <span class="hljs-string">"ing.dasl.masl#masl"</span>
           },
-          "createdAt": {
-            "type": "string",
-            "description": "Timestamp",
-            "format": "datetime"
+          <span class="hljs-string">"createdAt"</span>: {
+            <span class="hljs-string">"type"</span>: <span class="hljs-string">"string"</span>,
+            <span class="hljs-string">"description"</span>: <span class="hljs-string">"Timestamp"</span>,
+            <span class="hljs-string">"format"</span>: <span class="hljs-string">"datetime"</span>
           }
         }
       }
     }
   }
 }
-      </pre>
+      </code></pre>
     </section>
   
 
-<section><h2>References</h2><dl><dt id="ref-at">[at]</dt><dd><a href="https://atproto.com/specs/atp"><cite>AT Protocol</cite></a>. URL:&nbsp;<a href="https://atproto.com/">https://atproto.com/</a></dd><dt id="ref-car">[car]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/car.html"><cite>Content-Addressable aRchives (CAR)</cite></a>. 2026-07-14. URL:&nbsp;<a href="https://dasl.ing/car.html">https://dasl.ing/car.html</a></dd><dt id="ref-cid">[cid]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/cid.html"><cite>Content IDs (CIDs)</cite></a>. 2026-07-14. URL:&nbsp;<a href="https://dasl.ing/cid.html">https://dasl.ing/cid.html</a></dd><dt id="ref-masl">[masl]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/masl.html"><cite>MASL — Metadata for Arbitrary Structures &amp; Links</cite></a>. 2026-07-14. URL:&nbsp;<a href="https://dasl.ing/masl.html">https://dasl.ing/masl.html</a></dd></dl></section></main></body></html>
+<section><h2>References</h2><dl><dt id="ref-at">[at]</dt><dd><a href="https://atproto.com/specs/atp"><cite>AT Protocol</cite></a>. URL:&nbsp;<a href="https://atproto.com/">https://atproto.com/</a></dd><dt id="ref-car">[car]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/car.html"><cite>Content-Addressable aRchives (CAR)</cite></a>. 2026-07-17. URL:&nbsp;<a href="https://dasl.ing/car.html">https://dasl.ing/car.html</a></dd><dt id="ref-cid">[cid]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/cid.html"><cite>Content IDs (CIDs)</cite></a>. 2026-07-17. URL:&nbsp;<a href="https://dasl.ing/cid.html">https://dasl.ing/cid.html</a></dd><dt id="ref-masl">[masl]</dt><dd>Robin Berjon &amp; Juan Caballero. <a href="https://dasl.ing/masl.html"><cite>MASL — Metadata for Arbitrary Structures &amp; Links</cite></a>. 2026-07-17. URL:&nbsp;<a href="https://dasl.ing/masl.html">https://dasl.ing/masl.html</a></dd></dl></section></main></body></html>
