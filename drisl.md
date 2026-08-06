@@ -17,7 +17,7 @@ DRISL is an application profile of CBOR (\[[cbor](#ref-cbor)\]) that mostly subs
 -   Implementations must reject map keys that are not strings.
 -   Floating-point numbers must always be encoded as a 64-bit IEEE 754 binary floating-point, never as a "half-precision" (16-byte, major 7-25) or "single-precision (32-byte, major 7-26)" CBOR key. **NOTE**: It is recommended that users avoid encoding floating-point numbers as much as possible to minimize interoperability and tooling issues.
     -   Completely avoiding floating-point numbers is recommended to minimize interoperability and tooling issues.
-    -   Even where floating-point numbers are used, most of the IEEE 754 "special" floating points (infinity, negative infinity, minimal NaN, and NaN with payloads) must not be encoded. Negative zero is the only allowed special floating point.
+    -   Even where floating-point numbers are used, most of the IEEE 754 "special" floating points (infinity, negative infinity, minimal NaN, NaN with payloads, and negative zero) must not be encoded.
 -   Indefinite-length arrays (and the "break" code making them usable, in major type 7) are not allowed.
 -   Similarly, indefinite, incomplete, or streaming CBOR cannot be hashed and thus cannot be referenced by CID; for this reason, DRISL can only encode finite, bounded documents and resources.
 -   Concatenation of DRISL objects is generally discouraged and incurs both performance and interoperability risks.
@@ -73,7 +73,7 @@ C. Bormann. [CBOR Common Deterministic Encoding (CDE)](https://datatracker.ietf.
 
 <dfn id="ref-cid">\[cid\]</dfn>
 
-Robin Berjon & Juan Caballero. [Content IDs (CIDs)](https://dasl.ing/cid.html). 2026-07-17. URL: [https://dasl.ing/cid.html](https://dasl.ing/cid.html)
+Robin Berjon & Juan Caballero. [Content IDs (CIDs)](https://dasl.ing/cid.html). 2026-08-06. URL: [https://dasl.ing/cid.html](https://dasl.ing/cid.html)
 
 <dfn id="ref-dcbor">\[dcbor\]</dfn>
 
@@ -81,7 +81,7 @@ W. McNally, C. Allen, C. Bormann, & L. Lundblade. [dCBOR: A Deterministic CBOR A
 
 <dfn id="ref-drisl">\[drisl\]</dfn>
 
-Robin Berjon & Juan Caballero. [DRISL — Deterministic Representation for Interoperable Structures & Links](https://dasl.ing/drisl.html). 2026-07-17. URL: [https://dasl.ing/drisl.html](https://dasl.ing/drisl.html)
+Robin Berjon & Juan Caballero. [DRISL — Deterministic Representation for Interoperable Structures & Links](https://dasl.ing/drisl.html). 2026-08-06. URL: [https://dasl.ing/drisl.html](https://dasl.ing/drisl.html)
 
 <dfn id="ref-rfc8949">\[rfc8949\]</dfn>
 

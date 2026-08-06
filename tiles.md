@@ -270,12 +270,12 @@ The full lexicon is:
 
 <dfn id="ref-car">\[car\]</dfn>
 
-Robin Berjon & Juan Caballero. [Content-Addressable aRchives (CAR)](https://dasl.ing/car.html). 2026-07-17. URL: [https://dasl.ing/car.html](https://dasl.ing/car.html)
+Robin Berjon & Juan Caballero. [Content-Addressable aRchives (CAR)](https://dasl.ing/car.html). 2026-08-06. URL: [https://dasl.ing/car.html](https://dasl.ing/car.html)
 
 <dfn id="ref-cid">\[cid\]</dfn>
 
-Robin Berjon & Juan Caballero. [Content IDs (CIDs)](https://dasl.ing/cid.html). 2026-07-17. URL: [https://dasl.ing/cid.html](https://dasl.ing/cid.html)
+Robin Berjon & Juan Caballero. [Content IDs (CIDs)](https://dasl.ing/cid.html). 2026-08-06. URL: [https://dasl.ing/cid.html](https://dasl.ing/cid.html)
 
 <dfn id="ref-masl">\[masl\]</dfn>
 
-Robin Berjon & Juan Caballero. [MASL — Metadata for Arbitrary Structures & Links](https://dasl.ing/masl.html). 2026-07-17. URL: [https://dasl.ing/masl.html](https://dasl.ing/masl.html)
+Robin Berjon & Juan Caballero. [MASL — Metadata for Arbitrary Structures & Links](https://dasl.ing/masl.html). 2026-08-06. URL: [https://dasl.ing/masl.html](https://dasl.ing/masl.html)

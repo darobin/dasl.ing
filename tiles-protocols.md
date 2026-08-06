@@ -77,12 +77,12 @@ In web contexts, the communication will therefore be `postMessage` content. By c
 
 <dfn id="ref-tiles">\[tiles\]</dfn>
 
-Robin Berjon. [Web Tiles](https://dasl.ing/tiles.html). 2026-07-17. URL: [https://dasl.ing/tiles.html](https://dasl.ing/tiles.html)
+Robin Berjon. [Web Tiles](https://dasl.ing/tiles.html). 2026-08-06. URL: [https://dasl.ing/tiles.html](https://dasl.ing/tiles.html)
 
 <dfn id="ref-tp-data">\[tp-data\]</dfn>
 
-Robin Berjon. [Tiles Protocol: Data Passing](https://dasl.ing/tp-data.html). 2026-07-17. URL: [https://dasl.ing/tp-data.html](https://dasl.ing/tp-data.html)
+Robin Berjon. [Tiles Protocol: Data Passing](https://dasl.ing/tp-data.html). 2026-08-06. URL: [https://dasl.ing/tp-data.html](https://dasl.ing/tp-data.html)
 
 <dfn id="ref-tp-editable">\[tp-editable\]</dfn>
 
-Robin Berjon. [Tiles Protocol: Self-Editing Tiles](https://dasl.ing/tp-editable.html). 2026-07-17. URL: [https://dasl.ing/tp-editable.html](https://dasl.ing/tp-editable.html)
+Robin Berjon. [Tiles Protocol: Self-Editing Tiles](https://dasl.ing/tp-editable.html). 2026-08-06. URL: [https://dasl.ing/tp-editable.html](https://dasl.ing/tp-editable.html)
